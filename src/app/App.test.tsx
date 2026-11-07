@@ -14,7 +14,7 @@ describe('shell modular', () => {
     renderApp()
     expect(screen.getByRole('heading', { level: 1, name: 'Seu espaço, aos poucos.' })).toBeVisible()
     expect(screen.getByText(/Novos módulos serão adicionados gradualmente/)).toBeVisible()
-    expect(screen.getByLabelText('Versão da aplicação')).toHaveTextContent('v0.2.1')
+    expect(screen.getByLabelText('Versão da aplicação')).toHaveTextContent('v0.2.2')
     expect(screen.queryByRole('button', { name: /conectar|entrar/i })).not.toBeInTheDocument()
   })
   it('adiciona um módulo sem substituir a navegação inicial', async () => {

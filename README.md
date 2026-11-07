@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.2.1` acrescenta conexão Google e armazenamento privado no Drive ao shell modular. O módulo de mangás pertence à próxima etapa.
+Aplicação pessoal com módulos internos. A versão `0.2.2` acrescenta conexão Google e armazenamento privado no Drive ao shell modular. O módulo de mangás pertence à próxima etapa.
 
-Para ativar a conexão, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.2.1](docs/releases/0.2.1.md).
+Para ativar a conexão, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.2.2](docs/releases/0.2.2.md).
 
 ## Desenvolvimento local
 
@@ -47,7 +47,7 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-cloud-library`, em `0.2.1`. Próximas versões aprovadas: nuvem `0.2.1`; módulo de mangás e conclusão do MVP `1.0.0`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-cloud-library`, em `0.2.2`. Próximas versões aprovadas: nuvem `0.2.2`; módulo de mangás e conclusão do MVP `1.0.0`.
 
 ## Acrescentar um módulo
 

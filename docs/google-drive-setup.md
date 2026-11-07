@@ -25,4 +25,4 @@ Execute `npm ci`, `npm run dev -- --host localhost` e abra `http://localhost:517
 
 Use um dispositivo por vez: leitura seguida de escrita não é uma transação. Gravações simultâneas entre a conferência e o envio ainda podem se sobrepor. Não há fila offline durável; fechar a aba descarta tentativas. Desconectar limpa a sessão local e não revoga o consentimento no Google. Para revogar, use o link de gerenciamento.
 
-Não edite manualmente ou compartilhe `my-hub.json` durante a homologação. Arquivo inválido, inacessível ou múltiplos candidatos bloqueiam a escrita, sem criar substitutos. Em produção, registre os resultados sem nomes, emails, tokens ou conteúdo privado em `docs/releases/0.2.1.md`. Testes automatizados não substituem consentimento real nem homologação explícita.
+Não edite manualmente ou compartilhe `my-hub.json` durante a homologação. Arquivo inválido, inacessível ou múltiplos candidatos bloqueiam a escrita, sem criar substitutos. Em produção, registre os resultados sem nomes, emails, tokens ou conteúdo privado em `docs/releases/0.2.2.md`. Testes automatizados não substituem consentimento real nem homologação explícita.

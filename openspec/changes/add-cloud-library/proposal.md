@@ -2,7 +2,7 @@
 
 ## Version
 
-`0.2.1` — integração Google e segurança; tag automática `v0.2.1`.
+`0.2.2` — integração Google e segurança; tag automática `v0.2.2`.
 
 ## Why
 
@@ -30,7 +30,7 @@ Nenhuma. A integração acrescenta uma entrada ao shell extensível sem redefini
 
 ## Impact
 
-- Implementar em `dev`, atualizando `package.json` e lockfile para `0.2.1` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v0.2.1` e publica sem commits automáticos de versão.
+- Implementar em `dev`, atualizando `package.json` e lockfile para `0.2.2` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v0.2.2` e publica sem commits automáticos de versão.
 - Acrescentar `src/integrations/google-drive`, contrato de biblioteca compartilhada e tela técnica de conexão.
 - Configurar projeto OAuth, escopos e origens exatas de desenvolvimento e produção; manter identificadores públicos e segredos separados.
 - Reutilizar os workflows e o procedimento de entrega de `add-modular-shell`, sem reconstruí-los.
