@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { authorize, loadIdentity, type OAuth } from '../../integrations/google-drive/identity'
 import googleConfig from '../../integrations/google-drive/config.json'
+import { DriveFileLink } from '../../shared/components/DriveFileLink'
 import { CloudSession } from '../../integrations/google-drive/session'
 
 const session = new CloudSession()
@@ -35,6 +36,7 @@ export function ConnectionPage({ controller = session, clientId = import.meta.en
           <button disabled={busy || state.phase === 'expired' || state.phase === 'authorizing'} onClick={() => { if (!state.pending || window.confirm('Recarregar e descartar a tentativa local pendente?')) void controller.reload() }}>Reler do Drive{state.pending ? ' e descartar tentativa' : ''}</button>
         </div>
         {state.snapshot === null && <p>Ainda não existe documento. A primeira gravação criará my-hub.json.</p>}
+        {state.snapshot && <DriveFileLink fileId={state.snapshot.fileId} webViewLink={state.snapshot.webViewLink} />}
         {probe != null && <div><h3>Amostra retornada pelo Drive</h3><pre>{JSON.stringify(probe, null, 2)}</pre></div>}
         {state.pending && <p>Uma tentativa permanece somente na memória desta aba. Reconecte para conferir e repetir, ou releia para descartá-la.</p>}
       </>}

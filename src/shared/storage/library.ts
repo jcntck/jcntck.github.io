@@ -23,7 +23,7 @@ export function canonical(value: Json): string {
   if (record(value)) return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`
   return JSON.stringify(value)
 }
-export interface Snapshot { fileId: string; document: Envelope }
+export interface Snapshot { fileId: string; webViewLink?: string; document: Envelope }
 export interface LibraryStorage {
   load(): Promise<Snapshot | null>
   save(base: Snapshot | null, operation: Operation): Promise<Snapshot>

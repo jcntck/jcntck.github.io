@@ -77,3 +77,13 @@ describe('Drive storage', () => {
     expect(f.writes()).toBe(0)
   })
 })
+
+it('retorna o link do visualizador junto ao documento existente', async () => {
+  const webViewLink = 'https://drive.google.com/file/d/existing/view?usp=drivesdk'
+  const request = vi.fn()
+    .mockResolvedValueOnce(Response.json({ files: [{ id: 'existing', webViewLink }] }))
+    .mockResolvedValueOnce(Response.json(emptyEnvelope()))
+  const snapshot = await new DriveStorage(() => 'memory-only', request).load()
+  expect(snapshot).toMatchObject({ fileId: 'existing', webViewLink })
+  expect(new URL(String(request.mock.calls[0][0])).searchParams.get('fields')).toContain('webViewLink')
+})

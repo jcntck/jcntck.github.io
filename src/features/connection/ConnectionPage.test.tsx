@@ -19,8 +19,10 @@ it('conecta, grava e relê o mesmo identificador em nova leitura remota', async 
   const user = userEvent.setup()
   render(<ConnectionPage controller={session} clientId="public-id" />)
   await user.click(await screen.findByRole('button', { name: 'Conectar Google Drive' }))
+  expect(screen.queryByRole('link', { name: /Abrir arquivo no Google Drive/ })).not.toBeInTheDocument()
   await user.click(await screen.findByRole('button', { name: 'Gravar amostra' }))
   expect(await screen.findByText('Gravação confirmada por releitura do Drive.')).toBeVisible()
+  expect(screen.getByRole('link', { name: /Abrir arquivo no Google Drive/ })).toHaveAttribute('href', 'https://drive.google.com/file/d/file/view')
   const text = screen.getByRole('heading', { name: 'Amostra retornada pelo Drive' }).parentElement!.textContent
   const calls = load.mock.calls.length
   await user.click(screen.getByRole('button', { name: 'Reler do Drive' }))
@@ -30,5 +32,6 @@ it('conecta, grava e relê o mesmo identificador em nova leitura remota', async 
   expect(localStorage.length).toBe(0); expect(sessionStorage.length).toBe(0)
   await user.click(screen.getByRole('button', { name: 'Desconectar' }))
   expect(screen.queryByText('Conta: Conta de teste')).not.toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: /Abrir arquivo no Google Drive/ })).not.toBeInTheDocument()
   delete window.google
 })
