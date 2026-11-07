@@ -1,5 +1,8 @@
 {
   "changes": [
     "add-modular-shell"
-  ]
+  ],
+  "archivedChanges": {
+    "add-modular-shell": "2026-11-06-add-modular-shell"
+  }
 }

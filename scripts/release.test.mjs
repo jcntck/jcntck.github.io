@@ -1,10 +1,10 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { validateRelease, tagDecision } from './release.mjs'
+import { readRelease, validateRelease, tagDecision } from './release.mjs'
 import { ensureReleaseTag } from './tag.mjs'
 
 const valid = () => ({ manifest: { version: '0.1.0' }, lock: { version: '0.1.0', packages: { '': { version: '0.1.0' } } }, changes: [{ name: 'shell', proposal: '# Proposal\n\n## Version\n\n`0.1.0` — shell' }] })
@@ -52,4 +52,40 @@ test('cria, reutiliza e preserva uma tag remota sem mover referências', () => {
     assert.throws(() => ensureReleaseTag({ cwd, version: '0.1.0', commit: second }), /outro commit/)
     assert.ok(git(cwd, 'ls-remote', 'origin', 'refs/tags/v0.1.0').startsWith(first))
   } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+function releaseFixture(context) {
+  const root = mkdtempSync(join(tmpdir(), 'my-hub-release-'))
+  context.after(() => rmSync(root, { recursive: true, force: true }))
+  const data = valid()
+  writeFileSync(join(root, 'package.json'), JSON.stringify(data.manifest))
+  writeFileSync(join(root, 'package-lock.json'), JSON.stringify(data.lock))
+  writeFileSync(join(root, '.release.json'), JSON.stringify({ changes: ['shell'] }))
+  const active = join(root, 'openspec/changes/shell')
+  mkdirSync(active, { recursive: true })
+  writeFileSync(join(active, 'proposal.md'), data.changes[0].proposal)
+  return { root, active }
+}
+
+test('preserva a validação da release após arquivar a change com referência explícita', (context) => {
+  const { root, active } = releaseFixture(context)
+  const expected = readRelease(root)
+  const archiveRoot = join(root, 'openspec/changes/archive')
+  mkdirSync(archiveRoot)
+  const archivedName = '2026-11-06-shell'
+  const archived = join(archiveRoot, archivedName)
+  renameSync(active, archived)
+  assert.throws(() => readRelease(root), /ENOENT/)
+  writeFileSync(join(root, '.release.json'), JSON.stringify({ changes: ['shell'], archivedChanges: { shell: archivedName } }))
+  assert.deepEqual(readRelease(root), expected)
+  writeFileSync(join(archived, 'proposal.md'), '## Version\n\n`0.2.0`')
+  assert.throws(() => readRelease(root), /change shell.*0\.2\.0/)
+})
+
+test('recusa referências de arquivo fora do formato da change', (context) => {
+  const { root } = releaseFixture(context)
+  for (const reference of ['../shell', '2026-11-06-outra-change', '2026-11-06-shell/../../outside', 123]) {
+    writeFileSync(join(root, '.release.json'), JSON.stringify({ changes: ['shell'], archivedChanges: { shell: reference } }))
+    assert.throws(() => readRelease(root), /Referência de arquivo inválida/)
+  }
 })

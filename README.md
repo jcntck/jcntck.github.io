@@ -43,6 +43,8 @@ Cada change precisa de versão alvo aprovada em `proposal.md`, na seção `## Ve
 npm run check:release
 ```
 
+Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
+
 A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A primeira entrega seleciona apenas `add-modular-shell`, em `0.1.0`. Próximas versões aprovadas: nuvem `0.2.0`; módulo de mangás e conclusão do MVP `1.0.0`.
 
 ## Acrescentar um módulo

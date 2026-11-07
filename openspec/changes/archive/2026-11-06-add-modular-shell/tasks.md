@@ -17,7 +17,7 @@
 - [x] 3.1 Verificar a configuração do Pages por Actions e do ambiente `github-pages`, abrir o PR de `dev` para `main` e acompanhar o merge aprovado; confirmar que o workflow prod cria `v0.1.0` para o commit integrado e publica em `https://jcntck.github.io/`, registrando tag, SHA, URL e execução em `docs/releases/0.1.0.md`.
 - [x] 3.2 Executar verificação pós-publicação em navegador no endereço real, incluindo recursos, rota direta, atualização e coerência entre versão alvo, pacote, lockfile, tag, versão e commit expostos; registrar resultados em celular e computador e confirmar sinalização de falha quando a versão real não corresponde à esperada.
 - [x] 3.3 Exercitar republicação do mesmo commit de `v0.1.0` sem nova tag ou incremento e conferir novamente a versão real; registrar o procedimento e que ainda não há versão anterior para rollback na primeira entrega.
-- [ ] 3.4 Apresentar o site e as evidências ao usuário e registrar sua decisão explícita de homologação; verificar que a etapa não libera `add-cloud-library` enquanto essa decisão estiver pendente.
+- [x] 3.4 Apresentar o site e as evidências ao usuário e registrar sua decisão explícita de homologação; verificar que a etapa não libera `add-cloud-library` enquanto essa decisão estiver pendente.
 
 ## Workflow follow-up
 
