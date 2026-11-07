@@ -2,15 +2,15 @@
 
 ## 1. Shell, branch e versão da entrega
 
-- [ ] 1.1 Confirmar branch `dev` e versão alvo `0.1.0` antes de implementar; verificar que a entrega será por PR de `dev` para `main`, sem alterações diretas na branch protegida.
-- [ ] 1.2 Inicializar React, TypeScript e Vite com npm, `package.json` e campos correspondentes do lockfile em `0.1.0`, scripts de lint, tipos, testes e build; verificar `npm ci`, `npm run lint`, `npm run typecheck`, `npm test` e `npm run build` numa instalação limpa.
-- [ ] 1.3 Criar página inicial, navegação extensível por hash, retorno de rota desconhecida e versão/commit derivados do build; verificar teclado, acesso direto, atualização e recursos na raiz `/` com testes e preview, e documentar extensão de módulos, versionamento e comandos no README.
+- [x] 1.1 Confirmar branch `dev` e versão alvo `0.1.0` antes de implementar; verificar que a entrega será por PR de `dev` para `main`, sem alterações diretas na branch protegida.
+- [x] 1.2 Inicializar React, TypeScript e Vite com npm, `package.json` e campos correspondentes do lockfile em `0.1.0`, scripts de lint, tipos, testes e build; verificar `npm ci`, `npm run lint`, `npm run typecheck`, `npm test` e `npm run build` numa instalação limpa.
+- [x] 1.3 Criar página inicial, navegação extensível por hash, retorno de rota desconhecida e versão/commit derivados do build; verificar teclado, acesso direto, atualização e recursos na raiz `/` com testes e preview, e documentar extensão de módulos, versionamento e comandos no README.
 
 ## 2. Workflows dev e prod
 
 - [ ] 2.1 Configurar workflow dev para PR aberto, atualizado ou reaberto para `main`, validando origem `dev`, lint, tipos, testes, build e coerência da versão da entrega com pacote e lockfile; verificar execuções reais de sucesso e falha controlada, configurar checks obrigatórios e comprovar que PR não publica.
-- [ ] 2.2 Configurar workflow prod em `push` para `main` após merge, revalidando o commit final, criando o artefato, gerando a tag da versão do pacote e publicando no mesmo workflow; verificar dependência dos jobs, permissões mínimas, concorrência e ausência de commits automáticos de incremento, documentando o fluxo.
-- [ ] 2.3 Implementar validação de tag e reexecução segura, além de recuperação manual de release conhecida; verificar os casos de tag ausente, mesmo SHA e SHA divergente, garantindo que tags existentes não sejam movidas e que não seja necessário disparar outro workflow pela tag criada.
+- [x] 2.2 Configurar workflow prod em `push` para `main` após merge, revalidando o commit final, criando o artefato, gerando a tag da versão do pacote e publicando no mesmo workflow; verificar dependência dos jobs, permissões mínimas, concorrência e ausência de commits automáticos de incremento, documentando o fluxo.
+- [x] 2.3 Implementar validação de tag e reexecução segura, além de recuperação manual de release conhecida; verificar os casos de tag ausente, mesmo SHA e SHA divergente, garantindo que tags existentes não sejam movidas e que não seja necessário disparar outro workflow pela tag criada.
 
 ## 3. Publicação e homologação da versão 0.1.0
 
