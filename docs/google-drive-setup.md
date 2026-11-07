@@ -12,6 +12,8 @@ O client ID público está configurado; a API, as origens e as contas de teste a
 
 ## Teste local e homologação
 
+A partir de `0.3.0`, entre primeiro no hub conforme [configuração Firebase](firebase-setup.md). O login persiste e a conexão Drive permanece independente. Use **Preparar amostra** e depois **Sincronizar** para controlar o envio; preparar não grava no Drive.
+
 Execute `npm ci`, `npm run dev -- --host localhost` e abra `http://localhost:5173/#/connection`. Para validar o artefato: `npm run build`, `npm run preview -- --host localhost`, abra `http://localhost:4173/#/connection`.
 
 - Conecte a conta A. Antes de gravar, confirme que nenhum arquivo foi criado. Grave amostra, anote somente seu UUID técnico e releia: deve aparecer o mesmo UUID.

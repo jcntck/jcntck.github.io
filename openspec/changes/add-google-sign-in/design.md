@@ -70,7 +70,7 @@ Após login, consumir uma vez esse destino. Nunca aceitar URL externa, esquema/h
 
 ### Versão e entrega
 
-A revisão é somente planejamento da mesma versão `0.3.0`. Pacote, lockfile e `.release.json` ficam em `0.2.2` até implementação autorizada. Depois, implementar em `dev`, selecionar só esta change para a entrega e abrir PR para `main`. Cada fix relatado após abertura incrementa patch e alinha pacote, lockfile, proposta e evidências. Usuário testa e realiza o merge; CI Dev não publica.
+A implementação foi autorizada na versão `0.3.0`. Pacote, lockfile e `.release.json` são alinhados nesta entrega em `dev`. Ao concluir o plano inicial, abrir imediatamente o PR para `main` e liberar para teste; toda mudança solicitada a partir desse ponto é patch fix com as versões sincronizadas. Cada fix relatado após abertura incrementa patch e alinha pacote, lockfile, proposta e evidências. Usuário testa e realiza o merge; CI Dev não publica.
 
 Prod valida o commit final, cria a tag da versão final e publica o mesmo artefato; sem commits de versão em `main` ou movimentação de tag. Registrar configuração pública, custo/plano, URL, SHA, execução, verificações reais e homologação em `docs/releases/0.3.0.md` (ou versão final revisada). Não iniciar mangás antes da homologação do login e reconciliação do plano de sincronização.
 

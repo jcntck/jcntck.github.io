@@ -2,7 +2,7 @@
 
 ## Version
 
-`0.3.0` — versão definida pelo usuário para login Google, estado global e sessão persistente por até 30 dias. A aplicação permanece `0.2.2` durante o planejamento.
+`0.3.0` — versão definida pelo usuário para login Google, estado global e sessão persistente por até 30 dias. Versão anterior homologada: `0.2.2`; implementação autorizada nesta entrega `0.3.0`.
 
 ## Why
 
@@ -12,7 +12,7 @@ Hoje o refresh descarta a conexão em memória e não existe uma sessão global 
 
 - Adicionar “Entrar com Google” e menu de conta, mantendo Início público e verificando identidade nas rotas pessoais.
 - Adotar estado global compartilhado para identidade, autorização Drive e situação da sincronização, com restauração de login antes de decidir a navegação.
-- Usar Firebase Authentication com provedor Google no plano gratuito Spark, autorizado pelo usuário para persistir/renovar a sessão do aplicativo, com limite absoluto de 30 dias desde a entrada, sem estender o prazo a cada refresh. Logout, sessão inválida ou revogada podem encerrá-la antes.
+- Usar Firebase Authentication com provedor Google no plano gratuito Spark, autorizado pelo usuário, para persistir/renovar a sessão do aplicativo, com limite absoluto de 30 dias desde a entrada, sem estender o prazo a cada refresh. Logout, sessão inválida ou revogada podem encerrá-la antes.
 - Restaurar o login após refresh/reabertura sem conectar automaticamente o Drive. Credenciais Firebase ficam sob persistência do SDK; tokens Google usados para Drive continuam exclusivamente em memória.
 - Manter autorização `drive.file` explícita e independente, sem renovação offline ou backend de tokens Drive; conferir que login e Drive correspondem à mesma conta.
 - Expor contrato de alterações pendentes/sincronização para futuros módulos, com operação manual “Sincronizar”, confirmação remota e estados de erro/conflito. Nesta entrega validar o contrato com a amostra técnica, sem cadastrar mangás.
@@ -38,8 +38,8 @@ Hoje o refresh descarta a conexão em memória e não existe uma sessão global 
 - `App`, catálogo de módulos e provedores comuns passam a compartilhar identidade/Drive/sincronização. `ConnectionPage` deixa de possuir uma sessão isolada e consome esse estado.
 - Ajustar a regra de inspeção: é esperada persistência gerenciada de credenciais Firebase para o login; tokens Google Drive, client secret e dados privados do documento não podem ser persistidos pelo hub nem incluídos no pacote, URLs ou logs.
 - O controle de rotas organiza a experiência da SPA; o pacote estático continua público e os documentos seguem protegidos pelo Drive.
-- A biblioteca `0.2.2` já foi publicada, homologada e arquivada. A implementação desta proposta será solicitada separadamente, sempre em `dev` e entregue em PR para `main`.
-- Na implementação, alinhar pacote/lockfile e seleção da release a `0.3.0`. Usuário testa e faz o merge; cada fix de revisão incrementa patch. CI valida sem publicar; Prod cria a tag da versão final e publica o commit validado sem alterar versão em `main`.
+- A biblioteca `0.2.2` já foi publicada, homologada e arquivada. A implementação foi autorizada pelo usuário, sempre em `dev` e entregue em PR para `main`.
+- Na implementação, alinhar pacote/lockfile e seleção da release a `0.3.0`. Ao concluir o plano inicial, abrir imediatamente o PR e liberar para teste; a partir dessa entrega toda alteração pedida pelo usuário é patch fix, sem nova confirmação de versão. Usuário testa e faz o merge; cada fix de revisão incrementa patch. CI valida sem publicar; Prod cria a tag da versão final e publica o commit validado sem alterar versão em `main`.
 
 ## Sequence and Acceptance
 

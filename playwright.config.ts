@@ -13,9 +13,13 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
-  webServer: external ? undefined : {
+  webServer: external ? undefined : [{
     command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
-  },
+  }, {
+    command: 'npm run dev -- --host 127.0.0.1 --port 5175 --strictPort',
+    url: 'http://127.0.0.1:5175',
+    reuseExistingServer: !process.env.CI,
+  }],
 })

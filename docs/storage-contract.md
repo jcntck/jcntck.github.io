@@ -11,3 +11,11 @@ Erros tipados: `invalid`, `expired`, `network`, `remote`, `ambiguous`, `conflict
 A revisão detecta divergências anteriores à escrita, sem garantir exclusão mútua no Drive. Trabalhar em um dispositivo por vez. Não há armazenamento offline ou recuperação após fechar aba. Schema incompatível bloqueia gravação; não há migração destrutiva automática.
 
 `Snapshot.webViewLink` é metadado opcional retornado pelo Drive, fora do envelope persistido. `src/shared/components/DriveFileLink.tsx` aceita `fileId`, `webViewLink` opcional e rótulo opcional em `children`. Prefere o link HTTPS do Drive retornado pela API; se ausente ou inválido, monta o endereço do visualizador pelo ID. Abre em nova aba sem token na URL e sem alterar compartilhamento. Usar apenas snapshots da conta atualmente conectada.
+
+## Estado compartilhado e sincronização (0.3.0)
+
+Consumidores usam `useHub()` dentro de `HubProvider`: identidade em `hub.auth` e uma única sessão de documento em `hub.cloud`. `stageSection(target, key, value)` prepara uma operação em memória sem gravar; `sync()` envia a pendência ou faz leitura explícita quando não há alteração. Observar `syncPhase`, `pending`, `queued` e `lastSynced` por `getSnapshot`/`subscribe`. Uma nova edição durante envio é mantida separadamente; a confirmação não a descarta. O chamador nunca confirma persistência só por preparar uma alteração.
+
+O modo manual é padrão. `setAutomatic(true)` habilita tentativas com debounce de 750 ms somente com autorização válida e aba ativa; falha/conflito/expiração pausam a automação até decisão do usuário. `resumeAutomatic()` pode reagendar depois do retorno à aba. Conta/revisão/ID da operação continuam conferidos no contrato existente. Logout/troca limpam ambas as sessões e pendências. Recarregar restaura só o login Firebase; token Drive, estado remoto e rascunhos continuam voláteis.
+
+A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás devem consumir este contrato quando sua change estiver liberada, sem escrever uma segunda fila de sincronização.

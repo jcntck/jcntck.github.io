@@ -1,7 +1,7 @@
 {
   "name": "my-hub",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.3.0",
   "type": "module",
   "engines": {
     "node": ">=22.15.0 <23"
@@ -17,6 +17,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "firebase": "12.19.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-router-dom": "7.18.5"
@@ -43,6 +44,9 @@
     "yaml": "2.9.1"
   },
   "overrides": {
-    "minimatch": "11.0.1"
+    "minimatch": "11.0.1",
+    "@firebase/app": "0.16.2",
+    "@firebase/app-compat": "0.5.18",
+    "@grpc/grpc-js": "1.14.7"
   }
 }

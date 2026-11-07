@@ -2,10 +2,11 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 import { authorize, loadIdentity, type OAuth } from '../../integrations/google-drive/identity'
 import googleConfig from '../../integrations/google-drive/config.json'
 import { DriveFileLink } from '../../shared/components/DriveFileLink'
-import { CloudSession } from '../../integrations/google-drive/session'
+import { useHub } from '../../shared/session/hooks'
 
-const session = new CloudSession()
-export function ConnectionPage({ controller = session, clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || googleConfig.clientId }: { controller?: CloudSession; clientId?: string }) {
+export function ConnectionPage({ clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || googleConfig.clientId }: { clientId?: string }) {
+  const hub = useHub()
+  const controller = hub.cloud
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot)
   const [oauth, setOAuth] = useState<OAuth>()
   const [loadError, setLoadError] = useState('')
@@ -18,30 +19,39 @@ export function ConnectionPage({ controller = session, clientId = import.meta.en
   }, [clientId, attempt])
   const busy = ['authorizing', 'loading', 'saving'].includes(state.phase)
   const probe = state.snapshot?.document.diagnostics.probe
+  const connect = async (sync = false) => {
+    if (!hub.auth.isValid() || !oauth) return
+    await controller.connect(() => authorize(oauth, clientId))
+    if (sync && hub.auth.isValid()) await controller.sync()
+  }
   return <section className="connection-page">
     <p className="eyebrow">ARMAZENAMENTO PESSOAL</p><h1>Conexão</h1>
-    <p className="page-description">Conecte sua conta para guardar uma amostra privada no Google Drive. Nenhum arquivo é criado até você escolher gravar.</p>
-    {!clientId && <p className="connection-notice">A conexão Google ainda precisa ser configurada pelo responsável por este hub.</p>}
+    <p className="page-description">Seu login e seu Drive são independentes. Prepare uma amostra e escolha quando sincronizá-la com sua conta.</p>
+    {!clientId && <p className="connection-notice">A conexão Google precisa ser configurada pelo responsável por este hub.</p>}
     {loadError && <p role="alert">{loadError} <button onClick={() => setAttempt(value => value + 1)}>Tentar carregar Google</button></p>}
     <div className="connection-card">
-      <h2>{state.account ? `Conta: ${state.account.name}` : 'Sua conta Google'}</h2>
+      <h2>{state.account ? `Drive: ${state.account.name}` : 'Seu Google Drive'}</h2>
       <p role="status" aria-live="polite">{state.message}</p>
       <div className="connection-actions">
-        <button disabled={!oauth || !clientId || busy} onClick={() => void controller.connect(() => authorize(oauth!, clientId))}>{state.account ? 'Reconectar / trocar conta' : 'Conectar Google Drive'}</button>
-        {state.phase !== 'disconnected' && <button onClick={() => controller.disconnect()}>Desconectar</button>}
+        <button disabled={!oauth || !clientId || busy} onClick={() => void connect()}>{state.account ? 'Reconectar Drive' : 'Conectar Google Drive'}</button>
+        {state.phase !== 'disconnected' && <button onClick={() => controller.disconnect()}>Desconectar Drive</button>}
       </div>
-      {state.account && <>
-        <div className="connection-actions">
-          <button disabled={!state.canWrite || busy} onClick={() => void controller.saveProbe()}>{state.pending ? 'Repetir tentativa pendente' : 'Gravar amostra'}</button>
-          <button disabled={busy || state.phase === 'expired' || state.phase === 'authorizing'} onClick={() => { if (!state.pending || window.confirm('Recarregar e descartar a tentativa local pendente?')) void controller.reload() }}>Reler do Drive{state.pending ? ' e descartar tentativa' : ''}</button>
-        </div>
-        {state.snapshot === null && <p>Ainda não existe documento. A primeira gravação criará my-hub.json.</p>}
-        {state.snapshot && <DriveFileLink fileId={state.snapshot.fileId} webViewLink={state.snapshot.webViewLink} />}
-        {probe != null && <div><h3>Amostra retornada pelo Drive</h3><pre>{JSON.stringify(probe, null, 2)}</pre></div>}
-        {state.pending && <p>Uma tentativa permanece somente na memória desta aba. Reconecte para conferir e repetir, ou releia para descartá-la.</p>}
-      </>}
+      <div className="connection-actions">
+        <button onClick={() => { if (hub.auth.isValid()) controller.stageProbe() }}>Preparar amostra</button>
+        <button disabled={busy || (!state.canWrite && (!oauth || !clientId))} onClick={() => { if (!hub.auth.isValid()) return; if (state.canWrite) void controller.sync(); else void connect(true) }}>Sincronizar</button>
+        <button disabled={busy || !state.account || state.phase === 'expired'} onClick={() => { if (!hub.auth.isValid()) return; if (!state.pending || window.confirm('Reler e descartar as alterações locais pendentes?')) void controller.reload() }}>Reler do Drive</button>
+      </div>
+      <label className="automatic-control"><input type="checkbox" checked={state.automatic} disabled={busy || (!state.canWrite && !state.automatic)} onChange={event => controller.setAutomatic(event.target.checked)} /> Sincronizar automaticamente nesta sessão</label>
+      {state.syncPhase === 'conflict' && <p role="alert">Há uma divergência com o Drive. Releia para decidir sobre as alterações locais antes de tentar outro envio.</p>}
+      {state.syncPhase === 'error' && <p>Sincronização pausada. Confira a conexão e reconecte o Drive antes de repetir.</p>}
+      {state.snapshot === null && <p>Ainda não existe documento. Somente uma sincronização com alteração pendente criará my-hub.json.</p>}
+      {state.snapshot && <DriveFileLink fileId={state.snapshot.fileId} webViewLink={state.snapshot.webViewLink} />}
+      {probe != null && <div><h3>Amostra retornada pelo Drive</h3><pre>{JSON.stringify(probe, null, 2)}</pre></div>}
+      {state.pending && <p>Há uma alteração pendente nesta aba{state.queued ? ' e novas alterações aguardando o envio anterior' : ''}. Ela ainda não está confirmada no Drive.</p>}
+      {state.lastSynced && <p>Última sincronização confirmada: <time dateTime={state.lastSynced}>{new Date(state.lastSynced).toLocaleString('pt-BR')}</time></p>}
     </div>
-    <p className="page-description">Use um dispositivo por vez. Alterações simultâneas podem se sobrepor; não há edição offline. Fechar a aba encerra a sessão e descarta tentativas pendentes.</p>
+    <p className="page-description">O login pode ser restaurado por até 30 dias. Após refresh, reconecte o Drive para sincronizar. Alterações pendentes existem somente nesta aba e são descartadas ao recarregar ou sair. Use um dispositivo por vez.</p>
+    <p className="page-description">A sincronização automática funciona com esta página aberta e autorização válida; ela pausa em falhas, conflitos ou expiração.</p>
     <p className="page-description"><a href="https://myaccount.google.com/connections" target="_blank" rel="noreferrer">Gerenciar e revogar consentimento no Google</a></p>
   </section>
 }

@@ -5,4 +5,5 @@ export interface HubModule {
   label: string
   path: string
   element: ReactNode
+  access?: 'public' | 'signed-in'
 }

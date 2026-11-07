@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event'
 import { HashRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { App } from './App'
+import { Hub } from '../shared/session/hub'
+import type { AuthPort } from '../shared/session/auth-session'
 
 const renderApp = (path = '/', modules: Parameters<typeof App>[0]['modules'] = []) => {
   window.location.hash = path
-  return render(<HashRouter><App modules={modules} /></HashRouter>)
+  const port: AuthPort = { configured: false, initialize: async () => false, observe: () => () => {}, login: async () => {}, logout: async () => {} }
+  return render(<HashRouter><App modules={modules} hub={new Hub(port)} /></HashRouter>)
 }
 
 describe('shell modular', () => {
@@ -14,12 +17,12 @@ describe('shell modular', () => {
     renderApp()
     expect(screen.getByRole('heading', { level: 1, name: 'Seu espaço, aos poucos.' })).toBeVisible()
     expect(screen.getByText(/Novos módulos serão adicionados gradualmente/)).toBeVisible()
-    expect(screen.getByLabelText('Versão da aplicação')).toHaveTextContent('v0.2.2')
-    expect(screen.queryByRole('button', { name: /conectar|entrar/i })).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Versão da aplicação')).toHaveTextContent('v0.3.0')
+    expect(screen.getByRole('button', { name: 'Entrar com Google' })).toBeVisible()
   })
   it('adiciona um módulo sem substituir a navegação inicial', async () => {
     const user = userEvent.setup()
-    renderApp('/', [{ id: 'fixture', label: 'Módulo de teste', path: '/fixture', element: <h1>Conteúdo de teste</h1> }])
+    renderApp('/', [{ id: 'fixture', access: 'public', label: 'Módulo de teste', path: '/fixture', element: <h1>Conteúdo de teste</h1> }])
     await user.click(screen.getByRole('link', { name: 'Módulo de teste' }))
     expect(await screen.findByRole('heading', { name: 'Conteúdo de teste' })).toBeVisible()
     expect(screen.getByRole('link', { name: 'Início' })).toBeVisible()
@@ -27,7 +30,7 @@ describe('shell modular', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Seu espaço, aos poucos.' })).toBeVisible()
   })
   it('abre um módulo por endereço direto', () => {
-    renderApp('/fixture', [{ id: 'fixture', label: 'Módulo de teste', path: '/fixture', element: <h1>Conteúdo de teste</h1> }])
+    renderApp('/fixture', [{ id: 'fixture', access: 'public', label: 'Módulo de teste', path: '/fixture', element: <h1>Conteúdo de teste</h1> }])
     expect(screen.getByRole('heading', { name: 'Conteúdo de teste' })).toBeVisible()
   })
   it('oferece recuperação para um endereço inexistente', async () => {
@@ -45,5 +48,14 @@ describe('shell modular', () => {
     await user.keyboard('{Enter}')
     expect(screen.getByRole('main')).toHaveFocus()
     expect(window.location.hash).toBe('#/')
+  })
+})
+
+describe('navegação pessoal', () => {
+  it('oculta entrada e bloqueia montagem do módulo sem login', async () => {
+    renderApp('/private', [{ id: 'private', path: '/private', label: 'Pessoal', element: <h1>Conteúdo privado</h1> }])
+    expect(screen.queryByText('Conteúdo privado')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Pessoal' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Seu espaço, aos poucos.' })).toBeVisible()
   })
 })
