@@ -8,7 +8,7 @@ const expectedCommit = process.env.EXPECTED_COMMIT || execFileSync('git', ['rev-
 test.beforeEach(async ({ request }) => {
   await expect.poll(async () => {
     const response = await request.get(`version.json?verification=${Date.now()}`)
-    if (!response.ok()) return null
+    if (!response.ok() || !response.headers()['content-type']?.includes('application/json')) return null
     const data = await response.json() as { version: string; commit: string }
     return data
   }, { timeout: process.env.PLAYWRIGHT_BASE_URL ? 90_000 : 10_000, message: 'A versão e o commit publicados devem corresponder à entrega.' }).toEqual({ version: expectedVersion, commit: expectedCommit })

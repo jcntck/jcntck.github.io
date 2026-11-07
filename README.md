@@ -22,7 +22,7 @@ npm run build
 npm run preview
 ```
 
-O build gera `dist/`, inclusive `version.json`, e usa a raiz `/` por padrão. `APP_BASE_PATH=/outro-caminho/ npm run build` permite usar o mesmo shell sob outro caminho de hospedagem estática. A versão vem de `package.json` e o commit do checkout; em desenvolvimento o rodapé indica “desenvolvimento”.
+O build gera `dist/`, inclusive `version.json`, e usa a raiz `/` por padrão. `APP_BASE_PATH=/outro-caminho/ npm run build` permite usar o mesmo shell sob outro caminho de hospedagem estática. Para testar esse pacote localmente, iniciar também o preview com a mesma variável: `APP_BASE_PATH=/outro-caminho/ npm run preview`. A versão vem de `package.json` e o commit do checkout; em desenvolvimento o rodapé indica “desenvolvimento”.
 
 Para testes reais em navegador:
 
