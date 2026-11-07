@@ -28,7 +28,7 @@ it('usa modo temporário se armazenamento for bloqueado', async () => {
   expect(sdk.setPersistence).toHaveBeenLastCalledWith(expect.anything(), 'memory')
 })
 it('verifica com o serviço e usa identidade google.com, distinta do UID Firebase', async () => {
-  const user = { uid: 'firebase-uid', displayName: 'Conta', providerData: [{ providerId: 'google.com', uid: 'google-sub' }] }
+  const user = { uid: 'firebase-uid', displayName: 'Conta', providerData: [{ providerId: 'google.com', uid: 'google-sub', photoURL: 'https://lh3.googleusercontent.com/test-avatar' }] }
   sdk.onAuthStateChanged.mockImplementation((_, listener) => { listener(user); return vi.fn() })
   sdk.getIdTokenResult.mockResolvedValue({ signInProvider: 'google.com', authTime: '2026-11-07T12:00:00Z', issuedAtTime: '2026-11-07T13:00:00Z' })
   const port = createFirebaseAuth(); await port.initialize()
@@ -36,5 +36,5 @@ it('verifica com o serviço e usa identidade google.com, distinta do UID Firebas
   port.observe(value => { candidate = value })
   const verified = await (candidate as unknown as AuthCandidate).verify()
   expect(sdk.getIdTokenResult).toHaveBeenCalledWith(user, true)
-  expect(verified).toMatchObject({ uid: 'firebase-uid', googleId: 'google-sub', authTime: Date.parse('2026-11-07T12:00:00Z') })
+  expect(verified).toMatchObject({ uid: 'firebase-uid', googleId: 'google-sub', photoURL: 'https://lh3.googleusercontent.com/test-avatar', authTime: Date.parse('2026-11-07T12:00:00Z') })
 })

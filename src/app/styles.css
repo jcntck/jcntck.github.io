@@ -485,3 +485,7 @@ h1 {
 .auth-status { font-size:13px; color:#647168; line-height:1.8; margin-bottom:20px; }
 .automatic-control { display:flex; gap:10px; align-items:center; font-size:13px; line-height:1.8; }
 @media(max-width:640px) { .topbar { height:auto; min-height:75px; gap:12px; padding-top:12px; padding-bottom:12px; } .account-menu { max-width:240px; } }
+
+.account-identity { display:inline-flex; align-items:center; gap:8px; min-width:0; }
+.account-avatar { object-fit:cover; flex-shrink:0; }
+.account-name { max-width:18ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

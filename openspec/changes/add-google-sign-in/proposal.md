@@ -2,7 +2,7 @@
 
 ## Version
 
-`0.3.0` — versão definida pelo usuário para login Google, estado global e sessão persistente por até 30 dias. Versão anterior homologada: `0.2.2`; implementação autorizada nesta entrega `0.3.0`.
+`0.3.1` — alvo atual após fix de revisão; versão inicial `0.3.0` aprovada pelo usuário para login Google, estado global e sessão persistente por até 30 dias. Versão anterior homologada: `0.2.2`; implementação autorizada nesta entrega `0.3.1`.
 
 ## Why
 
@@ -39,7 +39,7 @@ Hoje o refresh descarta a conexão em memória e não existe uma sessão global 
 - Ajustar a regra de inspeção: é esperada persistência gerenciada de credenciais Firebase para o login; tokens Google Drive, client secret e dados privados do documento não podem ser persistidos pelo hub nem incluídos no pacote, URLs ou logs.
 - O controle de rotas organiza a experiência da SPA; o pacote estático continua público e os documentos seguem protegidos pelo Drive.
 - A biblioteca `0.2.2` já foi publicada, homologada e arquivada. A implementação foi autorizada pelo usuário, sempre em `dev` e entregue em PR para `main`.
-- Na implementação, alinhar pacote/lockfile e seleção da release a `0.3.0`. Ao concluir o plano inicial, abrir imediatamente o PR e liberar para teste; a partir dessa entrega toda alteração pedida pelo usuário é patch fix, sem nova confirmação de versão. Usuário testa e faz o merge; cada fix de revisão incrementa patch. CI valida sem publicar; Prod cria a tag da versão final e publica o commit validado sem alterar versão em `main`.
+- Na implementação, alinhar pacote/lockfile e seleção da release a `0.3.1`. Ao concluir o plano inicial, abrir imediatamente o PR e liberar para teste; a partir dessa entrega toda alteração pedida pelo usuário é patch fix, sem nova confirmação de versão. Usuário testa e faz o merge; cada fix de revisão incrementa patch. CI valida sem publicar; Prod cria a tag da versão final e publica o commit validado sem alterar versão em `main`.
 
 ## Sequence and Acceptance
 

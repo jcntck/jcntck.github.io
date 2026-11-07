@@ -29,6 +29,7 @@ Para testar o artefato, execute `npm run build`, `npm run preview -- --host loca
 ## Roteiro de avaliação
 
 - Sem login: Início público, botão de entrada e ausência de Conexão no menu. Abrir `/#/connection` deve levar à entrada; após login válido, voltar a Conexão. Rota desconhecida mantém o 404. Durante restauração não mostrar dados pessoais nem redirecionar antes de verificar a sessão.
+- Após entrar, confirme a foto Google no círculo do cabeçalho, com nome e ações de conta preservados. Se a conta não tiver foto ou a imagem falhar, são mostradas as iniciais. Isso não exige nova permissão/configuração.
 - Entre com Google e confirme que não foi pedido Drive. Recarregue ou feche/reabra: login deve voltar após verificação, mantendo a rota. Use duas abas e saia em uma: a outra deve remover conteúdo pessoal.
 - O prazo máximo é **30 dias desde a autenticação**, e refresh/renovação do ID token não o prolongam. Testes automatizados controlam o relógio; não são evidência de esperar fisicamente 30 dias. Logout ou sessão invalidada podem encerrar antes.
 - Se o navegador bloquear persistência, o hub informa login temporário. Restaurar com rede indisponível deve mostrar erro recuperável, sem dar acesso apenas pelo perfil em cache.
@@ -39,4 +40,4 @@ Para testar o artefato, execute `npm run build`, `npm run preview -- --host loca
 - Alterações pendentes existem somente na memória desta aba. Login persistente não as recupera após refresh. Sair/trocar conta remove dados e pendências; o navegador avisa ao sair com alterações quando puder.
 - Inspecione Local/Session Storage e IndexedDB: credenciais **Firebase Auth gerenciadas pelo SDK** são esperadas. Não deve haver token Google Drive, cópias próprias de credenciais ou documento privado persistido pelo hub. URLs, logs e pacote não contêm credenciais de usuário. Não publique dumps/prints de tokens.
 
-Após merge pelo usuário, repetir o roteiro no [Pages](https://jcntck.github.io/). Registrar resultados sanitizados em `docs/releases/0.3.0.md`. Login, consentimento e persistência reais aguardam a configuração e avaliação do titular; os testes simulados não os substituem.
+Após merge pelo usuário, repetir o roteiro no [Pages](https://jcntck.github.io/). Registrar resultados sanitizados em `docs/releases/0.3.1.md`. Login, consentimento e persistência reais aguardam a configuração e avaliação do titular; os testes simulados não os substituem.

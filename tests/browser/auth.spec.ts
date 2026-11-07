@@ -64,6 +64,8 @@ test('logout propaga entre abas e sessão de trinta dias não é restaurada apó
 })
 
 test('SDK Firebase real persiste e restaura sem sobrescrever o login com estado anônimo', async ({ page }) => {
+  const photoURL = 'https://lh3.googleusercontent.com/test-avatar'
+  await page.route(photoURL, route => route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="16" fill="#c2d4a4"/></svg>' }))
   const authTime = Math.floor(Date.now() / 1000)
   const token = () => {
     const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url')
@@ -75,7 +77,7 @@ test('SDK Firebase real persiste e restaura sem sobrescrever o login com estado 
     await route.fulfill({ json: { access_token: token(), id_token: token(), refresh_token: 'synthetic-sdk-refresh', token_type: 'Bearer', expires_in: '3600', user_id: 'test-firebase-sdk', project_id: 'myhub-847d2' } })
   })
   await page.route('https://identitytoolkit.googleapis.com/**', async route => {
-    if (route.request().url().includes('accounts:lookup')) await route.fulfill({ json: { users: [{ localId: 'test-firebase-sdk', displayName: 'SDK simulado', providerUserInfo: [{ providerId: 'google.com', rawId: 'test-google-sdk', federatedId: 'https://accounts.google.com/test-google-sdk', displayName: 'SDK simulado' }] }] } })
+    if (route.request().url().includes('accounts:lookup')) await route.fulfill({ json: { users: [{ localId: 'test-firebase-sdk', displayName: 'SDK simulado', photoUrl: photoURL, providerUserInfo: [{ providerId: 'google.com', rawId: 'test-google-sdk', federatedId: 'https://accounts.google.com/test-google-sdk', displayName: 'SDK simulado', photoUrl: photoURL }] }] } })
     else await route.fulfill({ json: { localId: 'test-firebase-sdk', displayName: 'SDK simulado', idToken: token(), refreshToken: 'synthetic-sdk-refresh', expiresIn: '3600', providerId: 'google.com' } })
   })
   await page.route('https://accounts.google.com/gsi/client', route => route.fulfill({ contentType: 'application/javascript', body: 'window.google={accounts:{oauth2:{}}};' }))
@@ -83,12 +85,20 @@ test('SDK Firebase real persiste e restaura sem sobrescrever o login com estado 
   await page.getByRole('button', { name: 'Entrar com Google' }).click()
   await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Foto de SDK simulado' })).toHaveJSProperty('naturalWidth', 32)
+  await expect(page.getByRole('button', { name: 'Trocar conta', exact: true })).toBeVisible()
   const previous = refreshes
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
   expect(refreshes).toBeGreaterThan(previous)
+  const avatar = page.getByRole('img', { name: 'Foto de SDK simulado' })
+  await expect(avatar).toHaveAttribute('src', photoURL)
+  await avatar.dispatchEvent('error', { bubbles: false })
+  await expect(avatar).toHaveCount(0)
+  await expect(page.getByText('SS', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Sair', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Entrar com Google' })).toBeVisible()
   await page.reload()
   await expect(page.getByRole('button', { name: 'Entrar com Google' })).toBeVisible()
 })

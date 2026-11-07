@@ -61,7 +61,7 @@ export function createFirebaseAuth(): AuthPort {
           const token = await getIdTokenResult(user, true)
           const google = user.providerData.find(provider => provider.providerId === 'google.com')
           if (!google?.uid || token.signInProvider !== 'google.com') throw Object.assign(new Error(), { code: 'identity/invalid' })
-          return { uid: user.uid, googleId: google.uid, name: user.displayName || 'Conta Google', authTime: Date.parse(token.authTime), issuedAt: Date.parse(token.issuedAtTime) }
+          return { uid: user.uid, googleId: google.uid, name: user.displayName || 'Conta Google', photoURL: google.photoURL || user.photoURL || undefined, authTime: Date.parse(token.authTime), issuedAt: Date.parse(token.issuedAtTime) }
         } } : null)
       })
     },

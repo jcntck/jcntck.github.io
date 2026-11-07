@@ -2,8 +2,8 @@
 
 ## 1. Base e preparação da entrega
 
-- [x] 1.1 Confirmar `dev`, versão `0.3.0` e evidências da biblioteca homologada `0.2.2`, incluindo arquivo OpenSpec, tag, SHA e Prod; registrar a referência da base antes da implementação.
-- [x] 1.2 Na implementação autorizada, alinhar pacote/lockfile a `0.3.0` e selecionar somente esta change na release; verificar `npm run check:release` e preservar a versão futura `1.0.0` de mangás.
+- [x] 1.1 Confirmar `dev`, versão `0.3.1` e evidências da biblioteca homologada `0.2.2`, incluindo arquivo OpenSpec, tag, SHA e Prod; registrar a referência da base antes da implementação.
+- [x] 1.2 Na implementação autorizada, alinhar pacote/lockfile a `0.3.1` e selecionar somente esta change na release; verificar `npm run check:release` e preservar a versão futura `1.0.0` de mangás.
 
 ## 2. Login persistente e configuração
 
@@ -34,7 +34,7 @@
 
 - [ ] 6.1 Executar instalação pelo lockfile, lint, tipos, testes, build, versão/OpenSpec e Chromium desktop/celular; incluir fetch nativo, Auth/Drive simulados, reload, duas abas e prazo com relógio controlado, além de consentimento real e inspeção do pacote; registrar resultados sem afirmar espera real de 30 dias se foi simulada.
 - [ ] 6.2 Abrir PR de implementação `dev` → `main`, fornecer comandos de teste e aguardar revisão/merge exclusivos do usuário; aplicar cada fix relatado com incremento patch alinhado em pacote, lockfile, proposta e evidências e conferir checks obrigatórios.
-- [ ] 6.3 Acompanhar Prod validar commit final, criar tag da versão final e publicar o mesmo artefato; conferir SHA/versão/tag/URL e registrar execução, configuração Spark e resultados em `docs/releases/0.3.0.md` ou versão final revisada, sem segredos.
+- [ ] 6.3 Acompanhar Prod validar commit final, criar tag da versão final e publicar o mesmo artefato; conferir SHA/versão/tag/URL e registrar execução, configuração Spark e resultados em `docs/releases/0.3.1.md` ou versão final revisada, sem segredos.
 - [ ] 6.4 Homologar no site real login persistente após refresh/reabertura, logout entre abas, Drive independente, contas A/B, sincronização manual e automática autorizada, erros e conflito; apresentar testes do prazo e limites documentados, obter homologação explícita antes de liberar implementação de mangás.
 
 ## Workflow follow-up
@@ -45,6 +45,10 @@
 
 ## Entrega inicial para avaliação
 
-- Código e verificações automatizadas entregues em `0.3.0`. Permanecem sem marca de conclusão as tarefas que incluem consentimento/configuração reais, revisão/merge do usuário, publicação ou homologação.
-- Configuração pública recebida; o titular ainda está configurando o Firebase. Guia com links em `docs/firebase-setup.md`; evidências em `docs/releases/0.3.0.md`.
+- Código e verificações automatizadas entregues em `0.3.1`. Permanecem sem marca de conclusão as tarefas que incluem consentimento/configuração reais, revisão/merge do usuário, publicação ou homologação.
+- Configuração pública recebida; o titular ainda está configurando o Firebase. Guia com links em `docs/firebase-setup.md`; evidências em `docs/releases/0.3.1.md`.
 - PR #3 aberto imediatamente ao liberar para teste: https://github.com/jcntck/jcntck.github.io/pull/3. Qualquer mudança solicitada pelo usuário após essa entrega será patch fix no mesmo PR, com pacote, lockfile e alvo alinhados.
+
+## 7. Fixes de revisão
+
+- [x] 7.1 Reaproveitar a foto do perfil Google validado no menu existente, com iniciais quando ausente ou em falha; verificar mapeamento pelo SDK, foto após refresh e ações preservadas, alinhando pacote, lockfile, alvo e evidências em `0.3.1`.

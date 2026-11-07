@@ -1,5 +1,5 @@
 export const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000
-export interface Identity { uid: string; googleId: string; name: string; authTime: number; issuedAt: number }
+export interface Identity { uid: string; googleId: string; name: string; photoURL?: string; authTime: number; issuedAt: number }
 export interface AuthCandidate { uid: string; verify(): Promise<Identity> }
 export interface AuthPort {
   configured: boolean

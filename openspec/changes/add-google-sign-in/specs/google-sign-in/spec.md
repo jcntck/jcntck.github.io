@@ -99,3 +99,14 @@ O sistema MUST permitir apenas a persistência de login gerenciada pelo SDK de a
 #### Scenario: Recarregar com tentativa pendente
 - **WHEN** a aba é recarregada ou fechada com alteração ainda não sincronizada
 - **THEN** a aplicação não promete recuperar essa tentativa apenas porque o login é persistente
+
+### Requirement: Reaproveitar foto Google no menu de conta
+O sistema SHALL exibir a foto disponível no perfil Google autenticado dentro do menu de conta existente, preservando nome e ações. Se a foto estiver ausente ou não carregar, SHALL apresentar iniciais. Sair ou trocar de conta MUST remover a apresentação da conta anterior, sem persistência adicional da imagem pelo hub.
+
+#### Scenario: Foto disponível
+- **WHEN** a identidade validada contém uma foto de perfil
+- **THEN** o menu apresenta a foto com o nome e as ações existentes, inclusive após restauração do login
+
+#### Scenario: Foto indisponível
+- **WHEN** não há foto ou seu carregamento falha
+- **THEN** o menu usa iniciais e mantém as ações de conta acessíveis

@@ -70,9 +70,9 @@ Após login, consumir uma vez esse destino. Nunca aceitar URL externa, esquema/h
 
 ### Versão e entrega
 
-A implementação foi autorizada na versão `0.3.0`. Pacote, lockfile e `.release.json` são alinhados nesta entrega em `dev`. Ao concluir o plano inicial, abrir imediatamente o PR para `main` e liberar para teste; toda mudança solicitada a partir desse ponto é patch fix com as versões sincronizadas. Cada fix relatado após abertura incrementa patch e alinha pacote, lockfile, proposta e evidências. Usuário testa e realiza o merge; CI Dev não publica.
+A implementação foi autorizada na versão `0.3.1`. Pacote, lockfile e `.release.json` são alinhados nesta entrega em `dev`. Ao concluir o plano inicial, abrir imediatamente o PR para `main` e liberar para teste; toda mudança solicitada a partir desse ponto é patch fix com as versões sincronizadas. Cada fix relatado após abertura incrementa patch e alinha pacote, lockfile, proposta e evidências. Usuário testa e realiza o merge; CI Dev não publica.
 
-Prod valida o commit final, cria a tag da versão final e publica o mesmo artefato; sem commits de versão em `main` ou movimentação de tag. Registrar configuração pública, custo/plano, URL, SHA, execução, verificações reais e homologação em `docs/releases/0.3.0.md` (ou versão final revisada). Não iniciar mangás antes da homologação do login e reconciliação do plano de sincronização.
+Prod valida o commit final, cria a tag da versão final e publica o mesmo artefato; sem commits de versão em `main` ou movimentação de tag. Registrar configuração pública, custo/plano, URL, SHA, execução, verificações reais e homologação em `docs/releases/0.3.1.md` (ou versão final revisada). Não iniciar mangás antes da homologação do login e reconciliação do plano de sincronização.
 
 ## Risks / Trade-offs
 
@@ -98,3 +98,7 @@ Prod valida o commit final, cria a tag da versão final e publica o mesmo artefa
 - [Firebase: ciclo de sessão](https://firebase.google.com/docs/auth/admin/manage-sessions).
 - [Firebase: plano Spark e limites](https://firebase.google.com/pricing).
 - [GIS: autorização temporária por token](https://developers.google.com/identity/oauth2/web/guides/use-token-model).
+
+## Revisão patch 0.3.1 — Foto no menu
+
+Mapear `photoURL` do provedor `google.com` (alternativa: perfil Firebase) após verificação de identidade e apresentá-la no círculo de 32 px do cabeçalho. Preservar disposição, nome e ações de conta; nomes longos usam elipse. Aceitar endereço HTTPS de imagem, com iniciais em ausência/erro. A troca de identidade/URL reinicia a apresentação para não reaproveitar falha ou foto da conta anterior. Nenhuma imagem é baixada para o repositório ou copiada para armazenamento próprio.
