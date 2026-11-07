@@ -17,9 +17,18 @@ export function readRelease(root = process.cwd()) {
   const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'))
   const selection = readJson('.release.json')
   if (!Array.isArray(selection.changes) || new Set(selection.changes).size !== selection.changes.length) throw new Error('Seleção de changes inválida ou duplicada.')
+  const archivedChanges = selection.archivedChanges ?? {}
+  if (typeof archivedChanges !== 'object' || Array.isArray(archivedChanges)) throw new Error('Referências de arquivo inválidas.')
   const changes = selection.changes.map((name) => {
     if (typeof name !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) throw new Error('Nome de change inválido.')
-    return { name, proposal: readFileSync(resolve(root, 'openspec/changes', name, 'proposal.md'), 'utf8') }
+    const archivedName = Object.hasOwn(archivedChanges, name) ? archivedChanges[name] : undefined
+    if (archivedName !== undefined && (typeof archivedName !== 'string' || !new RegExp(`^\\d{4}-\\d{2}-\\d{2}-${name}$`).test(archivedName))) {
+      throw new Error(`Referência de arquivo inválida para ${name}.`)
+    }
+    const proposalPath = archivedName === undefined
+      ? resolve(root, 'openspec/changes', name, 'proposal.md')
+      : resolve(root, 'openspec/changes/archive', archivedName, 'proposal.md')
+    return { name, proposal: readFileSync(proposalPath, 'utf8') }
   })
   return validateRelease({ manifest: readJson('package.json'), lock: readJson('package-lock.json'), changes })
 }

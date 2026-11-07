@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes } from 'react-router-dom'
+import { ConnectionPage } from '../features/connection/ConnectionPage'
 import { HomePage } from './HomePage'
 import type { HubModule } from './navigation'
 
@@ -6,7 +7,7 @@ function NotFound() {
   return <section className="page-heading"><p className="eyebrow">PÁGINA NÃO ENCONTRADA</p><h1>Vamos voltar ao início?</h1><p className="page-description">Este espaço ainda não existe no seu hub.</p><NavLink className="return-link" to="/">Voltar ao início <span aria-hidden="true">→</span></NavLink></section>
 }
 
-export function App({ modules = [] }: { modules?: readonly HubModule[] }) {
+export function App({ modules = [{ id: 'connection', label: 'Conexão', path: '/connection', element: <ConnectionPage /> }] }: { modules?: readonly HubModule[] }) {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById('main-content')?.focus() }}>Pular para o conteúdo</a>

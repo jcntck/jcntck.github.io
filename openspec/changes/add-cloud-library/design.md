@@ -16,7 +16,7 @@ Ver `proposal.md`. O estado observado ainda é apenas planejamento; o shell desc
 
 Após abrir o PR, fornecer comandos de execução local e aguardar a avaliação do usuário. Cada fix que ele relatar incrementa o patch e atualiza pacote, lockfile e versão alvo desta change no mesmo PR. A versão indicada inicialmente é a base; a tag e a identificação pública usam a versão final revisada. O usuário realiza o merge pelo GitHub nas próximas entregas; não executar merge ou auto-merge por ele.
 
-A versão aprovada desta change é `0.2.0`. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.2.0` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
+A versão aprovada desta change é `0.2.2`. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.2.2` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
 
 Conferir versão alvo, pacote, lockfile, tag, SHA e identificação pública, comparando somente as changes da entrega atual. Tag existente só é reutilizável no mesmo commit; divergência falha sem sobrescrita. A publicação automática segue separada da homologação explícita do usuário.
 
@@ -46,6 +46,8 @@ A revisão é um UUID novo por alteração confirmada. Uma operação guarda sua
 
 A tela “Conexão” mostra conta conectada, estado de carregamento e resultado da última operação, sem expor credenciais. Ações explícitas: conectar/desconectar, gravar amostra e reler do Drive. “Gravar amostra” escreve somente `diagnostics.probe` com UUID e instante técnico; “Reler” faz uma nova requisição e exibe a amostra retornada. Isso prova persistência sem introduzir formulário genérico de edição de arquivos ou regras de mangás.
 
+Após criação confirmada ou leitura de documento existente, apresentar `DriveFileLink`, componente compartilhado que recebe ID e `webViewLink` opcional do snapshot. Abrir o visualizador do Drive em nova aba, sem credencial na URL ou mudança de permissões. Remover o link junto aos dados ao desconectar/trocar de conta.
+
 Não gravar automaticamente ao conectar ou abrir a página. Ao usar outro dispositivo com a mesma conta, a amostra deve ser a mesma. A interface de diagnóstico pode continuar em configurações para revalidações futuras; não inventar um segundo módulo de negócio.
 
 ### Falhas, repetição e divergências
@@ -67,9 +69,9 @@ Uma resposta perdida exige conferir o arquivo e a identidade da operação antes
 
 Conferir a homologação da etapa 1. Configurar uma conta de teste e cliente OAuth; testar localmente com adaptador simulado e com integração real. Publicar uma nova versão pelo pipeline existente e testar a tela técnica no endereço final, em computador e celular. Validar recusa, cancelamento, expiração ou revogação, rede interrompida, desconexão e conta diferente, além de inspecionar pacote e armazenamento do navegador.
 
-Registrar URL, commit, tag, execução, resultados e decisão de homologação em `docs/releases/0.2.0.md`, sem incluir tokens ou dados pessoais. Só depois da homologação explícita do usuário liberar `add-manga-reading-tracker`. Testes automatizados não substituem essa decisão.
+Registrar URL, commit, tag, execução, resultados e decisão de homologação em `docs/releases/0.2.2.md`, sem incluir tokens ou dados pessoais. Só depois da homologação explícita do usuário liberar `add-manga-reading-tracker`. Testes automatizados não substituem essa decisão.
 
-Rollback republica um frontend anterior pelo procedimento do shell, sem remover o arquivo do Drive. Preservar schema versão 1 e dados; nenhuma migração destrutiva faz parte desta etapa. A release alvo é `v0.2.0`, sem alterar a tag `v0.1.0` já homologada.
+Rollback republica um frontend anterior pelo procedimento do shell, sem remover o arquivo do Drive. Preservar schema versão 1 e dados; nenhuma migração destrutiva faz parte desta etapa. A release alvo é `v0.2.2`, sem alterar a tag `v0.1.0` já homologada.
 
 ## References
 

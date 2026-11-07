@@ -89,3 +89,11 @@ O sistema SHALL usar um documento com formato versionado e preservar campos e se
 #### Scenario: Formato incompatível
 - **WHEN** o documento usa uma versão não suportada
 - **THEN** o sistema informa incompatibilidade e não modifica o arquivo
+
+### Requirement: Abrir arquivo confirmado no Google Drive
+O sistema SHALL exibir um link para abrir no Drive o documento da conta conectada após criação confirmada ou leitura. O componente MUST ser reutilizável por módulos futuros, abrir em nova aba sem tokens na URL e desaparecer quando o documento da conta anterior for removido da sessão. O acesso MUST respeitar as permissões existentes do arquivo.
+
+#### Scenario: Inspecionar o documento
+- **WHEN** a gravação ou leitura confirma um documento da conta atual
+- **THEN** a tela oferece abrir o visualizador do Drive para esse arquivo
+- **AND** desconectar remove esse link junto com os dados da conta
