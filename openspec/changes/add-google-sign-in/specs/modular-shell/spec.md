@@ -22,6 +22,11 @@ O sistema SHALL permitir acrescentar entradas de módulos sem substituir a naveg
 - **THEN** é encaminhado à entrada pública, sem renderizar o conteúdo pessoal
 - **AND** o destino interno é preservado em memória para retorno após login válido
 
+#### Scenario: Verificar sessão ao atualizar rota pessoal
+- **WHEN** o usuário atualiza uma rota pessoal e a restauração do login ainda está em andamento
+- **THEN** vê um estado de verificação sem conteúdo pessoal nem redirecionamento prematuro
+- **AND** uma sessão válida dentro do prazo mantém a rota; ausência ou expiração leva à entrada
+
 #### Scenario: Retorno após entrada
 - **WHEN** o login termina com um destino pessoal registrado pendente
 - **THEN** o sistema abre esse destino uma única vez

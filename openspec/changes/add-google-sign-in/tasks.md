@@ -1,35 +1,44 @@
 # Tasks
 
-## 1. Base homologada e preparação da entrega
+## 1. Base e preparação da entrega
 
-- [ ] 1.1 Confirmar `dev`, versão alvo `0.3.0`, publicação e homologação explícita da cloud library `0.2.2`; registrar em evidência o SHA, URL e execução da base e impedir início de implementação enquanto a pré-condição não estiver atendida.
-- [ ] 1.2 Na implementação, alinhar pacote e lockfile a `0.3.0`, selecionar somente `add-google-sign-in` em `.release.json` e conferir por `npm run check:release`; atualizar as referências da sequência para shell → cloud library → login → mangás sem alterar a versão aprovada `1.0.0` de mangás.
+- [ ] 1.1 Confirmar `dev`, versão `0.3.0` e evidências da biblioteca homologada `0.2.2`, incluindo arquivo OpenSpec, tag, SHA e Prod; registrar a referência da base antes da implementação.
+- [ ] 1.2 Na implementação autorizada, alinhar pacote/lockfile a `0.3.0` e selecionar somente esta change na release; verificar `npm run check:release` e preservar a versão futura `1.0.0` de mangás.
 
-## 2. Identidade e ciclo de sessão
+## 2. Login persistente e configuração
 
-- [ ] 2.1 Compartilhar carregador GIS/client ID e introduzir o adaptador Sign in with Google por ação explícita, sem chamar Drive; verificar testes de entrada válida, cancelamento local, indisponibilidade e callback tardio, e documentar as origens/configuração públicas necessárias.
-- [ ] 2.2 Integrar verificação JOSE no navegador com dependência fixa e conferir assinatura/chaves Google, algoritmo permitido, emissor, destinatário, expiração, instante de emissão e nonce da tentativa; testar credenciais válidas, adulteradas, expiradas, audiência/emissor/nonce incorretos e falha de chaves, sem registrar tokens.
-- [ ] 2.3 Criar estado de identidade em memória compartilhado pelo shell; implementar saída, expiração, nova entrada explícita e troca de conta com invalidação de gerações e limpeza do Drive; testar timer, ação após suspensão da aba, reload, troca A/B e resposta antiga, e documentar ausência de sessão persistida.
+- [ ] 2.1 Integrar SDK modular Firebase Auth com versão fixa e provedor Google, somente no plano Spark sem cobrança, Firestore ou Functions; documentar com links oficiais configuração pública, domínios local/produção e vínculo com o projeto Google existente; verificar login real sem permissão ou chamadas Drive.
+- [ ] 2.2 Configurar persistência local pelo SDK e restauração/verificação da sessão antes de liberar rotas; testar reload, reabertura, sessão inválida, rede indisponível e armazenamento bloqueado, incluindo aviso de login temporário sem promessa de persistência.
+- [ ] 2.3 Aplicar limite absoluto de 30 dias desde a autenticação fornecida pelo serviço, sem renovação por refresh/uso/renovação de token; verificar com relógio controlado limite exato, um instante antes/depois, retomada de aba, credencial renovada e rejeição de um prazo local adulterado como única fonte.
+- [ ] 2.4 Implementar saída/troca e observação entre abas com invalidação de gerações; testar limpeza de persistência pelo SDK, tokens Drive, documentos, links, rascunhos e agendamentos, sem efeitos de callbacks antigos; documentar logout local versus revogação Google.
 
-## 3. Navegação e experiência de entrada
+## 3. Estado global e navegação
 
-- [ ] 3.1 Acrescentar política pública/pessoal ao catálogo de módulos e aplicar a mesma regra ao menu e à montagem de rotas no HashRouter, com Início público e Conexão pessoal; verificar acesso direto, atualização e módulo de teste pessoal, sem criar módulo de mangás.
-- [ ] 3.2 Implementar entrada no cabeçalho/área pública e menu da conta com saída/troca; preservar foco, teclado e mensagens acessíveis; testar conta exibida, erro/cancelamento recuperável, ocultação de entradas pessoais e limpeza visual após saída/expiração em desktop e celular.
-- [ ] 3.3 Implementar destino interno pendente em memória e retorno único após login; verificar testes de rota registrada, endereço externo, esquema, rota inexistente, destino malformado e cancelamento, mantendo o 404 atual para endereços desconhecidos; documentar o contrato para módulos futuros.
+- [ ] 3.1 Criar provedor React compartilhado e controladores injetáveis para identidade, conexão e sincronização, movendo a propriedade de `CloudSession` da página para o coordenador; testar duas telas/consumidores observando a mesma sessão sem tokens Drive no estado persistido.
+- [ ] 3.2 Estender política pública/pessoal do catálogo e aplicar a mesma regra ao menu e à montagem de rotas, com Início público e Conexão pessoal; testar endereço direto, reload durante restauração, ausência de flash de conta anterior e consumidor pessoal de teste, sem módulo de mangás.
+- [ ] 3.3 Implementar entrada/menu de conta, estados de verificação e retorno único a destino interno registrado; testar acessibilidade, celular/desktop, sessão restaurada mantendo rota, destino externo/malformado/inexistente e 404, documentando o contrato para módulos futuros.
 
-## 4. Conta do login e autorização Drive
+## 4. Autorização Drive independente
 
-- [ ] 4.1 Coordenar uma instância compartilhada de `CloudSession` com a identidade; solicitar `drive.file` e `openid` somente por ação de conectar, conferir os escopos e comparar o `sub` do UserInfo Google ao login antes de acessar o Drive; testar A/A, A/B recusado sem leitura, escopo ausente, UserInfo indisponível e invalidação de resposta antiga.
-- [ ] 4.2 Preservar identidade válida quando somente Drive recusar, revogar ou expirar autorização; saída/troca/expiração do login limpa ambas as sessões, documento/link e tentativas; verificar testes de cada transição, operação pendente e nova leitura antes de retomada na mesma conta, mantendo o transporte fetch nativo corrigido.
-- [ ] 4.3 Atualizar guia de configuração e testes reais com entrada sem Drive, conferência da mesma conta e comportamento de logout versus revogação; conferir no navegador os links de configuração e ausência de token em DOM, URLs, logs e armazenamento persistente.
+- [ ] 4.1 Manter GIS por clique com `drive.file` e `openid`; comparar `sub` do UserInfo com a identidade Google do provedor Firebase antes de chamar Drive, sem confundir UID Firebase ou permissionId; testar A/A, A/B recusado sem acesso, escopo ausente, erro UserInfo e resposta tardia.
+- [ ] 4.2 Preservar login quando Drive recusar, expirar, revogar ou desconectar; após refresh restaurar só login sem recuperar token Drive ou abrir popup; testar cada transição, reconexão da mesma conta com releitura e descarte das tentativas ao sair/trocar login.
+- [ ] 4.3 Atualizar guia de configuração/privacidade e testar integrações reais local/Pages; inspecionar separadamente persistência Firebase esperada e ausência de token Drive/client secret em storage, URLs, logs e pacote, sem copiar credenciais para evidências.
 
-## 5. Revisão, produção e homologação
+## 5. Contrato de sincronização
 
-- [ ] 5.1 Executar instalação pelo lockfile, lint, tipos, testes, build, validação de versão/OpenSpec e Chromium desktop/celular; incluir teste com fetch nativo e Google simulado que cubra login, acesso direto, autorização e saída, além de inspeção do pacote sem credenciais/dados privados; registrar os resultados.
-- [ ] 5.2 Abrir PR exclusivo de implementação `dev` → `main`, fornecer comandos de teste local e aguardar revisão do usuário; aplicar cada fix relatado com incremento patch coerente em pacote, lockfile, proposta e evidências, verificar checks obrigatórios e aguardar merge feito exclusivamente pelo usuário.
-- [ ] 5.3 Após merge, acompanhar Prod validar o commit final, criar automaticamente a tag da versão final e publicar o mesmo artefato; conferir versão pública, SHA, tag e execução e registrar os resultados em `docs/releases/0.3.0.md` ou arquivo da versão final revisada, sem segredos.
-- [ ] 5.4 Homologar no site real entrada sem consentimento Drive, acesso direto/retorno, recusa/cancelamento, expiração/revogação independentes, troca A/B, saída e persistência com a mesma conta em outro dispositivo; registrar evidências sem dados privados e obter homologação explícita antes de liberar mangás.
+- [ ] 5.1 Expor preparação de alteração de seção e ação manual `sync` com estados pendente/enviando/confirmado/erro/conflito, usando revisão e identidade estável da biblioteca; testar serialização, resposta perdida, edição durante envio, preservação de seções e nova tentativa sem duplicação; documentar o contrato para mangás.
+- [ ] 5.2 Adaptar a amostra técnica para preparar alteração e acionar “Sincronizar”, mantendo releitura e link do arquivo; testar ausência de gravação ao preparar, reconexão explícita quando necessária, confirmação remota, ação sem pendência sem criação e descarte explícito em conflito.
+- [ ] 5.3 Oferecer automação habilitada explicitamente na sessão, com debounce de alteração pendente somente em aba aberta e Drive válido, usando a mesma serialização; testar cancelamento no logout/troca, pausa em erro/expiração/conflito, ausência de popup automático e de polling/gravação ao restaurar login; documentar modo manual padrão e perda das tentativas no refresh.
+
+## 6. Revisão e homologação
+
+- [ ] 6.1 Executar instalação pelo lockfile, lint, tipos, testes, build, versão/OpenSpec e Chromium desktop/celular; incluir fetch nativo, Auth/Drive simulados, reload, duas abas e prazo com relógio controlado, além de consentimento real e inspeção do pacote; registrar resultados sem afirmar espera real de 30 dias se foi simulada.
+- [ ] 6.2 Abrir PR de implementação `dev` → `main`, fornecer comandos de teste e aguardar revisão/merge exclusivos do usuário; aplicar cada fix relatado com incremento patch alinhado em pacote, lockfile, proposta e evidências e conferir checks obrigatórios.
+- [ ] 6.3 Acompanhar Prod validar commit final, criar tag da versão final e publicar o mesmo artefato; conferir SHA/versão/tag/URL e registrar execução, configuração Spark e resultados em `docs/releases/0.3.0.md` ou versão final revisada, sem segredos.
+- [ ] 6.4 Homologar no site real login persistente após refresh/reabertura, logout entre abas, Drive independente, contas A/B, sincronização manual e automática autorizada, erros e conflito; apresentar testes do prazo e limites documentados, obter homologação explícita antes de liberar implementação de mangás.
 
 ## Workflow follow-up
 
-- Após homologação, sincronizar/arquivar esta change quando solicitado; atualizar a pré-condição de `add-manga-reading-tracker` para exigir também a entrega de login homologada antes de implementar sua versão própria.
+- Antes de implementar mangás `1.0.0`, reconciliar sua proposta/design/specs/tasks para exigir também login homologado e distinguir alteração local pendente de confirmação remota, usando botão “Sincronizar” e o contrato compartilhado; não reimplementar sync no módulo.
+- A implementação de mangás continua em entrega própria; nenhuma fila offline durável ou tarefa em navegador fechado é prometida por esta revisão.
+- Após homologação de login, sincronizar/arquivar esta change quando solicitado.
