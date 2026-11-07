@@ -1,3 +1,8 @@
 {
-  "changes": ["add-google-sign-in"]
+  "changes": [
+    "add-google-sign-in"
+  ],
+  "archivedChanges": {
+    "add-google-sign-in": "2026-11-07-add-google-sign-in"
+  }
 }

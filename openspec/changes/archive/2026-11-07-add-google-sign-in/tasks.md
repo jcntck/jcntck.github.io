@@ -7,7 +7,7 @@
 
 ## 2. Login persistente e configuração
 
-- [ ] 2.1 Integrar SDK modular Firebase Auth com versão fixa e provedor Google, somente no plano Spark sem cobrança, Firestore ou Functions; documentar com links oficiais configuração pública, domínios local/produção, vínculo com o projeto Google existente, cotas vigentes e acompanhamento de uso; verificar tratamento de limite atingido sem migração automática para plano pago; verificar login real sem permissão ou chamadas Drive.
+- [x] 2.1 Integrar SDK modular Firebase Auth com versão fixa e provedor Google, somente no plano Spark sem cobrança, Firestore ou Functions; documentar com links oficiais configuração pública, domínios local/produção, vínculo com o projeto Google existente, cotas vigentes e acompanhamento de uso; verificar tratamento de limite atingido sem migração automática para plano pago; verificar login real sem permissão ou chamadas Drive.
 - [x] 2.2 Configurar persistência local pelo SDK e restauração/verificação da sessão antes de liberar rotas; testar reload, reabertura, sessão inválida, rede indisponível e armazenamento bloqueado, incluindo aviso de login temporário sem promessa de persistência.
 - [x] 2.3 Aplicar limite absoluto de 30 dias desde a autenticação fornecida pelo serviço, sem renovação por refresh/uso/renovação de token; verificar com relógio controlado limite exato, um instante antes/depois, retomada de aba, credencial renovada e rejeição de um prazo local adulterado como única fonte.
 - [x] 2.4 Implementar saída/troca e observação entre abas com invalidação de gerações; testar limpeza de persistência pelo SDK, tokens Drive, documentos, links, rascunhos e agendamentos, sem efeitos de callbacks antigos; documentar logout local versus revogação Google.
@@ -22,7 +22,7 @@
 
 - [x] 4.1 Manter GIS por clique com `drive.file` e `openid`; comparar `sub` do UserInfo com a identidade Google do provedor Firebase antes de chamar Drive, sem confundir UID Firebase ou permissionId; testar A/A, A/B recusado sem acesso, escopo ausente, erro UserInfo e resposta tardia.
 - [x] 4.2 Preservar login quando Drive recusar, expirar, revogar ou desconectar; após refresh restaurar só login sem recuperar token Drive ou abrir popup; testar cada transição, reconexão da mesma conta com releitura e descarte das tentativas ao sair/trocar login.
-- [ ] 4.3 Atualizar guia de configuração/privacidade e testar integrações reais local/Pages; inspecionar separadamente persistência Firebase esperada e ausência de token Drive/client secret em storage, URLs, logs e pacote, sem copiar credenciais para evidências.
+- [x] 4.3 Atualizar guia de configuração/privacidade e testar integrações reais local/Pages; inspecionar separadamente persistência Firebase esperada e ausência de token Drive/client secret em storage, URLs, logs e pacote, sem copiar credenciais para evidências.
 
 ## 5. Contrato de sincronização
 
@@ -32,10 +32,10 @@
 
 ## 6. Revisão e homologação
 
-- [ ] 6.1 Executar instalação pelo lockfile, lint, tipos, testes, build, versão/OpenSpec e Chromium desktop/celular; incluir fetch nativo, Auth/Drive simulados, reload, duas abas e prazo com relógio controlado, além de consentimento real e inspeção do pacote; registrar resultados sem afirmar espera real de 30 dias se foi simulada.
-- [ ] 6.2 Abrir PR de implementação `dev` → `main`, fornecer comandos de teste e aguardar revisão/merge exclusivos do usuário; aplicar cada fix relatado com incremento patch alinhado em pacote, lockfile, proposta e evidências e conferir checks obrigatórios.
-- [ ] 6.3 Acompanhar Prod validar commit final, criar tag da versão final e publicar o mesmo artefato; conferir SHA/versão/tag/URL e registrar execução, configuração Spark e resultados em `docs/releases/0.3.1.md` ou versão final revisada, sem segredos.
-- [ ] 6.4 Homologar no site real login persistente após refresh/reabertura, logout entre abas, Drive independente, contas A/B, sincronização manual e automática autorizada, erros e conflito; apresentar testes do prazo e limites documentados, obter homologação explícita antes de liberar implementação de mangás.
+- [x] 6.1 Executar instalação pelo lockfile, lint, tipos, testes, build, versão/OpenSpec e Chromium desktop/celular; incluir fetch nativo, Auth/Drive simulados, reload, duas abas e prazo com relógio controlado, além de consentimento real e inspeção do pacote; registrar resultados sem afirmar espera real de 30 dias se foi simulada.
+- [x] 6.2 Abrir PR de implementação `dev` → `main`, fornecer comandos de teste e aguardar revisão/merge exclusivos do usuário; aplicar cada fix relatado com incremento patch alinhado em pacote, lockfile, proposta e evidências e conferir checks obrigatórios.
+- [x] 6.3 Acompanhar Prod validar commit final, criar tag da versão final e publicar o mesmo artefato; conferir SHA/versão/tag/URL e registrar execução, configuração Spark e resultados em `docs/releases/0.3.1.md` ou versão final revisada, sem segredos.
+- [x] 6.4 Homologar no site real login persistente após refresh/reabertura, logout entre abas, Drive independente, contas A/B, sincronização manual e automática autorizada, erros e conflito; apresentar testes do prazo e limites documentados, obter homologação explícita antes de liberar implementação de mangás.
 
 ## Workflow follow-up
 
@@ -45,8 +45,8 @@
 
 ## Entrega inicial para avaliação
 
-- Código e verificações automatizadas entregues em `0.3.1`. Permanecem sem marca de conclusão as tarefas que incluem consentimento/configuração reais, revisão/merge do usuário, publicação ou homologação.
-- Configuração pública recebida; o titular ainda está configurando o Firebase. Guia com links em `docs/firebase-setup.md`; evidências em `docs/releases/0.3.1.md`.
+- Entrega final `0.3.1` revisada no PR #3, integrada pelo usuário e publicada no Prod 42417299801. Tag e site confirmam o commit `3f0e40687e6fa39090e194ef242332168e18d419`.
+- Configuração pública recebida e entrega homologada globalmente pelo titular: “HOmologado, pode arquivar”. Os cenários privados são aceitos por essa declaração, sem afirmar execução pelo agente. Guia com links em `docs/firebase-setup.md`; evidências em `docs/releases/0.3.1.md`.
 - PR #3 aberto imediatamente ao liberar para teste: https://github.com/jcntck/jcntck.github.io/pull/3. Qualquer mudança solicitada pelo usuário após essa entrega será patch fix no mesmo PR, com pacote, lockfile e alvo alinhados.
 
 ## 7. Fixes de revisão
