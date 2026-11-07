@@ -65,7 +65,7 @@ Configuração necessária no GitHub:
 3. No ruleset, não usar **Restrict updates** sem uma configuração de atores apropriada: a restrição bloqueia também merges e não substitui **Require a pull request before merging**. Para o fluxo deste projeto, usar PR e checks obrigatórios.
 4. No ambiente **github-pages**, permitir publicação a partir de `main`. A publicação usa o `GITHUB_TOKEN` temporário, não um PAT armazenado no código.
 
-Os workflows estão em `.github/workflows/dev.yml` e `prod.yml`, com actions oficiais fixadas por SHA. O deploy e a criação da tag fazem parte do mesmo workflow: a tag criada pelo `GITHUB_TOKEN` não é usada para disparar uma terceira execução.
+Os workflows estão em `.github/workflows/dev.yml` e `prod.yml`, com actions oficiais fixadas por SHA. O pacote Pages é um `artifact.tar` com os arquivos de `dist/`, enviado como artefato `github-pages` pela action de upload já autorizada; isso evita que um helper composto exija outra versão transitiva fora da lista de permissões. O deploy e a criação da tag fazem parte do mesmo workflow: a tag criada pelo `GITHUB_TOKEN` não é usada para disparar uma terceira execução.
 
 ### Verificação e evidências
 

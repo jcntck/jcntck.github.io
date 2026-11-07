@@ -76,9 +76,18 @@ jobs:
           if (process.env.EVENT === 'workflow_dispatch' && tag !== process.env.RECOVERY_TAG) throw new Error('A tag solicitada diverge da versão do pacote.')
           appendFileSync(process.env.GITHUB_OUTPUT, `version=${version}\ncommit=${commit}\n`)
           NODE
-      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+      - name: Package Pages artifact
+        run: |
+          tar --dereference --hard-dereference --directory dist \
+            --exclude=.git --exclude=.github --exclude=".[^/]*" \
+            -cf "$RUNNER_TEMP/artifact.tar" .
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          path: dist
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          if-no-files-found: error
+          retention-days: 1
       - name: Browser test report
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
