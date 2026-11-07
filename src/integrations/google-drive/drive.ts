@@ -4,7 +4,7 @@ const API = 'https://www.googleapis.com/drive/v3'
 export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 export interface Account { id: string; name: string }
 export class DriveStorage implements LibraryStorage {
-  constructor(private token: () => string, private request: typeof fetch = fetch) {}
+  constructor(private token: () => string, private request: typeof fetch = (input, init) => fetch(input, init)) {}
   private async call(url: string, init: RequestInit = {}): Promise<Response> {
     let response: Response
     try { response = await this.request(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${this.token()}` }, cache: 'no-store' }) }
