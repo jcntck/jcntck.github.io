@@ -32,5 +32,5 @@
 ## Andamento da implementação
 
 - Pacote, lockfile e seleção de release atualizados para `0.2.0`; 1.2 aguarda os checks obrigatórios do PR.
-- Configuração de build e guia OAuth entregues em `docs/google-drive-setup.md`; 2.3 aguarda client ID e consentimento real com contas de teste.
+- Configuração de build e guia OAuth entregues em `docs/google-drive-setup.md`; client ID público recebido e configurado no frontend; 2.3 aguarda consentimento real com contas de teste.
 - 4.1–4.3 permanecem pendentes de revisão, merge pelo usuário, publicação, testes reais e homologação. Evidências em `docs/releases/0.2.0.md`.

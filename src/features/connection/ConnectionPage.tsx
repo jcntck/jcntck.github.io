@@ -1,9 +1,10 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { authorize, loadIdentity, type OAuth } from '../../integrations/google-drive/identity'
+import googleConfig from '../../integrations/google-drive/config.json'
 import { CloudSession } from '../../integrations/google-drive/session'
 
 const session = new CloudSession()
-export function ConnectionPage({ controller = session, clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '' }: { controller?: CloudSession; clientId?: string }) {
+export function ConnectionPage({ controller = session, clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || googleConfig.clientId }: { controller?: CloudSession; clientId?: string }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot)
   const [oauth, setOAuth] = useState<OAuth>()
   const [loadError, setLoadError] = useState('')
