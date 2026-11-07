@@ -35,7 +35,7 @@ O Playwright inicia e encerra seu servidor de preview e verifica desktop e celul
 
 ## Branches e versões
 
-Toda alteração é feita em `dev` e entregue por PR de `dev` para `main`. Consultar [AGENTS.md](AGENTS.md) para as regras permanentes. Não fazer push direto em `main`.
+Toda alteração é feita em `dev` e entregue por PR de `dev` para `main`. Após abrir o PR, o usuário executa a versão localmente e relata os ajustes. Cada fix apontado nessa revisão incrementa a patch version, com pacote, lockfile e versão alvo da change sincronizados no mesmo PR. Nas entregas futuras, o usuário faz o merge pelo GitHub depois de concluir sua avaliação; o agente não integra automaticamente. A autorização para o agente integrar e publicar o PR #1 é uma exceção somente desta primeira entrega. Consultar [AGENTS.md](AGENTS.md) para as regras permanentes. Não fazer push direto em `main`.
 
 Cada change precisa de versão alvo aprovada em `proposal.md`, na seção `## Version`. Na implementação, atualizar `package.json` e os campos de versão do lockfile em `dev`. O arquivo `.release.json` seleciona as changes incluídas na entrega atual; propostas de versões futuras não entram nessa comparação.
 

@@ -4,8 +4,11 @@ context: |
   Projeto pessoal sem contratação de infraestrutura paga.
   Todo trabalho, inclusive planejamento e documentação, ocorre na branch dev.
   A main recebe alterações exclusivamente por PR de dev; não criar commits nem fazer push direto nela.
+  Após abrir cada PR, fornecer instruções para o usuário testar localmente e aguardar sua revisão. Nas próximas entregas o usuário faz o merge pelo GitHub; não executar merge ou auto-merge por ele.
+  Exceção explícita somente para o PR #1: o agente pode integrar e publicar v0.1.0 e testar a republicação da mesma tag.
   Cada change exige versão alvo SemVer definida pelo usuário. Se ausente, perguntar antes de concluir o planejamento ou implementar.
   Na implementação, alinhar package.json e lockfile à versão aprovada no mesmo PR da entrega.
+  Cada correção apontada pelo usuário após a abertura do PR incrementa a patch version; atualizar pacote, lockfile e versão alvo da change no mesmo PR, sem solicitar nova versão para cada fix.
   Changes futuras podem ter versões diferentes; comparar o pacote apenas com as changes incluídas na entrega atual.
   O CI valida PRs para main. Após o merge, o workflow de produção cria a tag da versão do pacote e publica via Actions.
   Versão é alterada em dev; produção não cria commits de incremento na main.
@@ -15,6 +18,7 @@ rules:
   proposal:
     - Incluir seção "## Version" com a versão alvo SemVer informada pelo usuário; perguntar se não foi fornecida, sem inferir incremento.
     - Preservar a regra de desenvolvimento em dev e entrega por PR para main.
+    - Prever validação local do usuário após abrir o PR, incremento patch para cada fix relatado e merge realizado pelo usuário nas entregas futuras.
   design:
     - Descrever como a versão aprovada será refletida no pacote, tag e entrega, reutilizando o CI/CD existente quando aplicável.
     - O CI executa em PR para main; produção executa após merge, valida o commit final, cria tag e publica no mesmo workflow.
@@ -23,3 +27,4 @@ rules:
     - Incluir verificação de branch dev e versão alvo definida antes da implementação.
     - Incluir tarefa para criar ou atualizar package.json e o lockfile com a versão da change na entrega em dev.
     - Incluir verificação de coerência entre versão alvo, pacote, lockfile, tag e versão publicada, além da homologação da etapa.
+    - Incluir entrega do PR para teste local do usuário e acompanhamento do merge feito por ele; cada fix de revisão incrementa o patch e mantém as versões sincronizadas.

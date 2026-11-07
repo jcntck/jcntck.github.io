@@ -21,7 +21,7 @@
 
 ## 4. Segurança e homologação em produção
 
-- [ ] 4.1 Integrar o PR `dev` → `main` e acompanhar o workflow prod criar automaticamente `v0.2.0` e publicar o commit validado; inspecionar pacote, URLs, logs e armazenamento persistente para verificar ausência de tokens ou segredos; conferir coerência entre versão alvo, pacote, lockfile, tag e site e ausência de dados privados no pacote, registrando URL, commit e execução em `docs/releases/0.2.0.md`.
+- [ ] 4.1 Abrir o PR `dev` → `main`, fornecer instruções para teste local do usuário, aplicar cada fix relatado com incremento patch sincronizado e aguardar o merge realizado por ele; então acompanhar o workflow prod criar automaticamente a tag da versão final revisada (inicial `v0.2.0`) e publicar o commit validado; inspecionar pacote, URLs, logs e armazenamento persistente para verificar ausência de tokens ou segredos; conferir coerência entre versão alvo, pacote, lockfile, tag e site e ausência de dados privados no pacote, registrando URL, commit e execução em `docs/releases/0.2.0.md`.
 - [ ] 4.2 Executar no site real gravação e releitura entre dispositivos, recusa ou cancelamento, expiração ou revogação, desconexão, troca entre duas contas de teste e falha de rede; registrar resultados de persistência e privacidade sem expor credenciais, além do sucesso das verificações automatizadas.
 - [ ] 4.3 Apresentar evidências de segurança e persistência ao usuário e registrar sua homologação explícita; verificar que `add-manga-reading-tracker` permanece sem liberação enquanto a homologação desta etapa estiver pendente.
 

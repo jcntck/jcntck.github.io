@@ -16,7 +16,7 @@
 
 ## 3. Entrega e homologação do negócio
 
-- [ ] 3.1 Integrar o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados e acompanhar o workflow prod criar `v1.0.0` e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/1.0.0.md`.
+- [ ] 3.1 Abrir o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados, fornecer instruções para teste local do usuário e aplicar cada fix relatado com incremento patch sincronizado; aguardar o merge feito por ele e acompanhar o workflow prod criar a tag da versão final revisada (inicial `v1.0.0`) e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/1.0.0.md`.
 - [ ] 3.2 Executar no site real cadastro retroativo, correção, reabertura em outro dispositivo, preservação da amostra técnica e revisão visual em celular e computador; apresentar os resultados e registrar homologação explícita do usuário, corrigindo regressões dos contratos anteriores antes de concluir.
 
 ## Workflow follow-up
