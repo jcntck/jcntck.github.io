@@ -23,9 +23,9 @@ export function loadIdentity(): Promise<OAuth> {
 export function authorize(oauth: OAuth, clientId: string): Promise<Grant> {
   return new Promise((resolve, reject) => {
     const fail = () => reject(new Error('Conexão não concluída: autorização recusada, cancelada ou popup bloqueado. Tente novamente.'))
-    const client = oauth.initTokenClient({ client_id: clientId, scope: DRIVE_SCOPE, include_granted_scopes: false,
+    const client = oauth.initTokenClient({ client_id: clientId, scope: `${DRIVE_SCOPE} openid`, include_granted_scopes: false,
       callback: grant => {
-        if (grant.error || !grant.access_token || !(Number(grant.expires_in) > 0) || !oauth.hasGrantedAllScopes(grant, DRIVE_SCOPE)) fail()
+        if (grant.error || !grant.access_token || !(Number(grant.expires_in) > 0) || (!oauth.hasGrantedAllScopes(grant, DRIVE_SCOPE) || !oauth.hasGrantedAllScopes(grant, 'openid'))) fail()
         else resolve(grant)
       }, error_callback: fail,
     })

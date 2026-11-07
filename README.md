@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.2.2` acrescenta conexão Google e armazenamento privado no Drive ao shell modular. O módulo de mangás pertence à próxima etapa.
+Aplicação pessoal com módulos internos. A versão `0.3.1` acrescenta login Google persistente por até 30 dias, estado global e sincronização Drive independente. O módulo de mangás pertence à próxima etapa.
 
-Para ativar a conexão, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.2.2](docs/releases/0.2.2.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.3.1](docs/releases/0.3.1.md).
 
 ## Desenvolvimento local
 
@@ -47,11 +47,11 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-cloud-library`, em `0.2.2`. Próximas versões aprovadas: nuvem `0.2.2`; módulo de mangás e conclusão do MVP `1.0.0`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-google-sign-in`, em `0.3.1`. Próximas versões aprovadas: nuvem `0.2.2`; módulo de mangás e conclusão do MVP `1.0.0`.
 
 ## Acrescentar um módulo
 
-`src/app/App.tsx` recebe uma lista de `HubModule`, definida em `src/app/navigation.ts`. Cada entrada tem `id`, `label`, `path` e `element`. A composição acontece no ponto de entrada `src/main.tsx`, preservando a página inicial e a navegação compartilhada. Colocar a funcionalidade em `src/modules/<nome>` quando ela existir; não criar placeholders de funcionalidades ainda não implementadas.
+`src/app/App.tsx` recebe uma lista de `HubModule`, definida em `src/app/navigation.ts`. Cada entrada tem `id`, `label`, `path`, `element` e política opcional `access: public | signed-in` (pessoal por padrão). Menu e rota usam a mesma política; consumidores usam `useHub()` para compartilhar identidade, Drive e sincronização. A composição acontece no ponto de entrada `src/main.tsx`, preservando a página inicial e a navegação compartilhada. Colocar a funcionalidade em `src/modules/<nome>` quando ela existir; não criar placeholders de funcionalidades ainda não implementadas.
 
 As rotas usam fragmentos (`/#/`), portanto acesso direto e atualização não exigem reescrita no Pages. Rotas desconhecidas oferecem uma ação para voltar ao início. Um módulo fictício existe apenas nos testes para comprovar a extensão da navegação.
 
@@ -87,6 +87,6 @@ A homologação exige manifestação explícita do usuário. A integração Goog
 
 ## Dependências e custo
 
-A aplicação é estática, com repositório público e endereço padrão do Pages. Não exige banco, servidor ou domínio contratado; cotas e termos dos provedores continuam aplicáveis. Nenhuma credencial ou dado pessoal deve ser colocado no bundle.
+A aplicação é estática, com repositório público e endereço padrão do Pages. Não exige banco, servidor ou domínio contratado; cotas e termos dos provedores continuam aplicáveis. Apenas configuração pública identifica Firebase e OAuth; credenciais de usuário e dados privados não entram no bundle. A sessão Firebase usa persistência gerenciada pelo SDK; tokens Drive permanecem em memória.
 
-Dependências diretas são fixadas e o lockfile é versionado. O override de `minimatch` para `11.0.1` corrige o aviso de amplificação de glob das ferramentas de lint, sem adicionar dependência de execução ao site. Rever o override quando essas ferramentas incorporarem a correção em seus intervalos nativos.
+Dependências diretas são fixadas e o lockfile é versionado. O override de `minimatch` para `11.0.1` corrige o aviso de amplificação de glob das ferramentas de lint, sem adicionar dependência de execução ao site. Rever o override quando essas ferramentas incorporarem a correção em seus intervalos nativos. Firebase está fixado em `12.19.0`, com App/App Compat compatíveis com Node 22 e gRPC transitivo corrigido em `1.14.7`; somente App e Auth são importados no frontend. Não há serviço Firestore ativado pelo lockfile.

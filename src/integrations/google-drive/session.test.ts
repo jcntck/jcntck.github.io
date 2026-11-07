@@ -67,3 +67,60 @@ describe('sessão isolada', () => {
     f.session.disconnect()
   })
 })
+
+describe('sincronização compartilhada', () => {
+  it('prepara sem gravar e sincroniza somente por ação, sem criar documento na leitura vazia', async () => {
+    const f = fixture(); await f.session.connect(async () => grant)
+    f.session.stageProbe(); expect(f.writes).toEqual([])
+    expect(f.session.getSnapshot().syncPhase).toBe('pending')
+    await f.session.sync(); expect(f.writes).toEqual(['A'])
+    expect(f.session.getSnapshot().syncPhase).toBe('synced'); f.session.disconnect()
+  })
+  it('confere a mesma identidade antes de about ou qualquer leitura de Drive', async () => {
+    const load = vi.fn(); const account = vi.fn(); const subject = vi.fn(async () => 'B')
+    const session = new CloudSession(() => ({ subject, account, load, save: vi.fn() }), () => 'A')
+    await session.connect(async () => grant)
+    expect(session.getSnapshot().message).toContain('diferente'); expect(account).not.toHaveBeenCalled(); expect(load).not.toHaveBeenCalled()
+    session.disconnect()
+  })
+  it('preserva edição durante envio e seções diferentes na fila', async () => {
+    let finish!: (value: Snapshot) => void
+    const save = vi.fn().mockImplementationOnce(() => new Promise(resolve => { finish = resolve })).mockImplementation(async (base, op) => ({ fileId: 'a', document: applyOperation(base?.document ?? emptyEnvelope(), op) }))
+    const session = new CloudSession(() => ({ account: async () => ({ id: 'A', name: 'A' }), load: async () => null, save }))
+    await session.connect(async () => grant); session.stageSection('modules', 'first', 1)
+    const sending = session.sync(); const first = session.getSnapshot().pending!
+    session.stageSection('modules', 'first', 2); session.stageSection('modules', 'second', 3)
+    finish({ fileId: 'a', document: applyOperation(emptyEnvelope(), first) }); await sending
+    expect(session.getSnapshot().pending?.value).toBe(2)
+    await session.sync(); expect(session.getSnapshot().pending?.key).toBe('second')
+    await session.sync(); expect(session.getSnapshot().snapshot?.document.modules).toEqual({ first: 2, second: 3 }); session.disconnect()
+  })
+  it('automação é opt-in, serializada e pausa sem abrir popup ao expirar ou falhar', async () => {
+    vi.useFakeTimers(); const f = fixture(); await f.session.connect(async () => grant)
+    f.session.stageProbe(); await vi.advanceTimersByTimeAsync(1000); expect(f.writes).toEqual([])
+    f.session.setAutomatic(true); await vi.advanceTimersByTimeAsync(750); expect(f.writes).toEqual(['A'])
+    f.expire(true); f.session.stageProbe(); await vi.advanceTimersByTimeAsync(750)
+    expect(f.session.getSnapshot().phase).toBe('expired')
+    await vi.advanceTimersByTimeAsync(10_000); expect(f.writes).toEqual(['A']); f.session.disconnect()
+  })
+  it('cancelar a sessão cancela o envio automático agendado', async () => {
+    vi.useFakeTimers(); const f = fixture(); await f.session.connect(async () => grant)
+    f.session.setAutomatic(true); f.session.stageProbe(); f.session.disconnect(); await vi.advanceTimersByTimeAsync(1000)
+    expect(f.writes).toEqual([]); expect(f.session.getSnapshot().automatic).toBe(false)
+  })
+})
+
+it('ancora uma alteração preparada antes de conectar na primeira leitura remota', async () => {
+  const f = fixture(); f.documents.A!.document.modules = { future: { keep: true } }
+  f.session.stageProbe(); const operation = f.session.getSnapshot().pending!
+  await f.session.connect(async () => grant); await f.session.sync()
+  expect(f.documents.A?.document.revision).toBe(operation.id)
+  expect(f.documents.A?.document.modules).toEqual({ future: { keep: true } }); f.session.disconnect()
+})
+it('automação espera a aba ficar ativa e só então envia a pendência', async () => {
+  vi.useFakeTimers(); const visible = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
+  const f = fixture(); await f.session.connect(async () => grant); f.session.setAutomatic(true); f.session.stageProbe()
+  await vi.advanceTimersByTimeAsync(1000); expect(f.writes).toEqual([])
+  visible.mockReturnValue('visible'); f.session.resumeAutomatic(); await vi.advanceTimersByTimeAsync(750)
+  expect(f.writes).toEqual(['A']); f.session.disconnect(); visible.mockRestore(); vi.useRealTimers()
+})

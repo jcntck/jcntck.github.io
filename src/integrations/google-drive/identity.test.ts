@@ -8,7 +8,7 @@ describe('GIS', () => {
     const oauth: OAuth = {
       hasGrantedAllScopes: () => scenario !== 'scope',
       initTokenClient: config => {
-        expect(config.scope).toBe(DRIVE_SCOPE); expect(config.include_granted_scopes).toBe(false)
+        expect(config.scope).toBe(`${DRIVE_SCOPE} openid`); expect(config.include_granted_scopes).toBe(false)
         return { requestAccessToken: options => { popup(options); if (scenario === 'cancelled') config.error_callback(); else config.callback(scenario === 'denied' ? { ...grant, error: 'access_denied' } : grant) } }
       },
     }

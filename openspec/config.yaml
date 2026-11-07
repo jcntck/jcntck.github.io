@@ -4,6 +4,7 @@ context: |
   Projeto pessoal sem contratação de infraestrutura paga.
   Todo trabalho, inclusive planejamento e documentação, ocorre na branch dev.
   A main recebe alterações exclusivamente por PR de dev; não criar commits nem fazer push direto nela.
+  Ao concluir o plano inicial e as verificações locais, abrir imediatamente o PR e liberar para teste; toda mudança solicitada a partir dessa entrega é patch fix com pacote, lockfile e alvo sincronizados, sem nova confirmação de versão.
   Após abrir cada PR, fornecer instruções para o usuário testar localmente e aguardar sua revisão. Nas próximas entregas o usuário faz o merge pelo GitHub; não executar merge ou auto-merge por ele.
   Exceção explícita somente para o PR #1: o agente pode integrar e publicar v0.1.0 e testar a republicação da mesma tag.
   Cada change exige versão alvo SemVer definida pelo usuário. Se ausente, perguntar antes de concluir o planejamento ou implementar.
@@ -12,7 +13,7 @@ context: |
   Changes futuras podem ter versões diferentes; comparar o pacote apenas com as changes incluídas na entrega atual.
   O CI valida PRs para main. Após o merge, o workflow de produção cria a tag da versão do pacote e publica via Actions.
   Versão é alterada em dev; produção não cria commits de incremento na main.
-  As etapas shell, cloud-library e manga-reading exigem publicação, testes reais e homologação antes da seguinte.
+  As etapas shell, cloud-library, google-sign-in e manga-reading exigem publicação, testes reais e homologação antes da seguinte.
 
 rules:
   proposal:

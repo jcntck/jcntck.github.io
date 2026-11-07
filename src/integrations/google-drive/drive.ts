@@ -13,6 +13,11 @@ export class DriveStorage implements LibraryStorage {
     if (!response.ok) throw new LibraryError('remote', `O Drive recusou a operação (${response.status}). Releia ou reconecte; nenhum substituto foi criado.`)
     return response
   }
+  async subject(): Promise<string> {
+    const data = await (await this.call('https://openidconnect.googleapis.com/v1/userinfo')).json()
+    if (typeof data.sub !== 'string' || !data.sub) throw new LibraryError('invalid', 'Não foi possível conferir a identidade Google do Drive.')
+    return data.sub
+  }
   async account(): Promise<Account> {
     const data = await (await this.call(`${API}/about?fields=user(permissionId,displayName)`)).json()
     if (typeof data.user?.permissionId !== 'string') throw new LibraryError('invalid', 'Não foi possível identificar a conta.')

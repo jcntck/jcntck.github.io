@@ -6,7 +6,8 @@ Estas regras se aplicam a todo planejamento, desenvolvimento, documentação e e
 
 - Trabalhar sempre na branch `dev`. Conferir a branch antes de editar; se estiver em `main`, mudar para `dev` preservando alterações locais. Se `dev` ainda não existir, criá-la sem descartar trabalho existente.
 - Entregar alterações por pull request de `dev` para `main`. Não desenvolver, criar commits ou fazer push direto em `main`, nem contornar sua proteção.
-- Após abrir o PR, apresentar ao usuário instruções para executar e testar a versão localmente. Aguardar sua avaliação e corrigir os problemas que ele relatar em `dev`.
+- Ao concluir o plano inicial de implementação e as verificações locais, abrir imediatamente o PR `dev` → `main` e liberar a versão para teste do usuário, apresentando as instruções de execução. Não esperar os comentários de teste para abrir o PR.
+- A partir dessa entrega para teste com PR aberto, toda alteração solicitada pelo usuário nesse ciclo é um patch fix: incrementar a versão patch em `package.json`, lockfile e versão alvo da change antes de enviar os novos commits ao mesmo PR. Essa autorização é permanente e não exige nova confirmação de versão. Aguardar a avaliação e corrigir os problemas em `dev`.
 - Nas entregas futuras, o merge pelo GitHub é feito exclusivamente pelo usuário. Não realizar merge, auto-merge ou bypass em seu lugar; CI verde significa pronto para sua revisão, não autorização para integrar.
 - Exceção restrita à primeira entrega: o usuário autorizou o agente a integrar o PR #1, publicar `v0.1.0` e republicar a mesma tag para testar recuperação. Essa autorização não se aplica a outros PRs ou versões.
 - O repositório é `jcntck/jcntck.github.io`; o Pages é publicado por GitHub Actions na raiz de `https://jcntck.github.io/`, com base `/`.
@@ -22,7 +23,7 @@ Estas regras se aplicam a todo planejamento, desenvolvimento, documentação e e
 - A versão da aplicação fica em `package.json`. Na implementação da entrega, atualizar essa versão e os campos de versão correspondentes do lockfile em `dev`, no mesmo PR do trabalho entregue.
 - Se o projeto ainda não tiver `package.json`, criá-lo com a versão aprovada durante a inicialização da aplicação; não criar um manifesto incompleto apenas para cumprir uma alteração de planejamento.
 - Conferir coerência entre versão alvo da change entregue, `package.json`, lockfile, identificação pública e tag `v<versão>` antes de publicar. Comparar apenas as changes incluídas na entrega atual; propostas futuras podem ter outras versões.
-- Versões aprovadas para as etapas atuais: `add-modular-shell` → `0.1.0`; `add-cloud-library` → `0.2.0`; `add-manga-reading-tracker` → `1.0.0`, concluindo o MVP. Não agrupar changes de versões diferentes numa mesma entrega sem decisão explícita do usuário.
+- Versões aprovadas para as etapas atuais: `add-modular-shell` → `0.1.0`; `add-cloud-library` → `0.2.0` (entrega final homologada `0.2.2`); `add-google-sign-in` → `0.3.0`; `add-manga-reading-tracker` → `1.0.0`, concluindo o MVP. Não agrupar changes de versões diferentes numa mesma entrega sem decisão explícita do usuário.
 
 ## CI/CD
 
@@ -36,7 +37,9 @@ Estas regras se aplicam a todo planejamento, desenvolvimento, documentação e e
 
 ## Etapas e custo
 
-- Seguir a ordem: `add-modular-shell`, `add-cloud-library`, `add-manga-reading-tracker`.
+- Seguir a ordem: `add-modular-shell`, `add-cloud-library`, `add-google-sign-in`, `add-manga-reading-tracker`.
 - Iniciar a etapa seguinte somente após publicação, testes em produção e homologação explícita do usuário da etapa anterior.
 - Registrar versão, URL, commit, execução, resultados e homologação da entrega sem incluir credenciais ou dados privados.
 - O projeto é pessoal e não deve exigir serviços pagos de infraestrutura, banco ou domínio.
+
+- BaaS é autorizado quando limitado ao plano gratuito e suas cotas, sem migração automática para plano pago. Para login, foi aprovado Firebase Auth no Spark; não ativar cobrança.
