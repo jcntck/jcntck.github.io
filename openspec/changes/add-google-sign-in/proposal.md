@@ -12,7 +12,7 @@ Hoje o refresh descarta a conexão em memória e não existe uma sessão global 
 
 - Adicionar “Entrar com Google” e menu de conta, mantendo Início público e verificando identidade nas rotas pessoais.
 - Adotar estado global compartilhado para identidade, autorização Drive e situação da sincronização, com restauração de login antes de decidir a navegação.
-- Propor Firebase Authentication com provedor Google no plano gratuito Spark para persistir/renovar a sessão do aplicativo, com limite absoluto de 30 dias desde a entrada, sem estender o prazo a cada refresh. Logout, sessão inválida ou revogada podem encerrá-la antes.
+- Usar Firebase Authentication com provedor Google no plano gratuito Spark, autorizado pelo usuário para persistir/renovar a sessão do aplicativo, com limite absoluto de 30 dias desde a entrada, sem estender o prazo a cada refresh. Logout, sessão inválida ou revogada podem encerrá-la antes.
 - Restaurar o login após refresh/reabertura sem conectar automaticamente o Drive. Credenciais Firebase ficam sob persistência do SDK; tokens Google usados para Drive continuam exclusivamente em memória.
 - Manter autorização `drive.file` explícita e independente, sem renovação offline ou backend de tokens Drive; conferir que login e Drive correspondem à mesma conta.
 - Expor contrato de alterações pendentes/sincronização para futuros módulos, com operação manual “Sincronizar”, confirmação remota e estados de erro/conflito. Nesta entrega validar o contrato com a amostra técnica, sem cadastrar mangás.
@@ -32,6 +32,7 @@ Hoje o refresh descarta a conexão em memória e não existe uma sessão global 
 
 ## Impact
 
+- A escolha de BaaS está autorizada pelo usuário enquanto houver cota gratuita: manter Spark sem cobrança, conferir limites antes da implementação e documentar acompanhamento de uso. Esgotar a cota deve resultar em mensagem recuperável, sem troca automática para plano pago.
 - Adicionar SDK modular Firebase Auth e configuração pública; provisionamento/configuração no console será manual e documentado antes dos testes reais. Não contratar plano pago, Firestore, Functions ou Firebase Hosting.
 - Reutilizar o frontend no GitHub Pages, o cliente GIS do Drive e o armazenamento schema 1. Não criar backend próprio ou mover dados de negócio para Firebase.
 - `App`, catálogo de módulos e provedores comuns passam a compartilhar identidade/Drive/sincronização. `ConnectionPage` deixa de possuir uma sessão isolada e consome esse estado.

@@ -7,7 +7,7 @@
 
 ## 2. Login persistente e configuração
 
-- [ ] 2.1 Integrar SDK modular Firebase Auth com versão fixa e provedor Google, somente no plano Spark sem cobrança, Firestore ou Functions; documentar com links oficiais configuração pública, domínios local/produção e vínculo com o projeto Google existente; verificar login real sem permissão ou chamadas Drive.
+- [ ] 2.1 Integrar SDK modular Firebase Auth com versão fixa e provedor Google, somente no plano Spark sem cobrança, Firestore ou Functions; documentar com links oficiais configuração pública, domínios local/produção, vínculo com o projeto Google existente, cotas vigentes e acompanhamento de uso; verificar tratamento de limite atingido sem migração automática para plano pago; verificar login real sem permissão ou chamadas Drive.
 - [ ] 2.2 Configurar persistência local pelo SDK e restauração/verificação da sessão antes de liberar rotas; testar reload, reabertura, sessão inválida, rede indisponível e armazenamento bloqueado, incluindo aviso de login temporário sem promessa de persistência.
 - [ ] 2.3 Aplicar limite absoluto de 30 dias desde a autenticação fornecida pelo serviço, sem renovação por refresh/uso/renovação de token; verificar com relógio controlado limite exato, um instante antes/depois, retomada de aba, credencial renovada e rejeição de um prazo local adulterado como única fonte.
 - [ ] 2.4 Implementar saída/troca e observação entre abas com invalidação de gerações; testar limpeza de persistência pelo SDK, tokens Drive, documentos, links, rascunhos e agendamentos, sem efeitos de callbacks antigos; documentar logout local versus revogação Google.

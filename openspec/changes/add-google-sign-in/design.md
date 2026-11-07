@@ -16,7 +16,7 @@ O usuário decidiu manter login por até 30 dias e tratar Drive separadamente. D
 
 ### Login persistente por Firebase Authentication
 
-Propor o SDK modular Firebase Auth com provedor Google no plano Spark gratuito. Isso acrescenta um serviço gerenciado de identidade, sem servidor próprio. Usar o projeto Google existente quando compatível, habilitar apenas autenticação Google e cadastrar os domínios autorizados de produção/local. Documentar criação do app Web, configuração pública e vínculo do provedor antes de qualquer provisionamento. Não ativar cobrança ou outros serviços.
+Usar o SDK modular Firebase Auth com provedor Google no plano Spark gratuito, escolha autorizada explicitamente pelo usuário. Isso acrescenta um serviço gerenciado de identidade, sem servidor próprio. Usar o projeto Google existente quando compatível, habilitar apenas autenticação Google e cadastrar os domínios autorizados de produção/local. Documentar criação do app Web, configuração pública e vínculo do provedor antes de qualquer provisionamento. Não ativar cobrança ou outros serviços. Conferir as cotas vigentes na configuração e documentar sua consulta no console. Ao atingir uma cota, informar indisponibilidade temporária e preservar o estado aplicável, sem migrar automaticamente para Blaze ou contratar capacidade.
 
 O SDK cuida do login e da renovação das credenciais da aplicação. O hub não implementa verificação JOSE ou renovação manual de um ID token Google. Login não pede escopo Drive, não lê documentos e não reutiliza como credencial Drive qualquer token retornado pelo provedor de login.
 
