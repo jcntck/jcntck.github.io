@@ -8,7 +8,7 @@
 
 ## 2. Workflows dev e prod
 
-- [ ] 2.1 Configurar workflow dev para PR aberto, atualizado ou reaberto para `main`, validando origem `dev`, lint, tipos, testes, build e coerência da versão da entrega com pacote e lockfile; verificar execuções reais de sucesso e falha controlada, configurar checks obrigatórios e comprovar que PR não publica.
+- [x] 2.1 Configurar workflow dev para PR aberto, atualizado ou reaberto para `main`, validando origem `dev`, lint, tipos, testes, build e coerência da versão da entrega com pacote e lockfile; verificar execuções reais de sucesso e falha controlada, configurar checks obrigatórios e comprovar que PR não publica.
 - [x] 2.2 Configurar workflow prod em `push` para `main` após merge, revalidando o commit final, criando o artefato, gerando a tag da versão do pacote e publicando no mesmo workflow; verificar dependência dos jobs, permissões mínimas, concorrência e ausência de commits automáticos de incremento, documentando o fluxo.
 - [x] 2.3 Implementar validação de tag e reexecução segura, além de recuperação manual de release conhecida; verificar os casos de tag ausente, mesmo SHA e SHA divergente, garantindo que tags existentes não sejam movidas e que não seja necessário disparar outro workflow pela tag criada.
 
