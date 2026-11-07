@@ -41,3 +41,14 @@ test('recupera rota inexistente e navega pelo teclado', async ({ page }) => {
   await expect(page.getByRole('main')).toBeFocused()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Seu espaço, aos poucos.')
 })
+
+test('navega para conexão por endereço e mantém layout no celular', async ({ page }) => {
+  await page.goto('./#/')
+  await page.getByRole('link', { name: 'Conexão', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Conectar Google Drive' })).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 })
+})
