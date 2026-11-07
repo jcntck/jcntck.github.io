@@ -47,4 +47,4 @@
 
 - Código e verificações automatizadas entregues em `0.3.0`. Permanecem sem marca de conclusão as tarefas que incluem consentimento/configuração reais, revisão/merge do usuário, publicação ou homologação.
 - Configuração pública recebida; o titular ainda está configurando o Firebase. Guia com links em `docs/firebase-setup.md`; evidências em `docs/releases/0.3.0.md`.
-- Abrir PR imediatamente ao liberar para teste. Qualquer mudança solicitada pelo usuário após essa entrega será patch fix no mesmo PR, com pacote, lockfile e alvo alinhados.
+- PR #3 aberto imediatamente ao liberar para teste: https://github.com/jcntck/jcntck.github.io/pull/3. Qualquer mudança solicitada pelo usuário após essa entrega será patch fix no mesmo PR, com pacote, lockfile e alvo alinhados.
