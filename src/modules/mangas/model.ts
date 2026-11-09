@@ -1,9 +1,9 @@
 import type { Json } from '../../shared/storage/library'
 import { localDay, validDay } from './dates'
 
-export type Manga = { [key: string]: Json } & { id: string; title: string; lastChapter: string; lastReadOn: string; updatedAt: string; scanUrl?: string; scanName?: string }
+export type Manga = { [key: string]: Json } & { id: string; title: string; lastChapter: string; lastReadOn: string; updatedAt: string; scanUrl?: string; scanName?: string; coverUrl?: string }
 export interface MangaSection { [key: string]: Json; items: Manga[] }
-export type Fields = Pick<Manga, 'title' | 'lastChapter' | 'lastReadOn' | 'scanUrl' | 'scanName'>
+export type Fields = Pick<Manga, 'title' | 'lastChapter' | 'lastReadOn' | 'scanUrl' | 'scanName' | 'coverUrl'>
 export type Errors = Partial<Record<keyof Fields, string>>
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value)
@@ -13,6 +13,7 @@ export function validScanUrl(value: string): boolean {
     return ['https:', 'http:'].includes(url.protocol) && !!url.hostname && !url.username && !url.password
   } catch { return false }
 }
+export function validCoverUrl(value: string): boolean { return validScanUrl(value) && new URL(value).protocol === 'https:' }
 export function validateFields(fields: Fields, today = localDay()): Errors {
   const errors: Errors = {}
   if (!fields.title.trim()) errors.title = 'Informe o título.'
@@ -20,6 +21,7 @@ export function validateFields(fields: Fields, today = localDay()): Errors {
   if (!validDay(fields.lastReadOn)) errors.lastReadOn = 'Informe uma data de leitura válida.'
   else if (fields.lastReadOn > today) errors.lastReadOn = 'A data de leitura não pode estar no futuro.'
   if (fields.scanUrl?.trim() && !validScanUrl(fields.scanUrl.trim())) errors.scanUrl = 'Informe um link completo http:// ou https://, sem usuário ou senha.'
+  if (fields.coverUrl?.trim() && !validCoverUrl(fields.coverUrl.trim())) errors.coverUrl = 'Informe o link direto HTTPS de uma imagem, sem usuário ou senha.'
   return errors
 }
 export function readSection(value: Json | undefined): MangaSection {
@@ -33,6 +35,7 @@ export function readSection(value: Json | undefined): MangaSection {
     ids.add(item.id)
     if (item.scanUrl !== undefined && (typeof item.scanUrl !== 'string' || (item.scanUrl !== '' && !validScanUrl(item.scanUrl)))) throw new Error('Há um link de scan inválido. Nada foi substituído.')
     if (item.scanName !== undefined && typeof item.scanName !== 'string') throw new Error('Há um nome de scan inválido. Nada foi substituído.')
+    if (item.coverUrl !== undefined && (typeof item.coverUrl !== 'string' || (item.coverUrl !== '' && !validCoverUrl(item.coverUrl)))) throw new Error('Há uma capa com endereço inválido. Nada foi substituído.')
   }
   return structuredClone(value) as MangaSection
 }
@@ -44,6 +47,8 @@ export function updateReading(section: MangaSection, record: Manga, today = loca
   else delete next.scanUrl
   if (next.scanUrl && record.scanName?.trim()) next.scanName = record.scanName.trim()
   else delete next.scanName
+  if (record.coverUrl?.trim()) next.coverUrl = new URL(record.coverUrl.trim()).href
+  else delete next.coverUrl
   const result = { ...section, items: current ? section.items.map(item => item.id === next.id ? next : item) : [...section.items, next] }
   return readSection(result)
 }

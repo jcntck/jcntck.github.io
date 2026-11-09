@@ -1,0 +1,111 @@
+import { test, expect } from '@playwright/test'
+import type { Envelope } from '../../src/shared/storage/library'
+import type { MangaSection } from '../../src/modules/mangas/model'
+
+test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL), 'Contas e 126 obras são simuladas somente no ambiente local/CI.')
+test('pagina 126 obras com capas externas, falha visual e tempo completo sem chamadas Drive ao navegar', async ({ page }, testInfo) => {
+  await page.clock.install({ time: new Date('2026-11-09T12:00:00Z') })
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.route('https://accounts.google.com/gsi/client', route => route.fulfill({ contentType: 'application/javascript', body: `window.google={accounts:{oauth2:{initTokenClient:config=>({requestAccessToken:()=>config.callback({access_token:'synthetic-library-drive',expires_in:3600,scope:'https://www.googleapis.com/auth/drive.file openid'})}),hasGrantedAllScopes:()=>true}}};` }))
+  const items = Array.from({ length: 126 }, (_, index) => ({
+    id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    title: `Obra ${String(index + 1).padStart(3, '0')}`, lastChapter: 'Extra 1',
+    lastReadOn: ['2026-11-08', '2026-04-09', '2024-07-25'][index % 3],
+    updatedAt: '2026-11-09T10:00:00.000Z', coverUrl: `https://covers.example/${index + 1}.svg`, extra: 'preserve',
+  }))
+  let remote: Envelope = { schemaVersion: 1, revision: 'original', diagnostics: { probe: 'preserve' }, modules: { mangas: { items, extension: 'preserve' }, another: 'preserve' } }
+  let driveRequests = 0; let writes = 0
+  const covers: string[] = []
+  await page.route('https://covers.example/**', async route => {
+    const request = route.request()
+    covers.push(new URL(request.url()).pathname)
+    expect(request.method()).toBe('GET')
+    expect(request.resourceType()).toBe('image')
+    expect(request.headers().authorization).toBeUndefined()
+    expect(request.headers().origin).toBeUndefined()
+    expect(request.headers().referer).toBeUndefined()
+    if (request.url().endsWith('/126.svg')) { await route.fulfill({ status: 404, body: '' }); return }
+    await route.fulfill({ contentType: 'image/svg+xml', headers: { 'access-control-allow-origin': 'https://other.example' }, body: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="112"><rect width="80" height="112" fill="#304540"/><path d="M20 25h40v62H20z" fill="#c2d4a4"/></svg>' })
+  })
+  await page.route('https://openidconnect.googleapis.com/v1/userinfo', route => route.fulfill({ json: { sub: 'test-google-A' } }))
+  await page.route('https://www.googleapis.com/**', async route => {
+    driveRequests++
+    const request = route.request(); const url = new URL(request.url())
+    if (request.method() === 'PATCH') { writes++; remote = request.postDataJSON() as Envelope; await route.fulfill({ json: {} }) }
+    else if (url.pathname.endsWith('/about')) await route.fulfill({ json: { user: { permissionId: 'test-permission', displayName: 'Conta simulada' } } })
+    else if (url.searchParams.get('alt') === 'media') await route.fulfill({ json: remote })
+    else await route.fulfill({ json: { files: [{ id: 'test-file' }] } })
+  })
+  await page.goto('http://127.0.0.1:5175/tests/browser/fixtures/auth.html#/mangas')
+  await page.getByRole('button', { name: 'Entrar com Google' }).click()
+  await page.getByRole('link', { name: /Abrir Conexão/ }).click()
+  await page.getByRole('button', { name: 'Conectar Google Drive' }).click()
+  await expect(page.getByText('Conta conectada e documento conferido.')).toBeVisible()
+  await page.getByRole('link', { name: 'Mangás', exact: true }).click()
+  const beforeNavigation = driveRequests
+  const pagination = page.getByRole('navigation', { name: 'Paginação da biblioteca' })
+  await expect(page.locator('.manga-list>li')).toHaveCount(12)
+  await expect(page.getByText('Exibindo 1–12 de 126 obras', { exact: true })).toBeVisible()
+  await expect(pagination.getByText('Página 1 de 11', { exact: true })).toBeVisible()
+  await expect(pagination.getByRole('button', { name: 'Página anterior', exact: true })).toBeDisabled()
+  const cover = page.getByRole('img', { name: 'Capa de Obra 001', exact: true })
+  await expect(cover).toHaveJSProperty('naturalWidth', 80)
+  await expect(cover).not.toHaveAttribute('crossorigin')
+  await expect(cover).toHaveAttribute('loading', 'lazy')
+  expect(covers.every(path => Number(path.slice(1, -4)) <= 12)).toBe(true)
+  const ageStyles = await page.locator('.manga-elapsed').evaluateAll(elements => elements.slice(0, 3).map(element => ({ color: getComputedStyle(element).color, weight: Number(getComputedStyle(element).fontWeight) })))
+  expect(new Set(ageStyles.map(style => style.color)).size).toBe(3)
+  expect(ageStyles[0].weight).toBeLessThan(ageStyles[1].weight)
+  expect(ageStyles[1].weight).toBeLessThan(ageStyles[2].weight)
+  await expect(page.locator('.manga-elapsed').nth(2)).toHaveText('Lido há 2 anos 3 meses 15 dias')
+  await page.screenshot({ path: testInfo.outputPath('manga-covers.png'), animations: 'disabled' })
+  await pagination.getByRole('button', { name: 'Página 11', exact: true }).click()
+  await expect(page.locator('.manga-list>li')).toHaveCount(6)
+  await expect(page.getByText('Exibindo 121–126 de 126 obras', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Sua biblioteca', exact: true })).toBeFocused()
+  await expect(pagination.getByRole('button', { name: 'Próxima página', exact: true })).toBeDisabled()
+  await page.getByRole('heading', { name: 'Obra 126', exact: true }).scrollIntoViewIfNeeded()
+  await expect(page.getByRole('img', { name: 'Capa indisponível: Obra 126', exact: true })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Capa de Obra 001', exact: true })).toHaveCount(0)
+  await page.getByLabel('Buscar mangá').fill('obra 00')
+  await expect(page.locator('.manga-list>li')).toHaveCount(9)
+  await expect(pagination).toHaveCount(0)
+  await page.getByLabel('Buscar mangá').fill('obra')
+  await expect(pagination.getByText('Página 1 de 11', { exact: true })).toBeVisible()
+  await pagination.getByRole('button', { name: 'Próxima página', exact: true }).click()
+  await page.getByLabel('Ordenar por').selectOption('title-desc')
+  await expect(pagination.getByText('Página 1 de 11', { exact: true })).toBeVisible()
+  await expect(page.locator('.manga-list h3').first()).toHaveText('Obra 126')
+  await page.getByLabel('Ordenar por').selectOption('title-asc')
+  expect(driveRequests).toBe(beforeNavigation)
+  expect(writes).toBe(0)
+  await page.getByRole('button', { name: 'Cadastrar mangá', exact: true }).click()
+  await page.getByLabel('Título', { exact: true }).fill('ZZZ nova obra')
+  await page.getByLabel('Último capítulo lido').fill('12.5')
+  await page.getByRole('button', { name: 'Salvar leitura', exact: true }).click()
+  await expect(page.getByRole('form')).toHaveCount(0)
+  await expect(pagination.getByText('Página 11 de 11', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'ZZZ nova obra', exact: true })).toBeFocused()
+  await expect(page.locator('.manga-list>li')).toHaveCount(7)
+  await page.getByRole('button', { name: 'Corrigir leitura de Obra 126', exact: true }).click()
+  await expect(page.getByLabel('Link da capa (opcional)')).toHaveValue('https://covers.example/126.svg')
+  await page.getByLabel('Link da capa (opcional)').fill('https://covers.example/repaired.svg')
+  await page.getByRole('button', { name: 'Salvar leitura', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Obra 126', exact: true })).toBeFocused()
+  const repaired = page.getByRole('img', { name: 'Capa de Obra 126', exact: true })
+  await expect(repaired).toHaveJSProperty('naturalWidth', 80)
+  expect(driveRequests).toBe(beforeNavigation)
+  expect(writes).toBe(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.getByRole('button', { name: 'Sincronizar', exact: true }).click()
+  await expect(page.getByText('Gravação confirmada no Drive.', { exact: true })).toBeVisible()
+  expect(writes).toBe(1)
+  const saved = remote.modules.mangas as MangaSection
+  expect(saved.items).toHaveLength(127)
+  expect(saved.items[125]).toMatchObject({ id: items[125].id, lastReadOn: items[125].lastReadOn, coverUrl: 'https://covers.example/repaired.svg', extra: 'preserve' })
+  expect(saved.extension).toBe('preserve')
+  expect(remote.diagnostics.probe).toBe('preserve')
+  expect(remote.modules.another).toBe('preserve')
+  expect(errors).toEqual([])
+})

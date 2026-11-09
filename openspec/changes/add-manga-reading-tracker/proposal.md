@@ -2,7 +2,7 @@
 
 ## Version
 
-`0.4.2` — patch de revisão da entrega inicial `0.4.0`, conforme regra permanente; tag automática `v0.4.2`.
+`0.4.3` — patch de revisão da entrega inicial `0.4.0`, conforme regra permanente; tag automática `v0.4.3`.
 
 ## Why
 
@@ -13,8 +13,9 @@ Com publicação, autenticação e persistência em nuvem já homologadas, podem
 - Adicionar o módulo “Mangás” à navegação do shell existente.
 - Permitir cadastrar e corrigir título, último capítulo lido e data da leitura, usando o armazenamento já validado.
 - Adicionar link opcional da scan, com nome/label opcional e abertura em nova aba. Nenhuma verificação de disponibilidade ou requisição para a scan.
-- Buscar obras por título e ordenar por nome ou data, localmente.
-- Mostrar data absoluta e mensagens como “Lido há 18 dias”, “Lido há 7 meses” e “Lido há 2 anos”.
+- Adicionar capa opcional por link HTTPS direto, com carregamento preguiçoso e alternativa visual para ausência/falha.
+- Buscar e ordenar localmente e paginar em 12 obras por página, atendendo bibliotecas de aproximadamente 126 obras sem chamadas Drive adicionais.
+- Mostrar data absoluta e tempo completo, como “Lido há 2 anos 3 meses 15 dias”, com três níveis de destaque: menos de 6 meses, de 6 meses a menos de 1 ano e a partir de 1 ano.
 - Preservar seis meses ou um ano como referência global do leitor, sem intervalos individuais, data de retorno ou cobrança por atraso.
 - Definir e refinar a aparência do módulo nesta etapa, com formulários acessíveis e listagem legível em celular e computador.
 - Fechar o formulário após salvar uma leitura válida na aba, com feedback animado, foco acessível e respeito a movimento reduzido.
@@ -34,7 +35,7 @@ Nenhuma. O módulo consome os contratos existentes de navegação e armazenament
 
 ## Impact
 
-- Implementar em `dev`, atualizando `package.json` e lockfile para `0.4.2` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v0.4.2` e publica sem commits automáticos de versão.
+- Implementar em `dev`, atualizando `package.json` e lockfile para `0.4.3` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v0.4.3` e publica sem commits automáticos de versão.
 - Acrescentar `src/modules/mangas`, modelo de leitura e sua seção no documento compartilhado, preservando dados existentes.
 - Reutilizar shell, sessão Google, tratamento de armazenamento e processo de entrega das etapas anteriores.
 - Não reconstruir CI/CD, OAuth ou adaptador Drive; defeitos nesses contratos devem ser corrigidos e revalidados antes de continuar a homologação do módulo.

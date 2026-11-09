@@ -48,3 +48,18 @@ describe('biblioteca de leituras', () => {
     expect(() => readSection({ items: [{ ...record, scanUrl }] })).toThrow(/scan inválido/)
   })
 })
+
+it('inclui, preserva e remove somente a URL da capa com compatibilidade dos registros antigos', () => {
+  const base = { extension: 'keep', items: [{ ...record, future: 'keep' }] }
+  expect(readSection(base).items[0].coverUrl).toBeUndefined()
+  const withCover = updateReading(readSection(base), { ...record, coverUrl: ' https://covers.example/capa?id=1 ' }, '2026-11-09')
+  expect(withCover.items[0]).toMatchObject({ coverUrl: 'https://covers.example/capa?id=1', future: 'keep', id: record.id, lastReadOn: record.lastReadOn })
+  const edited = updateReading(withCover, { ...withCover.items[0], title: 'Correção' }, '2026-11-09')
+  expect(edited.items[0].coverUrl).toBe('https://covers.example/capa?id=1')
+  expect(updateReading(edited, { ...edited.items[0], coverUrl: '' }, '2026-11-09').items[0]).not.toHaveProperty('coverUrl')
+  expect(base.items[0]).not.toHaveProperty('coverUrl')
+})
+it.each(['http://covers.example/a.jpg', '/capa.jpg', 'data:image/png;base64,abc', 'javascript:alert(1)', 'https://user:pass@covers.example/capa'])('recusa capa sem HTTPS absoluto ou com credenciais %s', coverUrl => {
+  expect(validateFields({ ...record, coverUrl }, '2026-11-09')).toHaveProperty('coverUrl')
+  expect(() => readSection({ items: [{ ...record, coverUrl }] })).toThrow(/capa/)
+})

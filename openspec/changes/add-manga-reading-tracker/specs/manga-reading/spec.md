@@ -54,23 +54,23 @@ O sistema SHALL mostrar as obras com título, último capítulo, data da leitura
 - **THEN** o sistema informa que ainda não há mangás cadastrados e oferece cadastrar o primeiro
 
 ### Requirement: Exibir o tempo desde a leitura
-O sistema SHALL calcular o tempo decorrido a partir da data de leitura e do dia local atual, usando dias antes de completar um mês, meses completos antes de completar um ano e anos completos a partir de um ano. O texto SHALL respeitar singular e plural e ser recalculado ao reabrir a aplicação e ao mudar o dia enquanto ela estiver aberta.
+O sistema SHALL calcular o tempo decorrido a partir da data de leitura e do dia local atual, apresentando conjuntamente anos, meses e dias completos de calendário, inclusive unidades zeradas. Meses completos totais usam o aniversário do dia original ajustado ao fim do mês; anos e meses são sua divisão por 12, e os dias são o restante civil desde esse aniversário. O texto SHALL respeitar singular e plural e ser recalculado ao reabrir a aplicação e ao mudar o dia enquanto ela estiver aberta.
 
 #### Scenario: Leitura de hoje
 - **WHEN** a data de leitura corresponde ao dia local atual
-- **THEN** a mensagem é “Lido hoje”
+- **THEN** a mensagem é “Lido há 0 anos 0 meses 0 dias”
 
 #### Scenario: Dias de leitura
 - **WHEN** hoje é 19/11/2026 e a leitura ocorreu em 01/11/2026
-- **THEN** a mensagem é “Lido há 18 dias”
+- **THEN** a mensagem é “Lido há 0 anos 0 meses 18 dias”
 
 #### Scenario: Meses de leitura
 - **WHEN** hoje é 06/11/2026 e a leitura ocorreu em 06/04/2026
-- **THEN** a mensagem é “Lido há 7 meses”
+- **THEN** a mensagem é “Lido há 0 anos 7 meses 0 dias”
 
 #### Scenario: Anos de leitura
 - **WHEN** hoje é 06/11/2026 e a leitura ocorreu em 06/11/2024
-- **THEN** a mensagem é “Lido há 2 anos”
+- **THEN** a mensagem é “Lido há 2 anos 0 meses 0 dias”
 
 #### Scenario: Virada do dia
 - **WHEN** a aplicação permanece aberta durante a mudança do dia local
@@ -135,7 +135,7 @@ O módulo SHALL permitir incluir, alterar e remover um link opcional HTTP/HTTPS 
 - **THEN** o formulário aponta o erro e mantém os demais campos sem preparar ou enviar a alteração
 
 ### Requirement: Abrir a scan sem consultar disponibilidade
-O módulo MUST apenas apresentar o link e seu nome/hostname para abertura pelo leitor. MUST NOT executar verificações HTTP, fetch, HEAD ou polling da scan ao abrir o módulo, salvar, buscar, ordenar ou interagir com a lista.
+O módulo MUST apenas apresentar o link da scan e seu nome/hostname para abertura pelo leitor; essa regra não impede exibir a URL escolhida explicitamente no campo separado de capa como imagem. MUST NOT executar verificações HTTP, fetch, HEAD ou polling da scan ao abrir o módulo, salvar, buscar, ordenar ou interagir com a lista.
 
 #### Scenario: Consultar a origem da leitura
 - **WHEN** o leitor consulta a biblioteca com scan cadastrada
@@ -173,3 +173,36 @@ Salvar uma leitura válida SHALL preparar a operação manual em memória, fecha
 #### Scenario: Campos inválidos e movimento reduzido
 - **WHEN** o leitor tenta salvar dados inválidos com preferência por movimento reduzido
 - **THEN** o formulário permanece aberto com erros associados aos campos e as animações/transições ficam desativadas
+
+### Requirement: Apresentar capas por URL
+O módulo SHALL permitir incluir, editar e remover capa opcional por URL HTTPS absoluta sem credenciais. Registros sem capa MUST permanecer compatíveis. A imagem SHALL ser exibida diretamente com carregamento preguiçoso, dimensões reservadas e alternativa visual acessível para ausência ou falha, sem exigir CORS para leitura de pixels, proxy, upload, cópia ou verificação HTTP. Somente o endereço SHALL ser persistido pelo envio manual existente.
+
+#### Scenario: Capa válida e alteração do endereço
+- **WHEN** o leitor salva uma capa HTTPS direta
+- **THEN** a página da obra mostra a imagem sem fetch/HEAD ou canvas e sincroniza somente a URL quando solicitado
+- **AND** trocar ou remover o endereço mantém identificação, data e demais propriedades
+
+#### Scenario: Imagem bloqueada ou ausente
+- **WHEN** a capa não existe, falha ou o servidor bloqueia hotlink
+- **THEN** a biblioteca mantém os controles e o layout e mostra uma alternativa acessível, sem tentativas em loop
+
+### Requirement: Paginar a biblioteca localmente
+O módulo SHALL paginar os resultados já buscados/ordenados em 12 obras, com anterior/próxima/números, total e intervalo exibido. Paginação MUST NOT consultar Drive, alterar registros ou criar pendências. Busca e ordem SHALL reiniciar na primeira página. Salvar SHALL abrir a página da obra e focá-la; diminuir a lista SHALL limitar a página para um intervalo válido.
+
+#### Scenario: Biblioteca com 126 obras
+- **WHEN** o leitor carrega 126 obras
+- **THEN** vê no máximo 12 registros por página, 11 páginas no total e 6 registros na última
+- **AND** apenas as imagens da página exibida são montadas e navegar não faz chamadas Drive
+
+#### Scenario: Filtrar ou salvar fora da primeira página
+- **WHEN** o leitor busca/ordena ou salva uma obra em uma biblioteca paginada
+- **THEN** a busca/ordenação abre a primeira página e salvar abre a página da obra, fecha o formulário e move o foco para ela
+- **AND** os dados e a ordenação persistida permanecem intactos até edição explícita
+
+### Requirement: Graduar o destaque do tempo de leitura
+O tempo completo SHALL ter no máximo três faixas de destaque crescente: menos de 6 meses completos, de 6 meses a menos de 12 e a partir de 12 meses. O texto SHALL permanecer legível e mostrar anos/meses/dias em todas as faixas, sem depender apenas de cor nem indicar atraso.
+
+#### Scenario: Tempo completo e cortes do destaque
+- **WHEN** hoje é 09/11/2026 e a leitura foi em 25/07/2024
+- **THEN** a mensagem é “Lido há 2 anos 3 meses 15 dias” com destaque forte
+- **AND** uma leitura com menos de 6 meses usa destaque discreto e, ao completar 6 meses, passa ao intermediário sem alterar sua data

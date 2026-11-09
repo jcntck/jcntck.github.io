@@ -22,15 +22,21 @@ function ordinal(day: string) {
 function anniversary(year: number, month: number, date: number) {
   return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(Math.min(date, daysInMonth(year, month))).padStart(2, '0')}`
 }
-export function elapsed(lastReadOn: string, today = localDay()): string {
-  if (lastReadOn > today) return 'Confira a data de leitura'
-  const days = ordinal(today) - ordinal(lastReadOn)
-  if (days === 0) return 'Lido hoje'
+export function calendarSince(lastReadOn: string, today = localDay()) {
+  if (lastReadOn > today) return null
   const [year, month, date] = parts(lastReadOn)
   const [currentYear, currentMonth] = parts(today)
-  const years = currentYear - year - Number(anniversary(currentYear, month, date) > today)
-  if (years > 0) return `Lido há ${years} ${years === 1 ? 'ano' : 'anos'}`
-  const months = (currentYear - year) * 12 + currentMonth - month - Number(anniversary(currentYear, currentMonth, date) > today)
-  if (months > 0) return `Lido há ${months} ${months === 1 ? 'mês' : 'meses'}`
-  return `Lido há ${days} ${days === 1 ? 'dia' : 'dias'}`
+  const totalMonths = (currentYear - year) * 12 + currentMonth - month - Number(anniversary(currentYear, currentMonth, date) > today)
+  const anchorMonth = year * 12 + month - 1 + totalMonths
+  const anchor = anniversary(Math.floor(anchorMonth / 12), anchorMonth % 12 + 1, date)
+  return { years: Math.floor(totalMonths / 12), months: totalMonths % 12, days: ordinal(today) - ordinal(anchor), totalMonths }
+}
+export function elapsed(lastReadOn: string, today = localDay()): string {
+  const age = calendarSince(lastReadOn, today)
+  if (!age) return 'Confira a data de leitura'
+  return `Lido há ${age.years} ${age.years === 1 ? 'ano' : 'anos'} ${age.months} ${age.months === 1 ? 'mês' : 'meses'} ${age.days} ${age.days === 1 ? 'dia' : 'dias'}`
+}
+export function readingEmphasis(lastReadOn: string, today = localDay()): 'recent' | 'medium' | 'long' {
+  const months = calendarSince(lastReadOn, today)?.totalMonths ?? 0
+  return months >= 12 ? 'long' : months >= 6 ? 'medium' : 'recent'
 }

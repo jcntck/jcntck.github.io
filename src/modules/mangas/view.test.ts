@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { visibleReadings } from './view'
+import { readingPage, visibleReadings } from './view'
 import type { Manga } from './model'
 const records: Manga[] = [
   { id: 'b', title: 'Zebra', lastReadOn: '2026-01-01', lastChapter: '1', updatedAt: '' },
@@ -19,4 +19,22 @@ it('ordena nas quatro direções sem alterar dados, com desempate estável', () 
   expect(visibleReadings(records, '', 'date-desc').map(item => item.id)).toEqual(['a', 'c', 'b'])
   expect(visibleReadings([{ ...records[1], id: '2' }, { ...records[1], id: '1' }], '', 'title-asc').map(item => item.id)).toEqual(['1', '2'])
   expect(records).toEqual(original)
+})
+
+it('pagina 126 obras em 11 páginas sem perder registros ou alterar a lista', () => {
+  const all = Array.from({ length: 126 }, (_, index) => index + 1)
+  const original = [...all]
+  const pages = Array.from({ length: 11 }, (_, index) => readingPage(all, index + 1))
+  expect(pages[0]).toMatchObject({ first: 1, last: 12, current: 1, total: 11 })
+  expect(pages[10]).toMatchObject({ first: 121, last: 126, current: 11, total: 11 })
+  expect(pages[10].items).toHaveLength(6)
+  expect(pages.flatMap(page => page.items)).toEqual(original)
+  expect(new Set(pages.flatMap(page => page.items)).size).toBe(126)
+  expect(all).toEqual(original)
+})
+it('limita a página após filtro/redução e trata lista vazia e limites', () => {
+  expect(readingPage([1, 2], 11)).toMatchObject({ items: [1, 2], current: 1, total: 1 })
+  expect(readingPage([1, 2], -1).current).toBe(1)
+  expect(readingPage([], 4)).toMatchObject({ items: [], current: 1, first: 0, last: 0, total: 1 })
+  expect(readingPage(visibleReadings(records, 'arvore', 'title-desc'), 11).items.map(item => item.id)).toEqual(['a'])
 })
