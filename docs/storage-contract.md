@@ -20,7 +20,7 @@ O modo manual é padrão. `setAutomatic(true)` habilita tentativas com debounce 
 
 A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás consomem este contrato sem uma segunda fila de sincronização.
 
-## Mangás (0.4.4)
+## Mangás (0.4.5)
 
 `modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `englishTitle` opcional, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO e os campos opcionais `scanUrl` (HTTP/HTTPS sem credenciais) , `scanName` (nome da scan) e `coverUrl` (capa HTTPS direta sem credenciais). Registros antigos sem link ou nome continuam válidos. Nome vazio usa o hostname como texto do link; esvaziar o endereço remove também o nome associado. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
 
@@ -43,3 +43,5 @@ No patch 0.4.3, `coverUrl` é opcional, validado como HTTPS absoluto e removido 
 No patch 0.4.4, `englishTitle` é texto opcional normalizado com trim, removido quando vazio e compatível com registros antigos sem esse campo. A listagem o apresenta abaixo do título principal com estilo secundário. `visibleReadings` pesquisa ambos sem caixa/acentos e sem duplicar resultados; ordenação mantém título principal/data e o recorte por página ocorre depois do filtro. Não há tradução ou chamadas externas. O nome segue a mesma operação manual, preservando UUID, data, scan, capa e extras.
 
 Cada card usa rodapé próprio com link da scan e Editar alinhados. Sem scan, o rodapé mantém Editar. O nome acessível do botão inclui o título da obra; os estados da sessão, fechamento/foco após salvar e feedback permanecem compartilhados.
+
+No patch visual 0.4.5, a biblioteca passa a uma grade de cards verticais com capa 3:4 dominante e textos/dados abaixo. A área fica reservada para imagem, falha ou ausência. Nomes ocupam até duas linhas na listagem e permanecem completos no formulário/atributo de título. A grade tem colunas adaptativas no computador, duas no celular e uma em telas muito estreitas. Rodapés mantêm scan/Editar alinhados e as linhas de cards alinham suas ações. Nenhum modelo, cálculo, operação ou requisição Drive é alterado pela composição; lazy loading, paginação, busca, foco e preferência de movimento reduzido permanecem.

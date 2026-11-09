@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.4.4` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura, capa opcional e tempo decorrido, com login Google e sincronização Drive compartilhados.
+Aplicação pessoal com módulos internos. A versão `0.4.5` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura, capa opcional e tempo decorrido, com login Google e sincronização Drive compartilhados.
 
-Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.4](docs/releases/0.4.4.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.5](docs/releases/0.4.5.md).
 
 ## Desenvolvimento local
 
@@ -47,7 +47,7 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.4`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.5`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
 
 ## Biblioteca de mangás
 
@@ -55,7 +55,7 @@ Entre com Google e abra **Mangás** (`/#/mangas`). Use a página **Conexão** pa
 
 **Link da scan** aceita HTTP/HTTPS e o **Nome da scan** identifica sua origem na lista. Ambos são opcionais; quando não há nome, o domínio do site identifica o link. A aplicação apenas oferece a abertura em nova aba, sem consultar disponibilidade. Remover o endereço remove também o nome associado. Animações discretas acompanham abertura do formulário, salvamento e botões, e são desativadas quando o navegador pede movimento reduzido.
 
-O **Nome em inglês** aparece abaixo do título principal, como informação secundária. Ele é informado manualmente e pode ser editado ou removido. Use **Buscar mangá** para filtrar pelo título principal ou pelo nome em inglês, sem distinguir caixa/acentos e **Ordenar por** para nome A–Z/Z–A ou leitura mais antiga/recente. A biblioteca exibe **12 obras por página**, com anterior/próxima e números; 126 obras ocupam 11 páginas. Busca e ordenação voltam à primeira; salvar abre a página da obra e a foca. Essas ações são locais e não consomem chamadas Drive.
+O **Nome em inglês** aparece abaixo do título principal, como informação secundária. Ele é informado manualmente e pode ser editado ou removido. Use **Buscar mangá** para filtrar pelo título principal ou pelo nome em inglês, sem distinguir caixa/acentos e **Ordenar por** para nome A–Z/Z–A ou leitura mais antiga/recente. A biblioteca usa **cards verticais em grade**, com a capa 3:4 em destaque, títulos abaixo, informações de leitura e rodapé com scan/Editar. Os nomes ocupam até duas linhas; o formulário de edição mantém o texto completo. A grade se adapta ao computador e usa duas colunas no celular, com uma em telas muito estreitas. Exibe **12 obras por página**, com anterior/próxima e números; 126 obras ocupam 11 páginas. Busca e ordenação voltam à primeira; salvar abre a página da obra e a foca. Essas ações são locais e não consomem chamadas Drive.
 
 **Link da capa** é opcional: cole o endereço HTTPS direto de uma imagem pública, não a página do site. Somente o link vai para o Drive. A capa carrega na lista, apenas nas obras da página atual e conforme se aproxima da tela. Uma imagem bloqueada ou inválida mostra uma alternativa visual. A exibição simples em `<img>` sem `crossorigin` não exige permissão CORS para ler pixels; o servidor ainda pode bloquear hotlink. [Detalhes na MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img#crossorigin). Deixe vazio para remover a capa.
 

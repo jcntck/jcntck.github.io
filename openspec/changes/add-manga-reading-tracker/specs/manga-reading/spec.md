@@ -226,3 +226,16 @@ Cada card SHALL apresentar a ação visível Editar no rodapé, alinhada ao link
 - **WHEN** o leitor consulta uma obra com ou sem scan em computador ou celular
 - **THEN** encontra Editar no rodapé e pode abrir o formulário por teclado
 - **AND** link e ação ficam na mesma linha quando há espaço, sem controles cortados ou rolagem horizontal por textos longos
+
+### Requirement: Destacar capas em cards verticais
+A biblioteca SHALL usar uma grade responsiva de cards com capa vertical dominante na proporção 3:4 e títulos/dados de leitura abaixo. A apresentação SHALL preservar nome em inglês secundário, capítulo, data, tempo completo com três faixas e rodapé scan/Editar. A grade SHALL usar múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
+
+#### Scenario: Consultar a coleção em grade
+- **WHEN** o leitor abre a biblioteca em computador ou celular
+- **THEN** encontra cards verticais com imagens em destaque, seguidos dos dados e ações existentes
+- **AND** cada capa mantém espaço reservado e proporção consistente ao carregar, falhar ou estar ausente
+
+#### Scenario: Preservar os fluxos na nova composição
+- **WHEN** o leitor busca, ordena, pagina ou edita na grade
+- **THEN** mantém os comportamentos existentes, incluindo página/foco após salvar e sincronização exclusivamente manual
+- **AND** nomes longos, rodapés e estados permanecem legíveis com teclado e movimento reduzido

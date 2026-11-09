@@ -16,11 +16,11 @@ Ver `proposal.md`. Shell `0.1.0`, Drive `0.2.2` e login `0.3.1` já foram public
 
 Após abrir o PR, fornecer comandos de execução local e aguardar a avaliação do usuário. Cada fix que ele relatar incrementa o patch e atualiza pacote, lockfile e versão alvo desta change no mesmo PR. A versão indicada inicialmente é a base; a tag e a identificação pública usam a versão final revisada. O usuário realiza o merge pelo GitHub nas próximas entregas; não executar merge ou auto-merge por ele.
 
-A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.4` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.4` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
+A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.5` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.5` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
 
 Conferir versão alvo, pacote, lockfile, tag, SHA e identificação pública, comparando somente as changes da entrega atual. Tag existente só é reutilizável no mesmo commit; divergência falha sem sobrescrita. A publicação automática segue separada da homologação explícita do usuário.
 
-A versão `0.4.4` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
+A versão `0.4.5` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
 
 ### Módulo sobre contratos existentes
 
@@ -77,6 +77,14 @@ Após busca e ordenação, apresentar 12 obras por página e controles anterior/
 
 A ação visível Editar fica no rodapé de cada card, alinhada ao link da scan e à direita, com nome acessível incluindo a obra. O rodapé permanece com Editar quando não há scan. Em celular, permitir quebra de rótulos longos sem rolagem horizontal, mantendo alcance por teclado e estados de habilitação existentes. A edição mantém fechamento, foco, feedback e sincronização manual.
 
+### Grade de capas (patch 0.4.5)
+
+A referência visual fornecida pelo titular inspira a composição dos cards: capa vertical dominante 3:4, cantos arredondados e grade responsiva, seguida de título principal e inglês secundário em até duas linhas (texto completo no formulário/atributo de título), capítulo/data e tempo completo com os três níveis. Preservar a identidade visual e a navegação existentes. A referência não acrescenta novos comportamentos de biblioteca.
+
+Em computador, distribuir cards por colunas conforme a largura disponível; em celular usar duas colunas e uma em telas muito estreitas. Reservar a área da imagem mesmo sem capa ou em falha, manter nomes longos legíveis e ações no rodapé. O rodapé com scan/Edit deve permanecer alinhado e sem cortes; permitir quebra do texto do link e priorizar seu nome em espaços estreitos. Cards da mesma linha alinham seus rodapés. Movimento sutil de hover somente quando há ponteiro e sem preferência por movimento reduzido.
+
+O PR #4 da versão 0.4.4 já foi integrado pelo titular; o fix visual 0.4.5 segue em PR de continuação dev → main da mesma change, sem arquivamento ou nova funcionalidade inferida da imagem. A alteração é de apresentação: não muda dados, formato, cálculos, busca, paginação de 12, envio manual ou custos. Validar geometria das capas/colunas e os fluxos já existentes em desktop/celular.
+
 ### Três faixas de tempo decorrido
 
 Menos de 6 meses completos: texto discreto; de 6 meses até menos de 12: destaque intermediário; a partir de 12 meses: destaque forte. Usar contraste legível, peso e fundo junto à cor. Indicar os cortes na interface; os valores completos continuam explícitos para não depender apenas de cor. Nenhum prazo, agendamento ou rótulo de atraso é persistido. As faixas e o texto são recalculados com o dia local e preservam a data original.
@@ -92,7 +100,7 @@ Menos de 6 meses completos: texto discreto; de 6 meses até menos de 12: destaqu
 
 Iniciar somente depois das etapas anteriores publicadas, testadas e explicitamente homologadas. Testar regras e interação com adaptador em memória, depois com a integração real homologada. Publicar pelo pipeline existente e conferir cadastro retroativo, correção, mensagens de tempo, reabertura em outro dispositivo e revisão visual no endereço de produção.
 
-Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.4.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
+Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.5.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
 
 ## Open Questions
 
