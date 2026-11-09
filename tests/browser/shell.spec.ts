@@ -43,6 +43,9 @@ test('recupera rota inexistente e navega pelo teclado', async ({ page }) => {
 })
 
 test('mantém rotas pessoais ocultas e pede login no endereço direto', async ({ page }) => {
+  await page.goto('./#/mangas')
+  await expect(page.getByRole('link', { name: 'Mangás', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Mangás', exact: true })).toHaveCount(0)
   await page.goto('./#/connection')
   await expect(page.getByRole('button', { name: 'Entrar com Google' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Conexão', exact: true })).toHaveCount(0)

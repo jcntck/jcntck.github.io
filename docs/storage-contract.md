@@ -1,8 +1,8 @@
 # Contrato compartilhado de biblioteca (schema 1)
 
-`src/shared/storage/library.ts` define `Envelope`, `Snapshot`, `Operation` e `LibraryStorage`. `CloudSession` oferece a sessão em memória para consumidores sem dependência direta de GIS ou fetch: conectar, carregar (`reload`) e salvar seção (`saveSection`). A interface `getSnapshot`/`subscribe` informa fase, conta, base remota, tentativa pendente e permissão de gravação. A tela e futuros módulos devem compartilhar a mesma instância de sessão.
+`src/shared/storage/library.ts` define `Envelope`, `Snapshot`, `Operation` e `LibraryStorage`. `CloudSession` oferece a sessão em memória para consumidores sem dependência direta de GIS ou fetch: conectar, carregar (`reload`), preparar seção (`stageSection`) e sincronizar (`sync`). A interface `getSnapshot`/`subscribe` informa fase, conta, base remota, tentativa pendente e permissão de gravação. A tela e futuros módulos devem compartilhar a mesma instância de sessão.
 
-O envelope JSON exige `schemaVersion: 1`, `revision` não vazia, objetos `diagnostics` e `modules`. Cada alteração recebe UUID em `revision`; a operação usa esse mesmo UUID durante todas as tentativas. Campos extras e seções alheias são preservados. `saveSection('modules', moduleId, jsonValue)` substitui somente a seção daquele módulo. Não incluir segredos nos dados de módulos.
+O envelope JSON exige `schemaVersion: 1`, `revision` não vazia, objetos `diagnostics` e `modules`. Cada alteração recebe UUID em `revision`; a operação usa esse mesmo UUID durante todas as tentativas. Campos extras e seções alheias são preservados. `stageSection('modules', moduleId, jsonValue)` prepara a substituição de somente a seção daquele módulo. Não incluir segredos nos dados de módulos.
 
 `load()` descobre `my-hub.json` por `appProperties.myHubDocument = library-v1` e retorna `Snapshot` ou `null` somente depois de ausência confirmada. Nunca cria arquivo. `save(base, operation)` relê, compara ID, revisão e conteúdo, preserva campos e envia atualização ou criação multipart. Depois relê para confirmar conteúdo. Resposta perdida é recuperável por nova leitura que reconhece UUID e valor da operação antes de tentar nova escrita. Revogar acesso ou perder rede não equivale a documento ausente.
 
@@ -18,4 +18,12 @@ Consumidores usam `useHub()` dentro de `HubProvider`: identidade em `hub.auth` e
 
 O modo manual é padrão. `setAutomatic(true)` habilita tentativas com debounce de 750 ms somente com autorização válida e aba ativa; falha/conflito/expiração pausam a automação até decisão do usuário. `resumeAutomatic()` pode reagendar depois do retorno à aba. Conta/revisão/ID da operação continuam conferidos no contrato existente. Logout/troca limpam ambas as sessões e pendências. Recarregar restaura só o login Firebase; token Drive, estado remoto e rascunhos continuam voláteis.
 
-A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás devem consumir este contrato quando sua change estiver liberada, sem escrever uma segunda fila de sincronização.
+A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás consomem este contrato sem uma segunda fila de sincronização.
+
+## Mangás (0.4.0)
+
+`modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
+
+`src/modules/mangas/model.ts` valida e atualiza exclusivamente essa seção. Datas remotas aparentemente futuras são mantidas e apresentadas para conferência; entradas do formulário não aceitam datas futuras. O cálculo de tempo usa aniversários completos, ajustados ao último dia de mês/ano, e dias civis sem divisão de intervalos locais de 24 horas. Foco, visibilidade e meia-noite local atualizam as mensagens.
+
+`CloudSession.pendingSection(target, key)` projeta o valor mais recente da seção em toda a fila existente, inclusive alterações aguardando uma operação em voo. Não cria cache ou fila adicional. A listagem distingue o conteúdo pendente da base remota confirmada. `DrivePanel` compartilha os controles de sincronização e o link do arquivo entre Conexão e Mangás. Reler/Desconectar com pendências exige confirmação de descarte.

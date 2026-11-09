@@ -2,7 +2,7 @@
 
 ## Version
 
-`1.0.0` — conclusão do MVP com o módulo de mangás; tag automática `v1.0.0`.
+`0.4.0` — versão aprovada pelo usuário para o módulo de mangás; tag automática `v0.4.0`.
 
 ## Why
 
@@ -15,6 +15,7 @@ Com publicação, autenticação e persistência em nuvem já homologadas, podem
 - Mostrar data absoluta e mensagens como “Lido há 18 dias”, “Lido há 7 meses” e “Lido há 2 anos”.
 - Preservar seis meses ou um ano como referência global do leitor, sem intervalos individuais, data de retorno ou cobrança por atraso.
 - Definir e refinar a aparência do módulo nesta etapa, com formulários acessíveis e listagem legível em celular e computador.
+- Preparar alterações em memória e sincronizar pelo controle compartilhado manual ou automático, distinguindo pendência de gravação confirmada.
 - Publicar pelo CI/CD existente e homologar o fluxo real de leitura, incluindo persistência entre dispositivos.
 
 ## Capabilities
@@ -29,7 +30,7 @@ Nenhuma. O módulo consome os contratos existentes de navegação e armazenament
 
 ## Impact
 
-- Implementar em `dev`, atualizando `package.json` e lockfile para `1.0.0` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v1.0.0` e publica sem commits automáticos de versão.
+- Implementar em `dev`, atualizando `package.json` e lockfile para `0.4.0` no PR para `main`. Após o merge, o workflow prod valida o commit, cria `v0.4.0` e publica sem commits automáticos de versão.
 - Acrescentar `src/modules/mangas`, modelo de leitura e sua seção no documento compartilhado, preservando dados existentes.
 - Reutilizar shell, sessão Google, tratamento de armazenamento e processo de entrega das etapas anteriores.
 - Não reconstruir CI/CD, OAuth ou adaptador Drive; defeitos nesses contratos devem ser corrigidos e revalidados antes de continuar a homologação do módulo.
@@ -38,6 +39,6 @@ Nenhuma. O módulo consome os contratos existentes de navegação e armazenament
 
 ## Sequence and Acceptance
 
-Etapa 3 de 3. Implementar somente após `add-modular-shell` (`0.1.0`) e `add-cloud-library` (`0.2.0`) publicados, testados em produção e homologados. A disponibilidade dos documentos no OpenSpec não implica liberação antecipada.
+Etapa 3 de 3. Implementar somente após `add-modular-shell` (`0.1.0`) e `add-cloud-library` (`0.2.2`) e `add-google-sign-in` (`0.3.1`) publicados, testados em produção e homologados. A disponibilidade dos documentos no OpenSpec não implica liberação antecipada.
 
 Concluir com cadastro de leitura retroativa, correção sem mudança implícita da data, mensagens de tempo corretas, reabertura em outro dispositivo e revisão visual no site publicado. Registrar versão, URL, commit, execução, resultados e homologação explícita do usuário.

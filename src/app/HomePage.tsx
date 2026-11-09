@@ -1,4 +1,9 @@
-export function HomePage() {
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../shared/session/hooks'
+
+export function HomePage({ mangasAvailable = true }: { mangasAvailable?: boolean }) {
+  const auth = useAuth()
+  const showMangas = mangasAvailable && auth.phase === 'signed-in'
   return (
     <>
       <div className="page-heading"><p className="eyebrow">VISÃO GERAL</p><h1>Seu espaço, aos poucos.</h1>
@@ -13,11 +18,11 @@ export function HomePage() {
       </section>
       <section className="modules-section" aria-labelledby="modules-title">
         <div className="section-heading"><h2 id="modules-title">Seus módulos</h2><span>Um passo de cada vez</span></div>
-        <div className="empty-state">
+        {showMangas ? <NavLink className="module-card" to="/mangas"><h3>Mangás</h3><p>Seu último capítulo, a data da leitura e o tempo para decidir quando retomar.</p><span>Abrir biblioteca →</span></NavLink> : <div className="empty-state">
           <span className="empty-icon" aria-hidden="true">+</span>
           <h3>O próximo espaço ainda está por vir.</h3>
           <p>Conforme novas ferramentas chegarem, você poderá acessá-las por aqui e pelo menu.</p>
-        </div>
+        </div>}
       </section>
     </>
   )

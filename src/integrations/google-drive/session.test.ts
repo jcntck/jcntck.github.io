@@ -90,10 +90,14 @@ describe('sincronização compartilhada', () => {
     await session.connect(async () => grant); session.stageSection('modules', 'first', 1)
     const sending = session.sync(); const first = session.getSnapshot().pending!
     session.stageSection('modules', 'first', 2); session.stageSection('modules', 'second', 3)
+    expect(session.pendingSection('modules', 'first')).toBe(2)
+    expect(session.pendingSection('modules', 'second')).toBe(3)
     finish({ fileId: 'a', document: applyOperation(emptyEnvelope(), first) }); await sending
     expect(session.getSnapshot().pending?.value).toBe(2)
     await session.sync(); expect(session.getSnapshot().pending?.key).toBe('second')
-    await session.sync(); expect(session.getSnapshot().snapshot?.document.modules).toEqual({ first: 2, second: 3 }); session.disconnect()
+    await session.sync(); expect(session.getSnapshot().snapshot?.document.modules).toEqual({ first: 2, second: 3 })
+    expect(session.pendingSection('modules', 'first')).toBeUndefined()
+    session.disconnect()
   })
   it('automação é opt-in, serializada e pausa sem abrir popup ao expirar ou falhar', async () => {
     vi.useFakeTimers(); const f = fixture(); await f.session.connect(async () => grant)

@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.3.1` acrescenta login Google persistente por até 30 dias, estado global e sincronização Drive independente. O módulo de mangás pertence à próxima etapa.
+Aplicação pessoal com módulos internos. A versão `0.4.0` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura e tempo decorrido, com login Google e sincronização Drive compartilhados.
 
-Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.3.1](docs/releases/0.3.1.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.0](docs/releases/0.4.0.md).
 
 ## Desenvolvimento local
 
@@ -47,7 +47,15 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-google-sign-in`, em `0.3.1`. Próximas versões aprovadas: nuvem `0.2.2`; módulo de mangás e conclusão do MVP `1.0.0`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.0`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
+
+## Biblioteca de mangás
+
+Entre com Google e abra **Mangás** (`/#/mangas`). Conecte o Drive da mesma conta para carregar os registros. Em **Cadastrar mangá**, preencha título, último capítulo (inclusive `12.5` ou `Extra 1`) e o dia em que leu; leituras retroativas são aceitas. **Preparar leitura** deixa a alteração pendente na aba. Clique em **Sincronizar** e aguarde **Confirmado no Drive**, ou habilite o envio automático enquanto a aba estiver ativa e autorizada.
+
+**Corrigir leitura** mantém a identificação e a data até você alterá-la. A lista mostra a data absoluta e o tempo em dias, meses ou anos completos. Seis meses ou um ano são referências pessoais; não há prazo de retorno nem informação sobre capítulos novos.
+
+Após refresh, o login pode continuar ativo por até 30 dias, mas é preciso reconectar o Drive. Pendências e formulário são voláteis: sincronize antes de sair ou recarregar. Em erro, preserve a aba e reconecte para repetir; em divergência, confira o arquivo e use **Reler do Drive** somente se quiser descartar pendências. Trabalhe em um dispositivo por vez. Não é necessária nova configuração de Firebase ou OAuth para este módulo.
 
 ## Acrescentar um módulo
 

@@ -2,7 +2,7 @@
 
 ## Context
 
-Ver `proposal.md`. Esta é a terceira etapa, posterior a `add-modular-shell` e `add-cloud-library`. Hoje existem documentos, não implementações dessas bases. Ao iniciar, conferir as evidências de publicação, testes e homologação das duas etapas, e consumir os contratos que elas tiverem entregue.
+Ver `proposal.md`. Shell `0.1.0`, Drive `0.2.2` e login `0.3.1` já foram publicados e homologados, conforme `docs/releases/`. Consumir `Hub`, `CloudSession.stageSection`/`sync`, operações idempotentes e `DriveFileLink`, sem outra fila ou persistência local do documento.
 
 ## Goals / Non-Goals
 
@@ -16,17 +16,17 @@ Ver `proposal.md`. Esta é a terceira etapa, posterior a `add-modular-shell` e `
 
 Após abrir o PR, fornecer comandos de execução local e aguardar a avaliação do usuário. Cada fix que ele relatar incrementa o patch e atualiza pacote, lockfile e versão alvo desta change no mesmo PR. A versão indicada inicialmente é a base; a tag e a identificação pública usam a versão final revisada. O usuário realiza o merge pelo GitHub nas próximas entregas; não executar merge ou auto-merge por ele.
 
-A versão aprovada desta change é `1.0.0`. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v1.0.0` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
+A versão aprovada desta change é `0.4.0`. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.0` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
 
 Conferir versão alvo, pacote, lockfile, tag, SHA e identificação pública, comparando somente as changes da entrega atual. Tag existente só é reutilizável no mesmo commit; divergência falha sem sobrescrita. A publicação automática segue separada da homologação explícita do usuário.
 
-A versão `1.0.0` marca a conclusão do MVP por decisão do usuário; não exige por si só alterar a versão 1 do formato de dados já homologado.
+A versão `0.4.0` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
 
 ### Módulo sobre contratos existentes
 
 Acrescentar `src/modules/mangas` e registrar a rota `#/mangas` no shell. O módulo recebe sessão e contrato de armazenamento compartilhados. Não importar a biblioteca Google nas regras de leitura. Estados de carregamento, erro, divergência e reconexão são consumidos da etapa 2, com apresentação apropriada ao formulário.
 
-A seção `modules.mangas` do envelope versão 1 contém os registros. Ausência dessa seção significa biblioteca de mangás vazia, não ausência do documento inteiro. Ao salvar, preservar `diagnostics` e seções compatíveis existentes. Incluir validador da seção de domínio usando o mecanismo de armazenamento existente, sem alterar o schema global sem necessidade.
+A seção `modules.mangas` do envelope versão 1 é um objeto com `items`, uma lista dos registros. Propriedades extras da seção e dos registros são preservadas. Ausência dessa seção significa biblioteca de mangás vazia, não ausência do documento inteiro. Ao salvar, preservar `diagnostics` e seções compatíveis existentes. Incluir validador da seção de domínio usando o mecanismo de armazenamento existente, sem alterar o schema global sem necessidade.
 
 ### Modelo de leitura
 
@@ -48,11 +48,11 @@ A referência global de seis meses ou um ano continua sendo um critério do leit
 
 O shell inicial fornece a base funcional; o trabalho visual do módulo ocorre agora. Preparar uma prévia navegável para revisar hierarquia, formulário e estados da listagem, e refinar a aparência com o usuário durante esta etapa. Preferências de cor, tipografia e composição permanecem abertas; não são dependências para implementar CI/CD ou segurança.
 
-O resultado precisa atender celular e computador, rótulos e foco visíveis, operação por teclado e mensagens compreensíveis. Oferecer estado vazio com cadastro e informação de salvamento remoto confirmado. Não inventar capa, busca externa, métricas ou componentes de domínio adicionais para preencher o layout.
+O resultado precisa atender celular e computador, rótulos e foco visíveis, operação por teclado e mensagens compreensíveis. Oferecer estado vazio somente após leitura remota válida, cadastro e distinção entre alteração pendente e salvamento remoto confirmado. Não inventar capa, busca externa, métricas ou componentes de domínio adicionais para preencher o layout.
 
 ### Confirmação de gravação e correção
 
-Gerar identidade estável antes da primeira tentativa e usar o contrato de persistência da etapa 2. Atualizar a biblioteca apresentada como salva apenas após confirmação. Em falha ou divergência, preservar o formulário e apresentar as ações fornecidas pelo armazenamento; não reimplementar sincronização dentro do módulo. Correção preserva a identificação e altera somente os valores confirmados.
+Gerar identidade estável antes da primeira tentativa. Preparar a seção por `stageSection` somente após leitura remota válida, apresentando os valores em memória como pendentes. O controle compartilhado permite Sincronizar, reler com descarte confirmado, reconectar e optar pelo envio automático na aba ativa. Somente a releitura de confirmação permite apresentar a alteração como salva no Drive. Em falha ou divergência, preservar formulário e pendências, sem outra fila. Correção preserva identificação e campos extras. Atualizar, sair ou desconectar descarta as pendências; informar essa limitação. A rota exige login e a conexão Drive é independente, sem popup ao abrir.
 
 ## Risks / Trade-offs
 
@@ -63,9 +63,9 @@ Gerar identidade estável antes da primeira tentativa e usar o contrato de persi
 
 ## Delivery and Homologation
 
-Iniciar somente depois das duas etapas anteriores publicadas, testadas e explicitamente homologadas. Testar regras e interação com adaptador em memória, depois com a integração real homologada. Publicar pelo pipeline existente e conferir cadastro retroativo, correção, mensagens de tempo, reabertura em outro dispositivo e revisão visual no endereço de produção.
+Iniciar somente depois das etapas anteriores publicadas, testadas e explicitamente homologadas. Testar regras e interação com adaptador em memória, depois com a integração real homologada. Publicar pelo pipeline existente e conferir cadastro retroativo, correção, mensagens de tempo, reabertura em outro dispositivo e revisão visual no endereço de produção.
 
-Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/1.0.0.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
+Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.0.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
 
 ## Open Questions
 

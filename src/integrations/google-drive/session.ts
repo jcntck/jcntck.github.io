@@ -31,6 +31,9 @@ export class CloudSession {
   constructor(private factory: (token: () => string) => AccountStorage = token => new DriveStorage(token), private identity?: () => string | undefined) { this.storage = factory(() => this.accessToken()) }
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   getSnapshot = () => this.state
+  pendingSection(target: Operation['target'], key: string) {
+    return [this.pending, ...this.queue].reverse().find(operation => operation?.target === target && operation.key === key)?.value
+  }
   private update(phase: Phase, message: string) {
     this.state = { phase, message, account: this.account, snapshot: this.known ? this.base : undefined, pending: this.pending, queued: this.queue[0], canWrite: this.known && !!this.token && !this.busy, automatic: this.automatic, syncPhase: this.syncPhase, lastSynced: this.lastSynced }
     this.listeners.forEach(listener => listener())

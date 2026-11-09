@@ -11,7 +11,8 @@ O sistema SHALL permitir cadastrar uma obra com título, último capítulo lido 
 
 #### Scenario: Cadastrar leitura anterior
 - **WHEN** o leitor informa um título, capítulo “1130” e data passada válida e confirma o cadastro
-- **THEN** o sistema solicita a gravação desse registro e o inclui na biblioteca após a confirmação do armazenamento
+- **THEN** o sistema prepara o registro em memória com indicação de pendência
+- **AND** somente após Sincronizar e a confirmação do armazenamento o apresenta como salvo no Drive
 - **AND** preserva a data informada em vez de substituí-la pela data do cadastro
 
 #### Scenario: Identificadores de capítulos especiais
@@ -39,7 +40,7 @@ O sistema SHALL permitir corrigir título, capítulo e data de um registro exist
 
 #### Scenario: Registrar um capítulo recém-lido
 - **WHEN** o leitor altera o capítulo e informa uma nova data de leitura
-- **THEN** o sistema grava ambos os valores após confirmação e preserva a identificação da obra
+- **THEN** o sistema prepara ambos os valores para sincronização, preserva a identificação da obra e só informa salvamento remoto após confirmação
 
 ### Requirement: Listar a biblioteca com estado vazio
 O sistema SHALL mostrar as obras com título, último capítulo, data da leitura em formato brasileiro e tempo decorrido em português. Uma biblioteca sem obras SHALL apresentar uma indicação de vazio e uma ação de cadastro.
@@ -101,3 +102,21 @@ O sistema SHALL oferecer formulário e listagem legíveis em celular e computado
 #### Scenario: Corrigir leitura pelo teclado
 - **WHEN** o leitor percorre o formulário pelo teclado e envia dados inválidos
 - **THEN** consegue identificar os campos, alcançar as ações e compreender o erro associado ao preenchimento
+
+### Requirement: Sincronizar pelo estado compartilhado
+O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e a edição MUST aguardar uma leitura remota válida e preservar as demais seções e campos compatíveis. Pendências SHALL existir somente na aba, sem outra fila ou persistência offline, com aviso de descarte ao atualizar ou sair.
+
+#### Scenario: Login restaurado e Drive desconectado
+- **WHEN** o leitor abre o módulo após refresh com login válido
+- **THEN** encontra uma ação explícita de conexão Drive sem popup automático
+- **AND** uma biblioteca ainda desconhecida não é apresentada como vazia
+
+#### Scenario: Falha ou conflito de envio
+- **WHEN** a sincronização de uma leitura falha ou detecta divergência
+- **THEN** o formulário e as alterações pendentes são preservados sem indicação de salvamento remoto
+- **AND** o leitor pode reconectar para tentar novamente ou reler com confirmação de descarte
+
+#### Scenario: Envio manual ou automático
+- **WHEN** o leitor prepara uma leitura após carregar a biblioteca
+- **THEN** o envio usa Sincronizar ou a opção automática já existente para a aba ativa com autorização válida
+- **AND** a operação modifica somente `modules.mangas`, preservando diagnóstico, outros módulos e propriedades extras
