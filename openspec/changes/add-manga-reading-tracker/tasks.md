@@ -58,4 +58,4 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.5
 ## 8. Patch visual de revisão 0.4.5
 
 - [x] 8.1 Apresentar grade responsiva de cards com capas 3:4 em destaque e dados abaixo, mantendo inglês secundário, tempo, rodapé scan/Editar e alternativas de capa; verificar colunas, proporção, nomes longos, foco/teclado, movimento reduzido e regressões de paginação/sincronização em desktop/celular.
-- [ ] 8.2 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.5, validar lint/tipos/testes/build/CI e abrir o PR de continuação dev → main para revisão visual do titular (PR #4 já integrado), sem merge automático.
+- [x] 8.2 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.5, validar lint/tipos/testes/build/CI e abrir o PR de continuação dev → main para revisão visual do titular (PR #4 já integrado), sem merge automático.
