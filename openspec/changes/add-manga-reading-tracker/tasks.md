@@ -64,4 +64,4 @@ PR #4 aberto com versão 0.4.0, revisado até 0.4.4 e integrado pelo titular, co
 
 - [x] 9.1 Persistir biblioteca e fila manual no localStorage por identidade Google, restaurar após login/refresh sem requisições Drive e preservar consulta/edições sem conexão; validar isolamento entre contas, expiração/saída, cache inválido, indisponível e sem espaço.
 - [x] 9.2 Registrar data de edição no envelope/operação e comparar com a cópia remota, usando modifiedTime para legado; prevalecer a atualização mais recente e Drive no empate, sem envio automático ou perda das demais seções e com recuperação idempotente após resposta perdida; testar ambas as direções e refresh pendente.
-- [ ] 9.3 Alinhar pacote, lockfile, alvo e guias/evidências em 0.4.6; validar lint/tipos/testes/build/CI e atualizar PR dev → main para teste do titular, sem merge automático.
+- [x] 9.3 Alinhar pacote, lockfile, alvo e guias/evidências em 0.4.6; validar lint/tipos/testes/build/CI e atualizar PR dev → main para teste do titular, sem merge automático.
