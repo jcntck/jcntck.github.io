@@ -87,3 +87,27 @@ it('retorna o link do visualizador junto ao documento existente', async () => {
   expect(snapshot).toMatchObject({ fileId: 'existing', webViewLink })
   expect(new URL(String(request.mock.calls[0][0])).searchParams.get('fields')).toContain('webViewLink')
 })
+
+it('mantém remoto mais recente ou empatado sem escrita, e aplica local mais recente preservando extras', async () => {
+  const original = { ...emptyEnvelope(), updatedAt: '2026-11-09T12:00:00.000Z', modules: { other: 'keep' }, extra: 7 }
+  for (const stamp of ['2026-11-09T11:00:00.000Z', '2026-11-09T12:00:00.000Z']) {
+    const f = fixture(original)
+    const result = await f.drive.save(null, { ...operation, updatedAt: stamp })
+    expect(result.document).toEqual(original)
+    expect(f.writes()).toBe(0)
+  }
+  const f = fixture(original)
+  const result = await f.drive.save(null, { ...operation, updatedAt: '2026-11-09T13:00:00.000Z' })
+  expect(result.document.updatedAt).toBe('2026-11-09T13:00:00.000Z')
+  expect(result.document.modules.other).toBe('keep'); expect(result.document.extra).toBe(7)
+  expect(f.writes()).toBe(1)
+})
+it('usa modifiedTime de arquivos legados sem mudar o schema nem criar substituto', async () => {
+  const document = emptyEnvelope()
+  const request = vi.fn().mockResolvedValueOnce(Response.json({ files: [{ id: 'legacy', modifiedTime: '2026-11-09T14:00:00.000Z' }] })).mockResolvedValueOnce(Response.json(document))
+  const drive = new DriveStorage(() => 'token', request)
+  const saved = await drive.save(null, { ...operation, updatedAt: '2026-11-09T13:00:00.000Z' })
+  expect(saved.document).toEqual(document)
+  expect(saved.modifiedTime).toBe('2026-11-09T14:00:00.000Z')
+  expect(request).toHaveBeenCalledTimes(2)
+})

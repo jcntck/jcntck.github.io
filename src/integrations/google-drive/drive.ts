@@ -1,4 +1,4 @@
-import { applyOperation, canonical, emptyEnvelope, LibraryError, validate, type LibraryStorage, type Operation, type Snapshot } from '../../shared/storage/library'
+import { applyOperation, canonical, emptyEnvelope, LibraryError, validate, type LibraryStorage, type Operation, type Snapshot, updatedTime } from '../../shared/storage/library'
 
 const API = 'https://www.googleapis.com/drive/v3'
 export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
@@ -24,7 +24,7 @@ export class DriveStorage implements LibraryStorage {
     return { id: data.user.permissionId, name: data.user.displayName || 'Conta Google' }
   }
   async load(): Promise<Snapshot | null> {
-    const query = new URLSearchParams({ q: "trashed = false and appProperties has { key='myHubDocument' and value='library-v1' }", fields: 'files(id,webViewLink),nextPageToken,incompleteSearch', pageSize: '100', spaces: 'drive' })
+    const query = new URLSearchParams({ q: "trashed = false and appProperties has { key='myHubDocument' and value='library-v1' }", fields: 'files(id,webViewLink,modifiedTime),nextPageToken,incompleteSearch', pageSize: '100', spaces: 'drive' })
     const data = await (await this.call(`${API}/files?${query}`)).json()
     if (!Array.isArray(data.files) || data.incompleteSearch || data.nextPageToken || data.files.length > 1) throw new LibraryError('ambiguous', 'Busca incompleta ou vários documentos encontrados. Gravação bloqueada.')
     if (!data.files.length) return null
@@ -33,14 +33,16 @@ export class DriveStorage implements LibraryStorage {
     let document: unknown
     try { document = await (await this.call(`${API}/files/${encodeURIComponent(fileId)}?alt=media`)).json() }
     catch (error) { if (error instanceof LibraryError) throw error; throw new LibraryError('invalid', 'O arquivo não contém JSON válido.') }
-    const webViewLink = data.files[0].webViewLink
-    return { fileId, ...(typeof webViewLink === 'string' ? { webViewLink } : {}), document: validate(document) }
+    const { webViewLink, modifiedTime } = data.files[0]
+    return { fileId, ...(typeof webViewLink === 'string' ? { webViewLink } : {}), ...(typeof modifiedTime === 'string' ? { modifiedTime } : {}), document: validate(document) }
   }
   async save(base: Snapshot | null, operation: Operation): Promise<Snapshot> {
     const remote = await this.load()
     // A lost success response can be recovered without issuing another write.
     if (remote?.document.revision === operation.id && canonical(remote.document[operation.target][operation.key]) === canonical(operation.value)) return remote
-    if (base?.fileId !== remote?.fileId || canonical(base?.document ?? null) !== canonical(remote?.document ?? null)) throw new LibraryError('conflict', 'O documento mudou no Drive. Recarregue para decidir sobre a tentativa local.')
+    // Timestamped local edits use last-write-wins; older clients retain conflict checks.
+    if (remote && operation.updatedAt && updatedTime(remote) >= Date.parse(operation.updatedAt)) return remote
+    if (!operation.updatedAt && (base?.fileId !== remote?.fileId || canonical(base?.document ?? null) !== canonical(remote?.document ?? null))) throw new LibraryError('conflict', 'O documento mudou no Drive. Recarregue para decidir sobre a tentativa local.')
     const document = applyOperation(remote?.document ?? emptyEnvelope(), operation)
     if (remote) {
       await this.call(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(remote.fileId)}?uploadType=media`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(document) })

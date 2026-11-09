@@ -30,11 +30,12 @@ export function MangasPage() {
   let problem = ''
   try { if (loaded) section = readSection(pending !== undefined ? pending : state.snapshot?.document.modules.mangas) }
   catch (error) { problem = (error as Error).message }
-  const canEdit = state.canWrite && !problem
+  const canEdit = state.canEdit && !problem
   let confirmed: Manga[] = []
   try { if (state.snapshot !== undefined) confirmed = readSection(state.snapshot?.document.modules.mangas).items } catch { /* Domain errors disable editing above. */ }
   const unavailable = ['disconnected', 'expired', 'error'].includes(state.phase)
   const syncing = state.phase === 'saving'
+  const remoteChosen = state.syncPhase === 'synced' && state.message.includes('versão mais recente')
   const feedbackVisible = feedback && section.items.some(item => item.id === feedback.record.id && canonical(item) === canonical(feedback.record))
   const feedbackConfirmed = feedback && confirmed.some(item => item.id === feedback.record.id && canonical(item) === canonical(feedback.record))
   const visible = visibleReadings(section.items, query, order)
@@ -70,11 +71,12 @@ export function MangasPage() {
     </div>
     <div className="reading-reference"><span aria-hidden="true">↗</span><p>Há seis meses ou um ano sem ler? O tempo é uma referência sua para decidir quando retomar.</p></div>
     <div className="manga-sync-bar">
-      <p role="status" key={`${state.phase}-${state.syncPhase}`} className="manga-sync-status">{unavailable ? 'Sincronização indisponível.' : ['loading', 'authorizing'].includes(state.phase) ? 'Carregando a biblioteca…' : syncing ? 'Sincronizando com o Drive…' : state.pending ? 'Alterações salvas nesta aba, pendentes de sincronização.' : state.syncPhase === 'synced' ? 'Gravação confirmada no Drive.' : 'Drive conectado. Biblioteca carregada.'}</p>
-      <button className="manga-secondary" aria-busy={syncing} disabled={!state.canWrite || !state.pending} onClick={() => { if (hub.auth.isValid()) void cloud.sync() }}>{syncing ? 'Sincronizando…' : 'Sincronizar'}</button>
+      <p role="status" key={`${state.phase}-${state.syncPhase}`} className="manga-sync-status">{unavailable ? loaded ? 'Biblioteca disponível no navegador. Drive desconectado para sincronização.' : 'Sincronização indisponível.' : ['loading', 'authorizing'].includes(state.phase) ? 'Carregando a biblioteca…' : syncing ? 'Sincronizando com o Drive…' : state.pending ? state.cached ? 'Alterações salvas no navegador, pendentes de sincronização.' : 'Alterações salvas nesta aba, pendentes de sincronização.' : state.syncPhase === 'synced' ? remoteChosen ? state.message : 'Gravação confirmada no Drive.' : 'Drive conectado. Biblioteca carregada.'}</p>
+      <button className="manga-secondary" aria-busy={syncing} disabled={!state.canWrite} onClick={() => { if (hub.auth.isValid()) void cloud.sync() }}>{syncing ? 'Sincronizando…' : 'Sincronizar'}</button>
     </div>
-    {unavailable && <div className="manga-connection-alert" role="alert"><p>{state.phase === 'disconnected' ? 'Drive desconectado. Abra Conexão para carregar sua biblioteca antes de cadastrar ou editar.' : state.message}</p><Link to="/connection">Abrir Conexão <span aria-hidden="true">→</span></Link></div>}
+    {unavailable && <div className="manga-connection-alert" role="alert"><p>{state.phase === 'disconnected' ? loaded ? 'Drive desconectado. Você pode consultar e editar a biblioteca local. Abra Conexão quando quiser sincronizar.' : 'Drive desconectado. Abra Conexão para carregar sua biblioteca antes de cadastrar ou editar.' : state.message}</p><Link to="/connection">Abrir Conexão <span aria-hidden="true">→</span></Link></div>}
     {!loaded && !unavailable && <p className="manga-notice">Aguarde a leitura do Drive para consultar seus registros.</p>}
+    {state.cacheError && <p role="alert" className="manga-notice">{state.cacheError}</p>}
     {problem && <div className="manga-connection-alert" role="alert"><p>{problem} Confira ou releia o arquivo pela página Conexão antes de editar.</p><Link to="/connection">Abrir Conexão →</Link></div>}
     {draft && <form className="manga-form" onSubmit={submit} noValidate aria-labelledby="reading-form-title">
       <div className="section-heading"><h2 id="reading-form-title">{section.items.some(item => item.id === draft.id) ? 'Editar leitura' : 'Nova leitura'}</h2>
@@ -91,9 +93,9 @@ export function MangasPage() {
       </div>
       {Object.keys(errors).length > 0 && <p role="alert">Confira os campos indicados antes de salvar a leitura.</p>}
       <div><button className="manga-primary" disabled={!canEdit} type="submit">Salvar leitura</button></div>
-      <p className="manga-help">Salva nesta aba. Quando terminar suas edições, use Sincronizar para enviar ao Drive.</p>
+      <p className="manga-help">{state.cached ? 'Salva no navegador.' : 'Salva nesta aba.'} Quando terminar suas edições, use Sincronizar para enviar ao Drive.</p>
     </form>}
-    {feedbackVisible && <p key={feedback.id} className="manga-feedback" role="status"><span aria-hidden="true">✓</span> {feedback.record.title}: {feedbackConfirmed ? 'gravação confirmada no Drive.' : 'leitura salva nesta aba. Pendente de sincronização.'}</p>}
+    {feedbackVisible && <p key={feedback.id} className="manga-feedback" role="status"><span aria-hidden="true">✓</span> {feedback.record.title}: {feedbackConfirmed ? 'gravação confirmada no Drive.' : state.cached ? 'leitura salva no navegador. Pendente de sincronização.' : 'leitura salva nesta aba. Pendente de sincronização.'}</p>}
     {loaded && !problem && <section className="manga-library" aria-labelledby="reading-list-title">
       <div className="section-heading"><h2 id="reading-list-title" ref={libraryHeading} tabIndex={-1}>Sua biblioteca</h2><span>{query.trim() ? `${visible.length} de ${section.items.length} obras` : `${section.items.length} ${section.items.length === 1 ? 'obra' : 'obras'}`}</span></div>
       {section.items.length > 0 && <div className="manga-toolbar">
@@ -117,6 +119,6 @@ export function MangasPage() {
         <p role="status">Página {page.current} de {page.total}</p>
       </nav>}
     </section>}
-    <p className="manga-help manga-storage-note">Alterações pendentes existem somente nesta aba e são descartadas ao recarregar ou sair. Sincronize antes de trocar de dispositivo.</p>
+    <p className="manga-help manga-storage-note">{state.cached ? 'A biblioteca e as edições ficam salvas neste navegador para sua conta. Ao sincronizar, a cópia com a atualização mais recente prevalece; em empate, prevalece o Drive. Sincronize antes de trocar de dispositivo.' : 'Sem cache local disponível, as alterações ficam somente nesta aba. Sincronize antes de recarregar ou sair.'}</p>
   </section>
 }

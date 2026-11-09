@@ -1,7 +1,7 @@
 {
   "name": "my-hub",
   "private": true,
-  "version": "0.4.5",
+  "version": "0.4.6",
   "type": "module",
   "engines": {
     "node": ">=22.15.0 <23"

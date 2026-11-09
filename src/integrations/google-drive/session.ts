@@ -1,10 +1,11 @@
-import { LibraryError, type LibraryStorage, type Operation, type Snapshot } from '../../shared/storage/library'
+import { canonical, updatedTime, LibraryError, type LibraryStorage, type Operation, type Snapshot } from '../../shared/storage/library'
 import { DriveStorage, type Account } from './drive'
 import type { Grant } from './identity'
+import { BrowserLibraryCache, type CachePort } from '../../shared/storage/cache'
 export type Phase = 'disconnected' | 'authorizing' | 'loading' | 'ready' | 'saving' | 'error' | 'expired'
 export interface State {
   phase: Phase; account?: Account; snapshot?: Snapshot | null; pending?: Operation; queued?: Operation
-  message: string; canWrite: boolean; automatic: boolean
+  message: string; canWrite: boolean; canEdit: boolean; automatic: boolean; cacheError?: string; cached: boolean
   syncPhase: 'idle' | 'pending' | 'syncing' | 'synced' | 'error' | 'conflict'
   lastSynced?: string
 }
@@ -16,27 +17,29 @@ export class CloudSession {
   private generation = 0
   private busy = false
   private known = false
+  private loaded = false
+  private cacheOwner?: string
+  private cacheError?: string
   private base: Snapshot | null = null
   private account?: Account
   private pending?: StagedOperation
-  private pendingBased = false
   private queue: StagedOperation[] = []
   private timer?: ReturnType<typeof setTimeout>
   private automaticTimer?: ReturnType<typeof setTimeout>
   private automatic = false
   private syncPhase: State['syncPhase'] = 'idle'
   private lastSynced?: string
-  private state: State = { phase: 'disconnected', message: 'Drive desconectado.', canWrite: false, automatic: false, syncPhase: 'idle' }
+  private state: State = { phase: 'disconnected', message: 'Drive desconectado.', canWrite: false, canEdit: false, cached: false, automatic: false, syncPhase: 'idle' }
   private listeners = new Set<() => void>()
   private storage: AccountStorage
-  constructor(private factory: (token: () => string) => AccountStorage = token => new DriveStorage(token), private identity?: () => string | undefined) { this.storage = factory(() => this.accessToken()) }
+  constructor(private factory: (token: () => string) => AccountStorage = token => new DriveStorage(token), private identity?: () => string | undefined, private cache: CachePort = new BrowserLibraryCache()) { this.storage = factory(() => this.accessToken()) }
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   getSnapshot = () => this.state
   pendingSection(target: Operation['target'], key: string) {
     return [this.pending, ...this.queue].reverse().find(operation => operation?.target === target && operation.key === key)?.value
   }
   private update(phase: Phase, message: string) {
-    this.state = { phase, message, account: this.account, snapshot: this.known ? this.base : undefined, pending: this.pending, queued: this.queue[0], canWrite: this.known && !!this.token && !this.busy, automatic: this.automatic, syncPhase: this.syncPhase, lastSynced: this.lastSynced }
+    this.state = { phase, message, account: this.account, snapshot: this.loaded ? this.base : undefined, pending: this.pending, queued: this.queue[0], canWrite: this.known && !!this.token && !this.busy, canEdit: this.loaded && !this.busy, cacheError: this.cacheError, cached: !!this.cacheOwner && this.loaded && !this.cacheError, automatic: this.automatic, syncPhase: this.syncPhase, lastSynced: this.lastSynced }
     this.listeners.forEach(listener => listener())
   }
   private accessToken() {
@@ -44,11 +47,60 @@ export class CloudSession {
     if (!this.token || Date.now() >= this.expires) throw new LibraryError('expired', 'Autorização Drive expirada. Reconecte para sincronizar.')
     return this.token
   }
-  disconnect() {
-    this.generation++; clearTimeout(this.timer); clearTimeout(this.automaticTimer); this.token = ''; this.expires = 0; this.known = false; this.base = null; this.account = undefined; this.busy = false; this.automatic = false
-    this.pending = undefined; this.pendingBased = false; this.queue = []; this.lastSynced = undefined
+  restoreCache() {
+    const owner = this.identity?.()
+    if (!owner || owner === this.cacheOwner) return
+    this.clearLocalSession()
+    this.cacheOwner = owner
+    try {
+      const cached = this.cache.read(owner)
+      if (cached) {
+        this.base = cached.snapshot; this.loaded = true
+        this.pending = cached.operations[0]; this.queue = cached.operations.slice(1)
+        this.lastSynced = cached.lastSynced
+        this.syncPhase = this.pending ? 'pending' : 'idle'
+      }
+    } catch { this.cacheError = 'Não foi possível ler o cache local. Conecte o Drive para carregar a biblioteca.' }
+    this.update('disconnected', this.loaded ? 'Biblioteca restaurada do cache local. Drive desconectado; conecte quando quiser sincronizar.' : 'Drive desconectado.')
+  }
+  private persist() {
+    if (!this.cacheOwner || !this.loaded) return
+    try {
+      this.cache.write(this.cacheOwner, { version: 1, snapshot: this.base, operations: [this.pending, ...this.queue].filter((op): op is StagedOperation => !!op), ...(this.lastSynced ? { lastSynced: this.lastSynced } : {}) })
+      this.cacheError = undefined
+    } catch { this.cacheError = 'Não foi possível salvar no navegador. As alterações estão somente nesta aba; sincronize antes de recarregar.' }
+  }
+  clearLocalSession() {
+    this.cacheOwner = undefined; this.cacheError = undefined
+    this.disconnect(false)
+  }
+  disconnect(keepLocal = true) {
+    this.generation++; clearTimeout(this.timer); clearTimeout(this.automaticTimer); this.token = ''; this.expires = 0; this.known = false; this.account = undefined; this.busy = false; this.automatic = false
+    if (!keepLocal) { this.base = null; this.loaded = false; this.pending = undefined; this.queue = []; this.lastSynced = undefined }
     this.syncPhase = this.pending ? 'pending' : 'idle'
     this.update('disconnected', 'Drive desconectado. O login do hub permanece independente.')
+  }
+  private adoptRemote(remote: Snapshot | null) {
+    // Recover a confirmed write after a lost response without sending it again.
+    if (this.pending && remote?.document.revision === this.pending.id && canonical(remote.document[this.pending.target][this.pending.key]) === canonical(this.pending.value)) this.pending = this.queue.shift()
+    const operations = [this.pending, ...this.queue].filter((op): op is StagedOperation => !!op)
+    const baseTime = updatedTime(this.base)
+    const remoteTime = updatedTime(remote)
+    const newest = Math.max(baseTime, ...operations.map(op => Date.parse(op.updatedAt ?? '') || 0))
+    if (remoteTime && newest <= remoteTime) { this.pending = undefined; this.queue = [] }
+    else if (this.base && baseTime > remoteTime) {
+      // A previously confirmed cache can also be newer than an older remote copy.
+      // Prepare differences without uploading; keep the original content timestamp.
+      const restored: StagedOperation[] = []
+      const value = this.base.document.modules.mangas
+      if (value !== undefined && !operations.some(op => op.target === 'modules' && op.key === 'mangas') && canonical(value) !== canonical(remote?.document.modules.mangas ?? null)) {
+        restored.push({ id: crypto.randomUUID(), target: 'modules', key: 'mangas', value, updatedAt: new Date(baseTime).toISOString(), manual: true })
+      }
+      const remaining = [...restored, ...operations]
+      this.pending = remaining.shift(); this.queue = remaining
+    }
+    this.base = remote; this.loaded = true; this.known = true
+    this.persist()
   }
   private failure(error: unknown) {
     this.known = false; clearTimeout(this.automaticTimer)
@@ -59,6 +111,7 @@ export class CloudSession {
   }
   async connect(authorize: () => Promise<Grant>) {
     if (this.busy || (this.identity && !this.identity())) return
+    this.restoreCache()
     const expectedSubject = this.identity?.()
     this.busy = true; this.known = false; this.token = ''; clearTimeout(this.timer); clearTimeout(this.automaticTimer)
     const generation = ++this.generation
@@ -77,16 +130,13 @@ export class CloudSession {
       }
       const account = await this.storage.account()
       if (generation !== this.generation) return
-      if (this.account && this.account.id !== account.id) { this.base = null; this.pending = undefined; this.queue = []; this.lastSynced = undefined; this.automatic = false }
+      if (this.account && this.account.id !== account.id) { this.base = null; this.loaded = false; this.pending = undefined; this.queue = []; this.lastSynced = undefined; this.automatic = false }
       this.account = account
       this.update('loading', 'Conferindo documento da conta…')
       const remote = await this.storage.load()
       if (generation !== this.generation) return
       this.accessToken()
-      // Keep the base for a failed operation. A newly prepared offline-in-this-tab change
-      // has no known base yet and must first adopt this successful remote read.
-      if (!this.pending || !this.pendingBased) { this.base = remote; this.pendingBased = !!this.pending }
-      this.known = true
+      this.adoptRemote(remote)
       this.timer = setTimeout(() => { this.token = ''; this.known = false; clearTimeout(this.automaticTimer); this.update('expired', 'Autorização Drive expirada. Reconecte para sincronizar.') }, Math.max(0, this.expires - Date.now()))
       this.busy = false; this.syncPhase = this.pending ? 'pending' : 'idle'
       this.update('ready', this.pending ? 'Conta conferida. A alteração está pendente de sincronização.' : 'Conta conectada e documento conferido.')
@@ -95,27 +145,27 @@ export class CloudSession {
   }
   async reload() {
     if (this.busy || !this.token) return
-    const discarded = new Set([this.pending?.id, ...this.queue.map(operation => operation.id)])
     this.busy = true; clearTimeout(this.automaticTimer); const generation = this.generation; this.update('loading', 'Relendo do Drive…')
     try {
       const remote = await this.storage.load()
       if (generation !== this.generation) return
-      this.accessToken(); this.base = remote; this.known = true
-      const remaining = [this.pending, ...this.queue].filter((operation): operation is StagedOperation => !!operation && !discarded.has(operation.id))
-      this.pending = remaining.shift(); this.queue = remaining; this.pendingBased = !!this.pending; this.busy = false; this.syncPhase = this.pending ? 'pending' : 'idle'
+      this.accessToken(); this.adoptRemote(remote)
+      this.busy = false; this.syncPhase = this.pending ? 'pending' : 'idle'
       this.update('ready', 'Nova leitura remota concluída.')
     } catch (error) { if (generation === this.generation) { this.busy = false; this.failure(error) } }
   }
   stageSection(target: Operation['target'], key: string, value: Operation['value'], { manual = false }: { manual?: boolean } = {}) {
     if (this.identity && !this.identity()) return
-    const operation: StagedOperation = { id: crypto.randomUUID(), target, key, value: structuredClone(value), ...(manual ? { manual } : {}) }
+    const previous = Math.max(updatedTime(this.base), ...[this.pending, ...this.queue].map(op => Date.parse(op?.updatedAt ?? '') || 0))
+    const operation: StagedOperation = { id: crypto.randomUUID(), updatedAt: new Date(Math.max(Date.now(), previous + 1)).toISOString(), target, key, value: structuredClone(value), ...(manual ? { manual } : {}) }
     // A failed/uncertain operation must retain its ID until resolved. Preserve edits
     // made while it is in flight separately and send them only after confirmation.
-    if (!this.pending) { this.pending = operation; this.pendingBased = this.known }
+    if (!this.pending) { this.pending = operation }
     else if (!this.busy && this.syncPhase === 'pending' && this.pending.target === target && this.pending.key === key) this.pending = operation
     else { this.queue = this.queue.filter(item => item.target !== target || item.key !== key); this.queue.push(operation) }
     if (!this.busy && !['error', 'conflict'].includes(this.syncPhase)) this.syncPhase = 'pending'
-    this.update(this.state.phase, 'Alteração preparada nesta aba; ainda não foi salva no Drive.')
+    this.persist()
+    this.update(this.state.phase, this.cacheOwner && !this.cacheError ? 'Alteração salva no navegador; ainda não foi salva no Drive.' : 'Alteração preparada nesta aba; ainda não foi salva no Drive.')
     this.scheduleAutomatic()
   }
   stageProbe() { this.stageSection('diagnostics', 'probe', { id: crypto.randomUUID(), at: new Date().toISOString() }) }
@@ -138,8 +188,8 @@ export class CloudSession {
     try {
       const saved = await this.storage.save(this.base, operation)
       if (generation !== this.generation) return
-      this.accessToken(); this.base = saved; this.known = true; this.pending = this.queue.shift(); this.pendingBased = !!this.pending; this.busy = false; this.lastSynced = new Date().toISOString(); this.syncPhase = this.pending ? 'pending' : 'synced'
-      this.update('ready', this.pending ? 'Envio confirmado. Há uma nova alteração pendente.' : 'Gravação confirmada por releitura do Drive.')
+      this.accessToken(); this.pending = this.queue.shift(); this.adoptRemote(saved); this.busy = false; this.lastSynced = new Date().toISOString(); this.syncPhase = this.pending ? 'pending' : 'synced'; this.persist()
+      this.update('ready', this.pending ? 'Envio confirmado. Há uma nova alteração pendente.' : saved.document.revision === operation.id ? 'Gravação confirmada por releitura do Drive.' : 'A versão mais recente do Drive foi mantida e salva no cache local.')
       this.scheduleAutomatic()
     } catch (error) { if (generation === this.generation) { this.busy = false; this.failure(error) } }
   }

@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.4.5` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura, capa opcional e tempo decorrido, com login Google e sincronização Drive compartilhados.
+Aplicação pessoal com módulos internos. A versão `0.4.6` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura, capa opcional e tempo decorrido, com login Google e sincronização Drive compartilhados.
 
-Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.5](docs/releases/0.4.5.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.6](docs/releases/0.4.6.md).
 
 ## Desenvolvimento local
 
@@ -47,11 +47,11 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.5`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.6`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
 
 ## Biblioteca de mangás
 
-Entre com Google e abra **Mangás** (`/#/mangas`). Use a página **Conexão** para conectar o Drive da mesma conta e volte a Mangás. O módulo mostra um alerta com esse acesso quando o Drive estiver desconectado, expirado ou em falha. Em **Cadastrar mangá**, preencha título, nome em inglês opcional, último capítulo (inclusive `12.5` ou `Extra 1`) e o dia em que leu; leituras retroativas são aceitas. **Salvar leitura** fecha o formulário, destaca a obra e deixa a alteração pendente na aba. Campos inválidos mantêm o formulário aberto. O feedback informa o salvamento na aba; o foco segue para a obra, inclusive após uma busca. Clique em **Sincronizar** e aguarde **Confirmado no Drive**, após concluir suas edições. Cadastros e correções não disparam envio automático, mesmo se ele estiver ligado em Conexão.
+Entre com Google e abra **Mangás** (`/#/mangas`). Use a página **Conexão** para conectar o Drive da mesma conta e volte a Mangás. O módulo mostra um alerta com esse acesso quando o Drive estiver desconectado, expirado ou em falha. Em **Cadastrar mangá**, preencha título, nome em inglês opcional, último capítulo (inclusive `12.5` ou `Extra 1`) e o dia em que leu; leituras retroativas são aceitas. **Salvar leitura** fecha o formulário, destaca a obra e deixa a alteração pendente no cache do navegador. Campos inválidos mantêm o formulário aberto. O feedback informa o salvamento local; o foco segue para a obra, inclusive após uma busca. Clique em **Sincronizar** e aguarde **Confirmado no Drive**, após concluir suas edições. Cadastros e correções não disparam envio automático, mesmo se ele estiver ligado em Conexão.
 
 **Link da scan** aceita HTTP/HTTPS e o **Nome da scan** identifica sua origem na lista. Ambos são opcionais; quando não há nome, o domínio do site identifica o link. A aplicação apenas oferece a abertura em nova aba, sem consultar disponibilidade. Remover o endereço remove também o nome associado. Animações discretas acompanham abertura do formulário, salvamento e botões, e são desativadas quando o navegador pede movimento reduzido.
 
@@ -61,7 +61,7 @@ O **Nome em inglês** aparece abaixo do título principal, como informação sec
 
 **Editar**, no rodapé do card e alinhado ao link da scan, abre o formulário mesmo quando não há scan cadastrada. A edição mantém a identificação e a data até você alterá-la. A lista mostra a data absoluta e o tempo completo, como **Lido há 2 anos 3 meses 15 dias**, incluindo unidades zeradas. Há três destaques: discreto antes de 6 meses, intermediário de 6 meses a menos de 1 ano, forte a partir de 1 ano. Os cálculos respeitam o calendário, sem alterar a data salva. Seis meses ou um ano são referências pessoais; não há prazo de retorno nem informação sobre capítulos novos.
 
-Após refresh, o login pode continuar ativo por até 30 dias, mas é preciso reconectar o Drive. Pendências e formulário são voláteis: sincronize antes de sair ou recarregar. Em erro, preserve a aba e reconecte para repetir; em divergência, confira o arquivo e use **Reler do Drive** somente se quiser descartar pendências. Trabalhe em um dispositivo por vez. Não é necessária nova configuração de Firebase ou OAuth para este módulo.
+Após a primeira carga, **biblioteca e edições salvas ficam no localStorage, separadas por conta**. Com login válido (até 30 dias), refresh restaura os registros sem consultar ou reconectar o Drive: consulte, busque, pagine e edite localmente. O formulário ainda não salvo permanece volátil. Para enviar ou receber atualizações, conecte o Drive em **Conexão** e use **Sincronizar**; sem pendências, o botão atualiza a consulta. Conectar/Reler compara as cópias, mas não envia edições. **A data de edição mais recente prevalece; em empate, prevalece o Drive.** Consultar não muda essa data. Arquivos antigos usam a data de modificação do Drive. Logout/troca de conta oculta o cache até novo login da mesma conta. Se o navegador bloquear/esgotar o cache, a tela avisa que as alterações estão somente na aba. Relógios dos dispositivos precisam estar corretos; trabalhe em um dispositivo/aba por vez e sincronize antes de trocar. Limpar os dados do navegador remove o cache local. Não é necessária nova configuração de Firebase ou OAuth para este módulo.
 
 ## Acrescentar um módulo
 
