@@ -16,7 +16,7 @@
 
 ## 3. Entrega e homologação do negócio
 
-- [ ] 3.1 Abrir o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados, fornecer instruções para teste local do usuário e aplicar cada fix relatado com incremento patch sincronizado; aguardar o merge feito por ele e acompanhar o workflow prod criar a tag da versão final revisada (atual `v0.4.4`, base `0.4.0`) e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/0.4.4.md`.
+- [ ] 3.1 Abrir o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados, fornecer instruções para teste local do usuário e aplicar cada fix relatado com incremento patch sincronizado; aguardar o merge feito por ele e acompanhar o workflow prod criar a tag da versão final revisada (atual `v0.4.6`, base `0.4.0`) e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/0.4.6.md`.
 - [ ] 3.2 Executar no site real cadastro retroativo, correção, reabertura em outro dispositivo, preservação da amostra técnica e revisão visual em celular e computador; apresentar os resultados e registrar homologação explícita do usuário, corrigindo regressões dos contratos anteriores antes de concluir.
 
 ## Workflow follow-up
@@ -25,7 +25,7 @@
 
 ## Entrega inicial para teste
 
-PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.4.md`. Prévia e documentação prontas; 2.1/2.4 permanecem pendentes somente pela avaliação/refinamento com o usuário. 3.1/3.2 aguardam merge, produção e homologação. Nenhuma tag criada antes do merge; cada alteração solicitada após esta liberação é patch fix no mesmo PR.
+PR #4 aberto com versão 0.4.0, revisado até 0.4.4 e integrado pelo titular, conforme `docs/releases/0.4.4.md`. O PR #5 continua em 0.4.6, conforme `docs/releases/0.4.6.md`. Prévia e documentação prontas; 2.1/2.4 permanecem pendentes somente pela avaliação/refinamento com o usuário. 3.1/3.2 aguardam merge/publicação da revisão final e homologação geral. Nenhuma tag criada antes do merge; cada alteração solicitada após esta liberação é patch fix no mesmo PR.
 
 ## 4. Patch de revisão 0.4.1
 
@@ -54,3 +54,14 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.4
 - [x] 7.1 Acrescentar nome em inglês opcional, secundário na listagem e incluído na busca local, com cadastro/edição/remoção, trim, compatibilidade e preservação de identidade/data/extras; verificar filtro e paginação sem chamadas Drive.
 - [x] 7.2 Mover e renomear a ação para Editar no rodapé alinhado à scan, mantendo controle sem scan, acessibilidade, fechamento/foco/feedback e layout em desktop/celular inclusive com nomes longos.
 - [x] 7.3 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.4, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 para revisão do titular, sem merge automático.
+
+## 8. Patch visual de revisão 0.4.5
+
+- [x] 8.1 Apresentar grade responsiva de cards com capas 3:4 em destaque e dados abaixo, mantendo inglês secundário, tempo, rodapé scan/Editar e alternativas de capa; verificar colunas, proporção, nomes longos, foco/teclado, movimento reduzido e regressões de paginação/sincronização em desktop/celular.
+- [x] 8.2 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.5, validar lint/tipos/testes/build/CI e abrir o PR de continuação dev → main para revisão visual do titular (PR #4 já integrado), sem merge automático.
+
+## 9. Cache local por conta (patch 0.4.6)
+
+- [x] 9.1 Persistir biblioteca e fila manual no localStorage por identidade Google, restaurar após login/refresh sem requisições Drive e preservar consulta/edições sem conexão; validar isolamento entre contas, expiração/saída, cache inválido, indisponível e sem espaço.
+- [x] 9.2 Registrar data de edição no envelope/operação e comparar com a cópia remota, usando modifiedTime para legado; prevalecer a atualização mais recente e Drive no empate, sem envio automático ou perda das demais seções e com recuperação idempotente após resposta perdida; testar ambas as direções e refresh pendente.
+- [x] 9.3 Alinhar pacote, lockfile, alvo e guias/evidências em 0.4.6; validar lint/tipos/testes/build/CI e atualizar PR dev → main para teste do titular, sem merge automático.

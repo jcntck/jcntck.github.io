@@ -38,6 +38,6 @@ it('conecta, grava e relê o mesmo identificador em nova leitura remota', async 
   expect(localStorage.length).toBe(0); expect(sessionStorage.length).toBe(0)
   await user.click(screen.getByRole('button', { name: 'Desconectar Drive' }))
   expect(screen.queryByText('Drive: Conta de teste')).not.toBeInTheDocument()
-  expect(screen.queryByRole('link', { name: /Abrir arquivo no Google Drive/ })).not.toBeInTheDocument()
+  expect(screen.getByRole('link', { name: /Abrir arquivo no Google Drive/ })).toHaveAttribute('href', 'https://drive.google.com/file/d/file/view')
   delete window.google
 })

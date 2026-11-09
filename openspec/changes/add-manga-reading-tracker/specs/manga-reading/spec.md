@@ -11,7 +11,7 @@ O sistema SHALL permitir cadastrar uma obra com título, último capítulo lido 
 
 #### Scenario: Cadastrar leitura anterior
 - **WHEN** o leitor informa um título, capítulo “1130” e data passada válida e confirma o cadastro
-- **THEN** o sistema prepara o registro em memória com indicação de pendência
+- **THEN** o sistema prepara o registro no cache local com indicação de pendência
 - **AND** somente após Sincronizar e a confirmação do armazenamento o apresenta como salvo no Drive
 - **AND** preserva a data informada em vez de substituí-la pela data do cadastro
 
@@ -104,7 +104,7 @@ O sistema SHALL oferecer formulário e listagem legíveis em celular e computado
 - **THEN** consegue identificar os campos, alcançar as ações e compreender o erro associado ao preenchimento
 
 ### Requirement: Sincronizar pelo estado compartilhado
-O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e a edição MUST aguardar uma leitura remota válida e preservar as demais seções e campos compatíveis. Pendências SHALL existir somente na aba, sem outra fila ou persistência offline, com aviso de descarte ao atualizar ou sair.
+O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e a edição MUST aguardar uma leitura remota ou cache válido e preservar as demais seções e campos compatíveis. A biblioteca e a fila compartilhada SHALL ser persistidas no localStorage por identidade Google, restauradas somente após validar o login correspondente e preservadas em refresh/desconexão. Falha de cache MUST ser informada sem perder o estado em memória.
 
 #### Scenario: Login restaurado e Drive desconectado
 - **WHEN** o leitor abre o módulo após refresh com login válido
@@ -114,7 +114,7 @@ O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e
 #### Scenario: Falha ou conflito de envio
 - **WHEN** a sincronização de uma leitura falha ou detecta divergência
 - **THEN** o formulário e as alterações pendentes são preservados sem indicação de salvamento remoto
-- **AND** o leitor pode reconectar para tentar novamente ou reler com confirmação de descarte
+- **AND** o leitor pode reconectar para tentar novamente ou reler aplicando a comparação por data
 
 #### Scenario: Envio manual solicitado ao fim das edições
 - **WHEN** o leitor prepara uma leitura após carregar a biblioteca
@@ -155,7 +155,7 @@ O módulo SHALL buscar por título principal ou nome em inglês opcional sem dis
 - **THEN** a interface informa que não houve resultado e oferece limpar a busca, distinguindo esse estado de biblioteca vazia
 
 ### Requirement: Centralizar a conexão e indicar seu estado
-O módulo SHALL observar a sessão Drive compartilhada, apresentar apenas estado e sincronização manual e encaminhar gestão/reconexão à página Conexão. Desconexão, expiração e erro SHALL alertar o leitor, preservar pendências e bloquear envio/edição até nova leitura válida.
+O módulo SHALL observar a sessão Drive compartilhada, apresentar apenas estado e sincronização manual e encaminhar gestão/reconexão à página Conexão. Desconexão, expiração e erro SHALL alertar o leitor, preservar pendências e bloquear envio até reconexão; cache válido MUST permitir consulta/edição.
 
 #### Scenario: Desconectar ou expirar durante o uso
 - **WHEN** a conexão fica indisponível durante o uso do módulo
@@ -163,12 +163,12 @@ O módulo SHALL observar a sessão Drive compartilhada, apresentar apenas estado
 - **AND** a aplicação não abre popup nem envia ou cria arquivo automaticamente
 
 ### Requirement: Fechar o formulário e dar feedback ao salvar
-Salvar uma leitura válida SHALL preparar a operação manual em memória, fechar o formulário e mostrar feedback acessível distinguindo salvamento na aba de confirmação no Drive. O foco SHALL alcançar a obra salva, mesmo com uma busca anterior ativa. Campos inválidos MUST manter o formulário aberto. Animações discretas SHALL responder às ações e respeitar a preferência de movimento reduzido.
+Salvar uma leitura válida SHALL preparar a operação manual no cache local, fechar o formulário e mostrar feedback acessível distinguindo salvamento local de confirmação no Drive. O foco SHALL alcançar a obra salva, mesmo com uma busca anterior ativa. Campos inválidos MUST manter o formulário aberto. Animações discretas SHALL responder às ações e respeitar a preferência de movimento reduzido.
 
 #### Scenario: Salvar uma leitura válida
 - **WHEN** o leitor salva cadastro ou correção válida
 - **THEN** o formulário fecha, a obra aparece com destaque e o foco vai para ela
-- **AND** o feedback informa que está salva nesta aba e pendente de sincronização, sem envio automático
+- **AND** o feedback informa que está salva no navegador e pendente de sincronização, sem envio automático
 
 #### Scenario: Campos inválidos e movimento reduzido
 - **WHEN** o leitor tenta salvar dados inválidos com preferência por movimento reduzido
@@ -211,7 +211,7 @@ O tempo completo SHALL ter no máximo três faixas de destaque crescente: menos 
 O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, com trim, apresentado abaixo do título principal como informação secundária. Registros sem o campo MUST permanecer compatíveis. A busca SHALL considerar ambos os nomes sem distinguir caixa/acentos nem duplicar resultados. A ordenação SHALL permanecer pelo título principal ou data e MUST NOT haver tradução, pesquisa externa ou sincronização automática.
 
 #### Scenario: Consultar por um nome alternativo
-- **WHEN** o leitor informa um nome em inglês, salva na aba e pesquisa esse nome ou o título principal
+- **WHEN** o leitor informa um nome em inglês, salva localmente e pesquisa esse nome ou o título principal
 - **THEN** encontra a mesma obra uma única vez com o título principal e o nome secundário na listagem
 - **AND** a consulta reinicia a paginação sem chamadas Drive e o nome é persistido somente ao Sincronizar
 
@@ -226,3 +226,42 @@ Cada card SHALL apresentar a ação visível Editar no rodapé, alinhada ao link
 - **WHEN** o leitor consulta uma obra com ou sem scan em computador ou celular
 - **THEN** encontra Editar no rodapé e pode abrir o formulário por teclado
 - **AND** link e ação ficam na mesma linha quando há espaço, sem controles cortados ou rolagem horizontal por textos longos
+
+### Requirement: Destacar capas em cards verticais
+A biblioteca SHALL usar uma grade responsiva de cards com capa vertical dominante na proporção 3:4 e títulos/dados de leitura abaixo. A apresentação SHALL preservar nome em inglês secundário, capítulo, data, tempo completo com três faixas e rodapé scan/Editar. A grade SHALL usar múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
+
+#### Scenario: Consultar a coleção em grade
+- **WHEN** o leitor abre a biblioteca em computador ou celular
+- **THEN** encontra cards verticais com imagens em destaque, seguidos dos dados e ações existentes
+- **AND** cada capa mantém espaço reservado e proporção consistente ao carregar, falhar ou estar ausente
+
+#### Scenario: Preservar os fluxos na nova composição
+- **WHEN** o leitor busca, ordena, pagina ou edita na grade
+- **THEN** mantém os comportamentos existentes, incluindo página/foco após salvar e sincronização exclusivamente manual
+- **AND** nomes longos, rodapés e estados permanecem legíveis com teclado e movimento reduzido
+
+### Requirement: Consultar o cache sem depender do Drive
+O sistema SHALL restaurar biblioteca e pendências do localStorage da conta autenticada sem requisições Drive, preservando busca, ordenação, paginação, datas e edição local. MUST manter uma única conexão/fila compartilhada e autorização Drive em memória. Logout, troca ou expiração de login MUST remover os dados visíveis; caches de outras contas MUST NOT aparecer. Cache inexistente/inválido MUST NOT ser tratado como biblioteca vazia confirmada.
+
+#### Scenario: Consultar e editar depois de refresh
+- **WHEN** o leitor recarrega com login válido e cache disponível, inclusive com edições pendentes
+- **THEN** consulta e edita a biblioteca local sem reconectar ou consultar Drive
+- **AND** pendências permanecem identificadas e somente Sincronizar após conexão envia dados
+
+#### Scenario: Cache indisponível e isolamento
+- **WHEN** o navegador bloqueia ou esgota localStorage, ou outra conta entra
+- **THEN** falhas de persistência são informadas com fallback em memória e nenhum dado da outra conta é exibido
+- **AND** tokens Drive não são persistidos no cache
+
+### Requirement: Escolher a cópia com atualização mais recente
+A sincronização SHALL comparar a data técnica de edição local com a data do envelope remoto, usando modifiedTime Drive no legado sem data. A cópia local SHALL prevalecer somente quando estritamente mais recente; a remota SHALL prevalecer se mais recente ou empatada. Consultar/restaurar MUST NOT alterar a data. Envio MUST preservar seções extras e recuperar gravações já confirmadas sem duplicar operações.
+
+#### Scenario: Atualização local mais recente
+- **WHEN** a edição local é posterior à remota e o leitor solicita Sincronizar
+- **THEN** a seção local é aplicada sobre a cópia remota preservando as demais seções e confirmada por releitura
+- **AND** apenas conectar ou consultar não envia essa pendência
+
+#### Scenario: Atualização remota mais recente ou empatada
+- **WHEN** a cópia do Drive é mais recente ou tem a mesma data da edição local
+- **THEN** a leitura/sincronização adota os dados remotos no cache e remove as pendências superadas sem escrita
+- **AND** refresh posterior mantém a cópia escolhida sem precisar reler o Drive

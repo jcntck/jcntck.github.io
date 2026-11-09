@@ -6,7 +6,8 @@ export class Hub {
   readonly cloud: CloudSession
   constructor(port: AuthPort, cloud?: CloudSession) {
     this.cloud = cloud ?? new CloudSession(undefined, () => this.auth.isValid() ? this.auth.getSnapshot().identity?.googleId : undefined)
-    this.auth = new AuthSession(port, () => this.cloud.disconnect())
+    this.auth = new AuthSession(port, () => this.cloud.clearLocalSession())
+    this.auth.subscribe(() => { if (this.auth.isValid()) this.cloud.restoreCache() })
   }
 }
 let defaultHub: Hub | undefined

@@ -105,7 +105,7 @@ it('observa expiração e reconexão sem controles OAuth no módulo', async () =
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   await act(() => vi.advanceTimersByTimeAsync(3_600_001))
   expect(screen.getByRole('alert')).toHaveTextContent('Autorização Drive expirada')
-  expect(screen.getByRole('button', { name: 'Cadastrar mangá' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Cadastrar mangá' })).toBeEnabled()
   expect(screen.getByRole('button', { name: 'Sincronizar' })).toBeDisabled()
   await act(() => cloud.connect(async () => ({ access_token: 'retry', expires_in: 3600, scope: '' })))
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()

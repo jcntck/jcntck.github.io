@@ -23,12 +23,20 @@ export function canonical(value: Json): string {
   if (record(value)) return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`
   return JSON.stringify(value)
 }
-export interface Snapshot { fileId: string; webViewLink?: string; document: Envelope }
+export interface Snapshot { fileId: string; webViewLink?: string; modifiedTime?: string; document: Envelope }
 export interface LibraryStorage {
   load(): Promise<Snapshot | null>
   save(base: Snapshot | null, operation: Operation): Promise<Snapshot>
 }
-export interface Operation { id: string; target: 'diagnostics' | 'modules'; key: string; value: Json }
+export interface Operation { id: string; target: 'diagnostics' | 'modules'; key: string; value: Json; updatedAt?: string }
 export function applyOperation(base: Envelope, operation: Operation): Envelope {
-  return { ...base, revision: operation.id, [operation.target]: { ...base[operation.target], [operation.key]: operation.value } }
+  return { ...base, ...(operation.updatedAt ? { updatedAt: operation.updatedAt } : {}), revision: operation.id, [operation.target]: { ...base[operation.target], [operation.key]: operation.value } }
+}
+
+// Reading a copy does not make its content newer. Legacy files use Drive metadata.
+export function updatedTime(snapshot: Snapshot | null): number {
+  for (const stamp of [snapshot?.document.updatedAt, snapshot?.modifiedTime]) {
+    if (typeof stamp === 'string' && Number.isFinite(Date.parse(stamp))) return Date.parse(stamp)
+  }
+  return 0
 }
