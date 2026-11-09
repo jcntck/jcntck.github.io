@@ -3,7 +3,7 @@
 ## 1. Pré-condições e regras de leitura
 
 - [x] 1.1 Confirmar branch `dev` e versão alvo `0.4.0`; conferir releases, resultados de produção e homologação explícita de `add-modular-shell`, `add-cloud-library` e `add-google-sign-in`; verificar as referências antes de iniciar o módulo e registrar os contratos existentes que serão reutilizados.
-- [ ] 1.2 Atualizar `package.json` e os campos de versão do lockfile para `0.4.0` em `dev`, no PR da entrega; verificar coerência com a versão alvo e aprovação dos checks obrigatórios antes do merge.
+- [x] 1.2 Atualizar `package.json` e os campos de versão do lockfile para `0.4.0` em `dev`, no PR da entrega; verificar coerência com a versão alvo e aprovação dos checks obrigatórios antes do merge.
 - [x] 1.3 Criar modelo e validação de leitura com UUID, capítulo textual e data civil, adicionando somente `modules.mangas` ao envelope existente; verificar por testes leituras retroativas, extras, campos inválidos, data futura e preservação do diagnóstico e demais seções, documentando o formato do domínio.
 - [x] 1.4 Implementar cálculo e formatação de dias, meses e anos completos; verificar com relógio controlado os exemplos da spec, singular/plural, fim de mês, ano bissexto, fuso, virada do dia e correção que não altera implicitamente a data.
 
@@ -22,3 +22,7 @@
 ## Workflow follow-up
 
 - Depois da entrega homologada, finalizar esta mudança no OpenSpec conforme solicitado, mantendo as evidências das três etapas.
+
+## Entrega inicial para teste
+
+PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.0.md`. Prévia e documentação prontas; 2.1/2.4 permanecem pendentes somente pela avaliação/refinamento com o usuário. 3.1/3.2 aguardam merge, produção e homologação. Nenhuma tag criada antes do merge; cada alteração solicitada após esta liberação é patch fix no mesmo PR.
