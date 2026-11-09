@@ -40,4 +40,4 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.2
 - [x] 5.1 Remover a verificação HTTP e acrescentar nome/label opcional da scan, com alternativa pelo hostname, compatibilidade, edição e remoção; verificar persistência sem consultas externas.
 - [x] 5.2 Retirar o painel Drive do módulo e observar a sessão compartilhada com estado, alerta/link para Conexão quando indisponível e botão de sincronização manual; verificar reconexão, refresh, expiração e falhas sem OAuth no módulo.
 - [x] 5.3 Fechar o formulário após salvar dados válidos na aba, preservar formulário inválido/pendências e fornecer feedback, destaque e foco na obra; adicionar animações discretas com movimento reduzido e verificar teclado/celular.
-- [ ] 5.4 Alinhar pacote, lockfile, alvo e documentação em 0.4.2, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 com instruções de teste, aguardando revisão e merge do titular.
+- [x] 5.4 Alinhar pacote, lockfile, alvo e documentação em 0.4.2, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 com instruções de teste, aguardando revisão e merge do titular.
