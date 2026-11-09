@@ -33,4 +33,4 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.1
 - [x] 4.2 Adicionar link opcional da scan com validação HTTP/HTTPS sem credenciais, compatibilidade com registros antigos, edição/remoção e abertura em nova aba; testar persistência e preservação dos demais dados.
 - [x] 4.3 Oferecer verificação HEAD manual com timeout e sinal HTTP acessível, distinguindo falha inconclusiva de site fora do ar; verificar ausência de polling/credenciais, cancelamento, CORS e erros sem gravar resultados no Drive.
 - [x] 4.4 Adicionar busca por título e ordenação por nome/data, com estado sem resultado e uso em celular/teclado; verificar localidade, desempate e ausência de mutação ou chamadas Drive.
-- [ ] 4.5 Alinhar pacote, lockfile e alvo em 0.4.1, atualizar guias/evidências e o mesmo PR #4 após lint, tipos, testes, build e checks aprovados; manter merge e homologação com o titular.
+- [x] 4.5 Alinhar pacote, lockfile e alvo em 0.4.1, atualizar guias/evidências e o mesmo PR #4 após lint, tipos, testes, build e checks aprovados; manter merge e homologação com o titular.
