@@ -47,4 +47,4 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.3
 - [x] 6.1 Acrescentar capa opcional HTTPS por URL, validação e preservação/remoção no modelo, imagem lazy sem requisição CORS de pixels e alternativa para falha/ausência; testar edição, persistência e carregamento sem cabeçalho CORS.
 - [x] 6.2 Paginar em 12 obras após busca/ordem, com controles acessíveis, clamping, reset e página/foco da obra salva; testar 126 registros sem chamadas Drive adicionais ou perda de pendências em desktop/celular.
 - [x] 6.3 Apresentar anos, meses e dias juntos e três faixas de destaque (<6 meses, 6–11 meses, >=1 ano); testar cortes, singular/plural, calendário/fuso e preservação da data.
-- [ ] 6.4 Alinhar pacote, lockfile, alvo, guias e evidências em 0.4.3, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 para revisão do titular, sem merge automático.
+- [x] 6.4 Alinhar pacote, lockfile, alvo, guias e evidências em 0.4.3, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 para revisão do titular, sem merge automático.
