@@ -53,4 +53,4 @@ PR #4 aberto com versão 0.4.0 e checks aprovados, conforme `docs/releases/0.4.4
 
 - [x] 7.1 Acrescentar nome em inglês opcional, secundário na listagem e incluído na busca local, com cadastro/edição/remoção, trim, compatibilidade e preservação de identidade/data/extras; verificar filtro e paginação sem chamadas Drive.
 - [x] 7.2 Mover e renomear a ação para Editar no rodapé alinhado à scan, mantendo controle sem scan, acessibilidade, fechamento/foco/feedback e layout em desktop/celular inclusive com nomes longos.
-- [ ] 7.3 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.4, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 para revisão do titular, sem merge automático.
+- [x] 7.3 Alinhar pacote, lockfile, alvo, guias/evidências em 0.4.4, validar lint/tipos/testes/build/CI e atualizar o mesmo PR #4 para revisão do titular, sem merge automático.
