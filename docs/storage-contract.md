@@ -20,10 +20,14 @@ O modo manual é padrão. `setAutomatic(true)` habilita tentativas com debounce 
 
 A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás consomem este contrato sem uma segunda fila de sincronização.
 
-## Mangás (0.4.0)
+## Mangás (0.4.1)
 
-`modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
+`modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO e `scanUrl` HTTP/HTTPS opcional sem credenciais. Registros antigos sem link continuam válidos; esvaziar o campo remove o link. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
 
 `src/modules/mangas/model.ts` valida e atualiza exclusivamente essa seção. Datas remotas aparentemente futuras são mantidas e apresentadas para conferência; entradas do formulário não aceitam datas futuras. O cálculo de tempo usa aniversários completos, ajustados ao último dia de mês/ano, e dias civis sem divisão de intervalos locais de 24 horas. Foco, visibilidade e meia-noite local atualizam as mensagens.
 
 `CloudSession.pendingSection(target, key)` projeta o valor mais recente da seção em toda a fila existente, inclusive alterações aguardando uma operação em voo. Não cria cache ou fila adicional. A listagem distingue o conteúdo pendente da base remota confirmada. `DrivePanel` compartilha os controles de sincronização e o link do arquivo entre Conexão e Mangás. Reler/Desconectar com pendências exige confirmação de descarte.
+
+No patch 0.4.1, Mangás usa `stageSection(..., { manual: true })`. Essa política acompanha a operação em memória, inclusive na fila, retry e reconexão, e impede o agendamento automático mesmo se outro consumidor tiver habilitado o modo automático da sessão. Somente `sync()` solicitado pelo leitor envia as pendências de mangás; múltiplas edições preparadas antes do envio são consolidadas na mesma seção. A política manual não é persistida no envelope. O controle automático permanece disponível para a amostra da tela Conexão.
+
+Busca e ordenação usam somente os registros em memória. O resultado da verificação HEAD da scan é volátil, por clique, com timeout de 8 s, sem credenciais/referrer e sem fallback ou polling. CORS/rede/conteúdo misto/resposta opaca são inconclusivos; erro HTTP observável mostra o código, sem afirmar que o site caiu. Não há proxy, backend ou gravação desse status no Drive. Referência: [Fetch/CORS (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).

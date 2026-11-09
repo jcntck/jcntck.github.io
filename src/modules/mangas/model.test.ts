@@ -30,4 +30,18 @@ describe('biblioteca de leituras', () => {
     const future = { ...record, lastReadOn: '2027-01-01' }
     expect(readSection({ items: [future] }).items[0].lastReadOn).toBe('2027-01-01')
   })
+  it('inclui, corrige e remove link opcional sem perder identidade ou campos extras', () => {
+    const original = readSection({ extension: 'keep', items: [{ ...record, future: 'keep' }] })
+    expect(original.items[0].scanUrl).toBeUndefined()
+    const added = updateReading(original, { ...record, scanUrl: ' https://scan.example/obra ' }, '2026-11-09')
+    expect(added.items[0]).toMatchObject({ id: record.id, lastReadOn: record.lastReadOn, scanUrl: 'https://scan.example/obra', future: 'keep' })
+    const edited = updateReading(added, { ...added.items[0], title: 'Título corrigido' }, '2026-11-09')
+    expect(edited.items[0].scanUrl).toBe('https://scan.example/obra')
+    expect(updateReading(edited, { ...edited.items[0], scanUrl: '' }, '2026-11-09').items[0]).not.toHaveProperty('scanUrl')
+    expect(original.items[0]).not.toHaveProperty('scanUrl')
+  })
+  it.each(['javascript:alert(1)', 'data:text/html,hi', '/obra', 'https://user:password@scan.example', 'texto sem URL'])('recusa link inseguro/inválido %s', scanUrl => {
+    expect(validateFields({ ...record, scanUrl }, '2026-11-09')).toHaveProperty('scanUrl')
+    expect(() => readSection({ items: [{ ...record, scanUrl }] })).toThrow(/scan inválido/)
+  })
 })

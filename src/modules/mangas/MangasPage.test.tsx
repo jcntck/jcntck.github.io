@@ -39,6 +39,12 @@ it('valida, prepara sem escrever, preserva formulário na falha e confirma retry
   await user.type(screen.getByLabelText('Último capítulo lido'), 'Extra 1')
   await user.clear(screen.getByLabelText('Data da leitura'))
   await user.type(screen.getByLabelText('Data da leitura'), '2026-04-06')
+  await user.type(screen.getByLabelText('Link da scan (opcional)'), 'javascript:alert(1)')
+  await user.click(screen.getByRole('button', { name: 'Preparar leitura' }))
+  expect(screen.getByLabelText('Link da scan (opcional)')).toHaveAttribute('aria-invalid', 'true')
+  expect(cloud.getSnapshot().pending).toBeUndefined()
+  await user.clear(screen.getByLabelText('Link da scan (opcional)'))
+  await user.type(screen.getByLabelText('Link da scan (opcional)'), 'https://scan.example/obra')
   await user.click(screen.getByRole('button', { name: 'Preparar leitura' }))
   expect(screen.getByText('Pendente de sincronização')).toBeVisible()
   expect(save).not.toHaveBeenCalled()
@@ -57,12 +63,15 @@ it('valida, prepara sem escrever, preserva formulário na falha e confirma retry
   expect(remote()?.document.modules.other).toBe('keep')
   const id = (remote()!.document.modules.mangas as { items: { id: string }[] }).items[0].id
   await user.click(screen.getByRole('button', { name: 'Corrigir leitura de One Piece' }))
+  expect(screen.getByLabelText('Link da scan (opcional)')).toHaveValue('https://scan.example/obra')
+  await user.clear(screen.getByLabelText('Link da scan (opcional)'))
   await user.clear(screen.getByLabelText('Título')); await user.type(screen.getByLabelText('Título'), 'One Piece corrigido')
   await user.click(screen.getByRole('button', { name: 'Preparar leitura' }))
   await user.click(screen.getByRole('button', { name: 'Sincronizar' }))
   const card = screen.getByRole('heading', { name: 'One Piece corrigido' }).closest('li')!
   expect(within(card).getByText('06/04/2026')).toBeVisible()
   expect((remote()!.document.modules.mangas as { items: { id: string }[] }).items[0].id).toBe(id)
+  expect((remote()!.document.modules.mangas as { items: { scanUrl?: string }[] }).items[0]).not.toHaveProperty('scanUrl')
   await act(() => cloud.disconnect())
 })
 it('bloqueia seção corrompida sem substituí-la por dados vazios', async () => {

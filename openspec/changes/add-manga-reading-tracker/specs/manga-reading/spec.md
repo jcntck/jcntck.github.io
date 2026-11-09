@@ -116,7 +116,45 @@ O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e
 - **THEN** o formulário e as alterações pendentes são preservados sem indicação de salvamento remoto
 - **AND** o leitor pode reconectar para tentar novamente ou reler com confirmação de descarte
 
-#### Scenario: Envio manual ou automático
+#### Scenario: Envio manual solicitado ao fim das edições
 - **WHEN** o leitor prepara uma leitura após carregar a biblioteca
-- **THEN** o envio usa Sincronizar ou a opção automática já existente para a aba ativa com autorização válida
+- **THEN** cadastrar, corrigir, buscar e ordenar não enviam requisições ao Drive
+- **AND** somente a ação explícita Sincronizar envia a seção consolidada, mesmo se o automático estiver ligado em Conexão
 - **AND** a operação modifica somente `modules.mangas`, preservando diagnóstico, outros módulos e propriedades extras
+
+### Requirement: Registrar o link da scan
+O módulo SHALL permitir incluir, alterar e remover um link opcional HTTP/HTTPS absoluto da scan, sem credenciais na URL. Registros anteriores sem link MUST permanecer compatíveis. Links válidos SHALL abrir em nova aba, sem enviar token Drive ou referenciador.
+
+#### Scenario: Incluir e remover a scan
+- **WHEN** o leitor prepara uma obra com um link válido e depois solicita Sincronizar
+- **THEN** o link é preservado junto à obra e pode ser aberto na listagem
+- **AND** esvaziar o campo em nova edição remove o link sem alterar a data implicitamente
+
+#### Scenario: URL inválida
+- **WHEN** o leitor informa URL relativa, protocolo executável ou credenciais no link
+- **THEN** o formulário aponta o erro e mantém os demais campos sem preparar ou enviar a alteração
+
+### Requirement: Verificar o link sob solicitação
+O módulo SHALL oferecer uma verificação HTTP manual do link por requisição HEAD com timeout de 8 segundos, sem cookies, credenciais, corpo de resposta ou polling. O resultado SHALL existir somente na aba e MUST NOT disparar sincronização. Resposta observável SHALL mostrar o código HTTP; falha inconclusiva MUST NOT ser apresentada como site fora do ar.
+
+#### Scenario: Resposta observável
+- **WHEN** o leitor solicita Verificar link e o navegador permite ler a resposta
+- **THEN** a interface mostra o código HTTP e um sinal textual/visual de sucesso ou erro HTTP
+- **AND** não realiza fallback automático quando HEAD é recusado
+
+#### Scenario: Restrição do navegador ou rede
+- **WHEN** CORS, rede, timeout, conteúdo misto ou resposta opaca impedem ler o resultado
+- **THEN** a interface informa que não foi possível verificar e permite abrir o link para conferir
+- **AND** não classifica a scan como indisponível nem reutiliza o resultado após mudar o link
+
+### Requirement: Buscar e ordenar a biblioteca localmente
+O módulo SHALL buscar por título sem distinção de caixa/acentos e ordenar por título crescente/decrescente ou data de leitura mais antiga/recente, com desempate estável. O padrão SHALL ser título crescente. Essas ações MUST NOT fazer requisições ao Drive, modificar dados ou criar pendências.
+
+#### Scenario: Buscar e ordenar obras
+- **WHEN** o leitor busca um título e escolhe nome ou data
+- **THEN** somente as obras correspondentes são apresentadas na ordem escolhida
+- **AND** limpar a busca restaura os demais registros e a ordem persistida permanece intacta
+
+#### Scenario: Busca sem resultado
+- **WHEN** o título buscado não corresponde a nenhuma obra
+- **THEN** a interface informa que não houve resultado e oferece limpar a busca, distinguindo esse estado de biblioteca vazia

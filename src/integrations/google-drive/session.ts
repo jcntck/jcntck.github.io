@@ -9,6 +9,7 @@ export interface State {
   lastSynced?: string
 }
 export interface AccountStorage extends LibraryStorage { account(): Promise<Account>; subject?(): Promise<string> }
+interface StagedOperation extends Operation { manual?: boolean }
 export class CloudSession {
   private token = ''
   private expires = 0
@@ -17,9 +18,9 @@ export class CloudSession {
   private known = false
   private base: Snapshot | null = null
   private account?: Account
-  private pending?: Operation
+  private pending?: StagedOperation
   private pendingBased = false
-  private queue: Operation[] = []
+  private queue: StagedOperation[] = []
   private timer?: ReturnType<typeof setTimeout>
   private automaticTimer?: ReturnType<typeof setTimeout>
   private automatic = false
@@ -100,14 +101,14 @@ export class CloudSession {
       const remote = await this.storage.load()
       if (generation !== this.generation) return
       this.accessToken(); this.base = remote; this.known = true
-      const remaining = [this.pending, ...this.queue].filter((operation): operation is Operation => !!operation && !discarded.has(operation.id))
+      const remaining = [this.pending, ...this.queue].filter((operation): operation is StagedOperation => !!operation && !discarded.has(operation.id))
       this.pending = remaining.shift(); this.queue = remaining; this.pendingBased = !!this.pending; this.busy = false; this.syncPhase = this.pending ? 'pending' : 'idle'
       this.update('ready', 'Nova leitura remota concluída.')
     } catch (error) { if (generation === this.generation) { this.busy = false; this.failure(error) } }
   }
-  stageSection(target: Operation['target'], key: string, value: Operation['value']) {
+  stageSection(target: Operation['target'], key: string, value: Operation['value'], { manual = false }: { manual?: boolean } = {}) {
     if (this.identity && !this.identity()) return
-    const operation: Operation = { id: crypto.randomUUID(), target, key, value: structuredClone(value) }
+    const operation: StagedOperation = { id: crypto.randomUUID(), target, key, value: structuredClone(value), ...(manual ? { manual } : {}) }
     // A failed/uncertain operation must retain its ID until resolved. Preserve edits
     // made while it is in flight separately and send them only after confirmation.
     if (!this.pending) { this.pending = operation; this.pendingBased = this.known }
@@ -125,7 +126,7 @@ export class CloudSession {
   }
   private scheduleAutomatic() {
     clearTimeout(this.automaticTimer)
-    if (!this.automatic || this.busy || !this.known || !this.pending || this.syncPhase !== 'pending' || !this.token || (typeof document !== 'undefined' && document.visibilityState === 'hidden')) return
+    if (!this.automatic || this.busy || !this.known || !this.pending || this.pending.manual || this.syncPhase !== 'pending' || !this.token || (typeof document !== 'undefined' && document.visibilityState === 'hidden')) return
     this.automaticTimer = setTimeout(() => { void this.sync() }, 750)
   }
   resumeAutomatic() { this.scheduleAutomatic() }
