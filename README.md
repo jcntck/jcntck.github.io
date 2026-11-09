@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.4.1` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura e tempo decorrido, com login Google e sincronização Drive compartilhados.
+Aplicação pessoal com módulos internos. A versão `0.4.2` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura e tempo decorrido, com login Google e sincronização Drive compartilhados.
 
-Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.1](docs/releases/0.4.1.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.2](docs/releases/0.4.2.md).
 
 ## Desenvolvimento local
 
@@ -47,13 +47,13 @@ npm run check:release
 
 Ao arquivar uma change ainda selecionada na release, registrar seu diretório em `.release.json`, no mapa opcional `archivedChanges` (nome da change → diretório `YYYY-MM-DD-nome` dentro do arquivo OpenSpec). A leitura usa essa referência explícita, sem escolher automaticamente uma proposta histórica.
 
-A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.1`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
+A validação recusa versão ausente, seleção inválida e divergência entre pacote, lockfile e changes selecionadas. A entrega atual seleciona apenas `add-manga-reading-tracker`, em `0.4.2`, conforme a versão aprovada pelo usuário. As bases homologadas são shell `0.1.0`, Drive `0.2.2` e login `0.3.1`.
 
 ## Biblioteca de mangás
 
-Entre com Google e abra **Mangás** (`/#/mangas`). Conecte o Drive da mesma conta para carregar os registros. Em **Cadastrar mangá**, preencha título, último capítulo (inclusive `12.5` ou `Extra 1`) e o dia em que leu; leituras retroativas são aceitas. **Preparar leitura** deixa a alteração pendente na aba. Clique em **Sincronizar** e aguarde **Confirmado no Drive**, após concluir suas edições. Cadastros e correções não disparam envio automático, mesmo se ele estiver ligado em Conexão.
+Entre com Google e abra **Mangás** (`/#/mangas`). Use a página **Conexão** para conectar o Drive da mesma conta e volte a Mangás. O módulo mostra um alerta com esse acesso quando o Drive estiver desconectado, expirado ou em falha. Em **Cadastrar mangá**, preencha título, último capítulo (inclusive `12.5` ou `Extra 1`) e o dia em que leu; leituras retroativas são aceitas. **Salvar leitura** fecha o formulário, destaca a obra e deixa a alteração pendente na aba. Campos inválidos mantêm o formulário aberto. O feedback informa o salvamento na aba; o foco segue para a obra, inclusive após uma busca. Clique em **Sincronizar** e aguarde **Confirmado no Drive**, após concluir suas edições. Cadastros e correções não disparam envio automático, mesmo se ele estiver ligado em Conexão.
 
-**Link da scan** é opcional e aceita HTTP/HTTPS. A lista oferece **Abrir scan** e **Verificar link**, consultando apenas ao clicar; verde indica uma resposta HTTP de sucesso e âmbar mostra erro HTTP. CORS, rede ou timeout produzem resultado inconclusivo, sem classificar o site como fora do ar. A verificação não usa o Drive nem salva o resultado.
+**Link da scan** aceita HTTP/HTTPS e o **Nome da scan** identifica sua origem na lista. Ambos são opcionais; quando não há nome, o domínio do site identifica o link. A aplicação apenas oferece a abertura em nova aba, sem consultar disponibilidade. Remover o endereço remove também o nome associado. Animações discretas acompanham abertura do formulário, salvamento e botões, e são desativadas quando o navegador pede movimento reduzido.
 
 Use **Buscar mangá** para filtrar o título sem distinguir caixa/acentos e **Ordenar por** para nome A–Z/Z–A ou leitura mais antiga/recente. Essas ações são locais e não consomem chamadas Drive.
 

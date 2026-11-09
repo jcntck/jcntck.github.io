@@ -16,11 +16,11 @@ Ver `proposal.md`. Shell `0.1.0`, Drive `0.2.2` e login `0.3.1` já foram public
 
 Após abrir o PR, fornecer comandos de execução local e aguardar a avaliação do usuário. Cada fix que ele relatar incrementa o patch e atualiza pacote, lockfile e versão alvo desta change no mesmo PR. A versão indicada inicialmente é a base; a tag e a identificação pública usam a versão final revisada. O usuário realiza o merge pelo GitHub nas próximas entregas; não executar merge ou auto-merge por ele.
 
-A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.1` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.1` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
+A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.2` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.2` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
 
 Conferir versão alvo, pacote, lockfile, tag, SHA e identificação pública, comparando somente as changes da entrega atual. Tag existente só é reutilizável no mesmo commit; divergência falha sem sobrescrita. A publicação automática segue separada da homologação explícita do usuário.
 
-A versão `0.4.1` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
+A versão `0.4.2` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
 
 ### Módulo sobre contratos existentes
 
@@ -30,7 +30,7 @@ A seção `modules.mangas` do envelope versão 1 é um objeto com `items`, uma l
 
 ### Modelo de leitura
 
-Cada registro possui `id` UUID estável, `title`, `lastChapter`, `lastReadOn`, `updatedAt` e o link opcional `scanUrl`. Links aceitam somente HTTP/HTTPS absolutos sem credenciais; registros antigos sem link permanecem compatíveis e remover o campo exclui o link. Capítulo é texto obrigatório para aceitar “12.5” e “Extra 1”; título não é identificador único. Validar trim de título e capítulo e exigir data válida não futura no dia local.
+Cada registro possui `id` UUID estável, `title`, `lastChapter`, `lastReadOn`, `updatedAt` e os campos opcionais `scanUrl` e `scanName` (nome/label da origem). Links aceitam somente HTTP/HTTPS absolutos sem credenciais; registros antigos sem link ou nome permanecem compatíveis. Nome vazio usa o hostname como label; remover o link remove seu nome associado. Capítulo é texto obrigatório para aceitar “12.5” e “Extra 1”; título não é identificador único. Validar trim de título e capítulo e exigir data válida não futura no dia local.
 
 Guardar `lastReadOn` como `YYYY-MM-DD`, um dia civil sem horário e sem conversão para UTC. `updatedAt` é um instante técnico e não determina quando a obra foi lida. Cadastro começa com hoje selecionado, sempre editável para registros retroativos. A edição mantém a data até uma mudança explícita, inclusive ao corrigir título ou capítulo.
 
@@ -52,13 +52,18 @@ O resultado precisa atender celular e computador, rótulos e foco visíveis, ope
 
 ### Confirmação de gravação e correção
 
-Gerar identidade estável antes da primeira tentativa. Preparar a seção por `stageSection` somente após leitura remota válida, apresentando os valores em memória como pendentes. O controle compartilhado permite Sincronizar, reler com descarte confirmado e reconectar. Todas as operações de mangás são marcadas como manuais na fila compartilhada, inclusive se o automático estiver habilitado em Conexão; preparar, cadastrar, corrigir, buscar e ordenar não fazem requisições ao Drive. Somente a releitura de confirmação permite apresentar a alteração como salva no Drive. Em falha ou divergência, preservar formulário e pendências, sem outra fila. Correção preserva identificação e campos extras. Atualizar, sair ou desconectar descarta as pendências; informar essa limitação. A rota exige login e a conexão Drive é independente, sem popup ao abrir.
+Gerar identidade estável antes da primeira tentativa. Preparar a seção por `stageSection` somente após leitura remota válida, apresentando os valores em memória como pendentes. O módulo apresenta somente estado e Sincronizar. Conectar, reconectar, reler com descarte confirmado e gerenciar o arquivo ficam na página Conexão. Desconexão, expiração ou erro mostram alerta com acesso a essa página e bloqueiam edição/envio até leitura válida. Todas as operações de mangás são marcadas como manuais na fila compartilhada, inclusive se o automático estiver habilitado em Conexão; preparar, cadastrar, corrigir, buscar e ordenar não fazem requisições ao Drive. Somente a releitura de confirmação permite apresentar a alteração como salva no Drive. Salvar leitura válida prepara a operação, fecha o formulário, limpa a busca para exibir o registro e move o foco para a obra; isso não confirma gravação remota. Entrada inválida mantém o formulário aberto. Em falha de sincronização, preservar pendências e qualquer formulário aberto, sem outra fila. Correção preserva identificação e campos extras. Atualizar, sair ou desconectar descarta as pendências; informar essa limitação. A rota exige login e a conexão Drive é independente, sem popup ao abrir.
 
-### Consulta local e link da scan (patch 0.4.1)
+### Consulta local e link da scan (patch 0.4.2)
 
 Busca por título sem distinguir caixa ou acentos e ordenação por título A–Z/Z–A ou data de leitura mais antiga/recente. A ordenação padrão é título A–Z; empates usam título e UUID. Filtrar e ordenar não mudam a seção persistida ou a fila. Resultado vazio de busca é distinto de biblioteca vazia.
 
-A listagem abre o link em nova aba e oferece Verificar link. Uma requisição HEAD por clique, com timeout de 8 segundos, sem cookies/credenciais ou referenciador e sem corpo baixado; nenhum polling, proxy ou BaaS adicional. Mostrar resposta HTTP observada e diferenciar sucesso de erro HTTP, sem prometer disponibilidade integral do site. Erros de rede, CORS, timeout, respostas opacas ou conteúdo misto são inconclusivos. HEAD recusado não implica site fora do ar e não dispara fallback automático. A verificação é volátil, não altera `updatedAt` nem sincroniza. Cancelar ao sair ou trocar URL, sem reaproveitar resultado anterior.
+A listagem usa o nome opcional da scan como texto do link, com hostname como alternativa para registros antigos. Abre em nova aba sem referenciador; não executa fetch, HEAD, polling ou consulta de status. O patch 0.4.2 remove por solicitação do titular a verificação entregue em 0.4.1.
+
+### Feedback e movimento
+
+Ao salvar, destacar a obra e mostrar confirmação textual de salvamento na aba com pendência de sincronização, seguida do estado de confirmação remota somente após envio validado. Animar discretamente entrada do formulário, feedback, destaque da obra e interação dos botões. `prefers-reduced-motion: reduce` desativa animações/transições. Erros não fecham o formulário e não dependem só de cor. Foco visível permanece no registro após salvar e retorna ao cadastro ao cancelar.
+
 
 ## Risks / Trade-offs
 
@@ -71,7 +76,7 @@ A listagem abre o link em nova aba e oferece Verificar link. Uma requisição HE
 
 Iniciar somente depois das etapas anteriores publicadas, testadas e explicitamente homologadas. Testar regras e interação com adaptador em memória, depois com a integração real homologada. Publicar pelo pipeline existente e conferir cadastro retroativo, correção, mensagens de tempo, reabertura em outro dispositivo e revisão visual no endereço de produção.
 
-Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.1.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
+Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.2.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
 
 ## Open Questions
 

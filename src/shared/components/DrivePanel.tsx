@@ -4,7 +4,7 @@ import googleConfig from '../../integrations/google-drive/config.json'
 import { DriveFileLink } from './DriveFileLink'
 import { useHub } from '../session/hooks'
 
-export function DrivePanel({ diagnostics = false, manualOnly = false, clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || googleConfig.clientId }: { diagnostics?: boolean; manualOnly?: boolean; clientId?: string }) {
+export function DrivePanel({ diagnostics = false, clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || googleConfig.clientId }: { diagnostics?: boolean; clientId?: string }) {
   const hub = useHub()
   const controller = hub.cloud
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot)
@@ -39,7 +39,7 @@ export function DrivePanel({ diagnostics = false, manualOnly = false, clientId =
         <button disabled={busy || (!state.canWrite && (!oauth || !clientId))} onClick={() => { if (!hub.auth.isValid()) return; if (state.canWrite) void controller.sync(); else void connect(true) }}>Sincronizar</button>
         <button disabled={busy || !state.account || state.phase === 'expired'} onClick={() => { if (!hub.auth.isValid()) return; if (!state.pending || window.confirm('Reler e descartar as alterações locais pendentes?')) void controller.reload() }}>Reler do Drive</button>
       </div>
-      {!manualOnly && <label className="automatic-control"><input type="checkbox" checked={state.automatic} disabled={busy || (!state.canWrite && !state.automatic)} onChange={event => controller.setAutomatic(event.target.checked)} /> Sincronizar automaticamente nesta sessão</label>}
+      <label className="automatic-control"><input type="checkbox" checked={state.automatic} disabled={busy || (!state.canWrite && !state.automatic)} onChange={event => controller.setAutomatic(event.target.checked)} /> Sincronizar automaticamente nesta sessão</label>
       {state.syncPhase === 'conflict' && <p role="alert">Há uma divergência com o Drive. Releia para decidir sobre as alterações locais antes de tentar outro envio.</p>}
       {state.syncPhase === 'error' && <p>Sincronização pausada. Confira a conexão e reconecte o Drive antes de repetir.</p>}
       {state.snapshot === null && <p>Ainda não existe documento. Somente uma sincronização com alteração pendente criará my-hub.json.</p>}
@@ -49,7 +49,7 @@ export function DrivePanel({ diagnostics = false, manualOnly = false, clientId =
       {state.lastSynced && <p>Última sincronização confirmada: <time dateTime={state.lastSynced}>{new Date(state.lastSynced).toLocaleString('pt-BR')}</time></p>}
     </div>
     <p className="page-description">O login pode ser restaurado por até 30 dias. Após refresh, reconecte o Drive para sincronizar. Alterações pendentes existem somente nesta aba e são descartadas ao recarregar ou sair. Use um dispositivo por vez.</p>
-    <p className="page-description">{manualOnly ? 'Edite suas obras e clique em Sincronizar ao terminar. Alterações de mangás são enviadas somente quando você solicita.' : 'A sincronização automática funciona com esta página aberta e autorização válida; ela pausa em falhas, conflitos ou expiração.'}</p>
+    <p className="page-description">A sincronização automática funciona com esta página aberta e autorização válida; ela pausa em falhas, conflitos ou expiração.</p>
     <p className="page-description"><a href="https://myaccount.google.com/connections" target="_blank" rel="noreferrer">Gerenciar e revogar consentimento no Google</a></p>
   </section>
 }

@@ -108,7 +108,7 @@ O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e
 
 #### Scenario: Login restaurado e Drive desconectado
 - **WHEN** o leitor abre o módulo após refresh com login válido
-- **THEN** encontra uma ação explícita de conexão Drive sem popup automático
+- **THEN** encontra um alerta de desconexão com link para a página Conexão, sem painel OAuth ou popup no módulo
 - **AND** uma biblioteca ainda desconhecida não é apresentada como vazia
 
 #### Scenario: Falha ou conflito de envio
@@ -123,29 +123,24 @@ O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e
 - **AND** a operação modifica somente `modules.mangas`, preservando diagnóstico, outros módulos e propriedades extras
 
 ### Requirement: Registrar o link da scan
-O módulo SHALL permitir incluir, alterar e remover um link opcional HTTP/HTTPS absoluto da scan, sem credenciais na URL. Registros anteriores sem link MUST permanecer compatíveis. Links válidos SHALL abrir em nova aba, sem enviar token Drive ou referenciador.
+O módulo SHALL permitir incluir, alterar e remover um link opcional HTTP/HTTPS absoluto da scan e seu nome/label opcional, sem credenciais na URL. Registros anteriores sem link ou nome MUST permanecer compatíveis. O texto do link SHALL usar o nome informado ou o hostname como alternativa. Links válidos SHALL abrir em nova aba, sem enviar token Drive ou referenciador.
 
 #### Scenario: Incluir e remover a scan
 - **WHEN** o leitor prepara uma obra com um link válido e depois solicita Sincronizar
-- **THEN** o link é preservado junto à obra e pode ser aberto na listagem
-- **AND** esvaziar o campo em nova edição remove o link sem alterar a data implicitamente
+- **THEN** o link e seu nome são preservados junto à obra e o nome identifica o link na listagem
+- **AND** esvaziar o endereço em nova edição remove o link e o nome associado sem alterar a data implicitamente
 
 #### Scenario: URL inválida
 - **WHEN** o leitor informa URL relativa, protocolo executável ou credenciais no link
 - **THEN** o formulário aponta o erro e mantém os demais campos sem preparar ou enviar a alteração
 
-### Requirement: Verificar o link sob solicitação
-O módulo SHALL oferecer uma verificação HTTP manual do link por requisição HEAD com timeout de 8 segundos, sem cookies, credenciais, corpo de resposta ou polling. O resultado SHALL existir somente na aba e MUST NOT disparar sincronização. Resposta observável SHALL mostrar o código HTTP; falha inconclusiva MUST NOT ser apresentada como site fora do ar.
+### Requirement: Abrir a scan sem consultar disponibilidade
+O módulo MUST apenas apresentar o link e seu nome/hostname para abertura pelo leitor. MUST NOT executar verificações HTTP, fetch, HEAD ou polling da scan ao abrir o módulo, salvar, buscar, ordenar ou interagir com a lista.
 
-#### Scenario: Resposta observável
-- **WHEN** o leitor solicita Verificar link e o navegador permite ler a resposta
-- **THEN** a interface mostra o código HTTP e um sinal textual/visual de sucesso ou erro HTTP
-- **AND** não realiza fallback automático quando HEAD é recusado
-
-#### Scenario: Restrição do navegador ou rede
-- **WHEN** CORS, rede, timeout, conteúdo misto ou resposta opaca impedem ler o resultado
-- **THEN** a interface informa que não foi possível verificar e permite abrir o link para conferir
-- **AND** não classifica a scan como indisponível nem reutiliza o resultado após mudar o link
+#### Scenario: Consultar a origem da leitura
+- **WHEN** o leitor consulta a biblioteca com scan cadastrada
+- **THEN** encontra um link identificado pelo nome da scan ou hostname e pode abri-lo em nova aba
+- **AND** a aplicação não solicita o endereço da scan nem mostra controle ou estado de verificação
 
 ### Requirement: Buscar e ordenar a biblioteca localmente
 O módulo SHALL buscar por título sem distinção de caixa/acentos e ordenar por título crescente/decrescente ou data de leitura mais antiga/recente, com desempate estável. O padrão SHALL ser título crescente. Essas ações MUST NOT fazer requisições ao Drive, modificar dados ou criar pendências.
@@ -158,3 +153,23 @@ O módulo SHALL buscar por título sem distinção de caixa/acentos e ordenar po
 #### Scenario: Busca sem resultado
 - **WHEN** o título buscado não corresponde a nenhuma obra
 - **THEN** a interface informa que não houve resultado e oferece limpar a busca, distinguindo esse estado de biblioteca vazia
+
+### Requirement: Centralizar a conexão e indicar seu estado
+O módulo SHALL observar a sessão Drive compartilhada, apresentar apenas estado e sincronização manual e encaminhar gestão/reconexão à página Conexão. Desconexão, expiração e erro SHALL alertar o leitor, preservar pendências e bloquear envio/edição até nova leitura válida.
+
+#### Scenario: Desconectar ou expirar durante o uso
+- **WHEN** a conexão fica indisponível durante o uso do módulo
+- **THEN** um alerta apresenta o estado e um link para Conexão, sem outro painel de autorização
+- **AND** a aplicação não abre popup nem envia ou cria arquivo automaticamente
+
+### Requirement: Fechar o formulário e dar feedback ao salvar
+Salvar uma leitura válida SHALL preparar a operação manual em memória, fechar o formulário e mostrar feedback acessível distinguindo salvamento na aba de confirmação no Drive. O foco SHALL alcançar a obra salva, mesmo com uma busca anterior ativa. Campos inválidos MUST manter o formulário aberto. Animações discretas SHALL responder às ações e respeitar a preferência de movimento reduzido.
+
+#### Scenario: Salvar uma leitura válida
+- **WHEN** o leitor salva cadastro ou correção válida
+- **THEN** o formulário fecha, a obra aparece com destaque e o foco vai para ela
+- **AND** o feedback informa que está salva nesta aba e pendente de sincronização, sem envio automático
+
+#### Scenario: Campos inválidos e movimento reduzido
+- **WHEN** o leitor tenta salvar dados inválidos com preferência por movimento reduzido
+- **THEN** o formulário permanece aberto com erros associados aos campos e as animações/transições ficam desativadas
