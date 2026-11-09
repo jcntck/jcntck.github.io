@@ -1,9 +1,9 @@
 import type { Json } from '../../shared/storage/library'
 import { localDay, validDay } from './dates'
 
-export type Manga = { [key: string]: Json } & { id: string; title: string; lastChapter: string; lastReadOn: string; updatedAt: string; scanUrl?: string; scanName?: string; coverUrl?: string }
+export type Manga = { [key: string]: Json } & { id: string; title: string; englishTitle?: string; lastChapter: string; lastReadOn: string; updatedAt: string; scanUrl?: string; scanName?: string; coverUrl?: string }
 export interface MangaSection { [key: string]: Json; items: Manga[] }
-export type Fields = Pick<Manga, 'title' | 'lastChapter' | 'lastReadOn' | 'scanUrl' | 'scanName' | 'coverUrl'>
+export type Fields = Pick<Manga, 'title' | 'englishTitle' | 'lastChapter' | 'lastReadOn' | 'scanUrl' | 'scanName' | 'coverUrl'>
 export type Errors = Partial<Record<keyof Fields, string>>
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value)
@@ -33,6 +33,7 @@ export function readSection(value: Json | undefined): MangaSection {
       throw new Error('Há um registro de mangá inválido. Nada foi substituído.')
     }
     ids.add(item.id)
+    if (item.englishTitle !== undefined && typeof item.englishTitle !== 'string') throw new Error('Há um nome em inglês inválido. Nada foi substituído.')
     if (item.scanUrl !== undefined && (typeof item.scanUrl !== 'string' || (item.scanUrl !== '' && !validScanUrl(item.scanUrl)))) throw new Error('Há um link de scan inválido. Nada foi substituído.')
     if (item.scanName !== undefined && typeof item.scanName !== 'string') throw new Error('Há um nome de scan inválido. Nada foi substituído.')
     if (item.coverUrl !== undefined && (typeof item.coverUrl !== 'string' || (item.coverUrl !== '' && !validCoverUrl(item.coverUrl)))) throw new Error('Há uma capa com endereço inválido. Nada foi substituído.')
@@ -43,6 +44,8 @@ export function updateReading(section: MangaSection, record: Manga, today = loca
   if (Object.keys(validateFields(record, today)).length) throw new Error('Confira os campos da leitura.')
   const current = section.items.find(item => item.id === record.id)
   const next: Manga = { ...current, id: record.id, title: record.title.trim(), lastChapter: record.lastChapter.trim(), lastReadOn: record.lastReadOn, updatedAt: record.updatedAt }
+  if (record.englishTitle?.trim()) next.englishTitle = record.englishTitle.trim()
+  else delete next.englishTitle
   if (record.scanUrl?.trim()) next.scanUrl = new URL(record.scanUrl.trim()).href
   else delete next.scanUrl
   if (next.scanUrl && record.scanName?.trim()) next.scanName = record.scanName.trim()

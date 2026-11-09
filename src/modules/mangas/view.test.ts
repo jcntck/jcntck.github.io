@@ -3,7 +3,7 @@ import { readingPage, visibleReadings } from './view'
 import type { Manga } from './model'
 const records: Manga[] = [
   { id: 'b', title: 'Zebra', lastReadOn: '2026-01-01', lastChapter: '1', updatedAt: '' },
-  { id: 'a', title: 'Árvore', lastReadOn: '2026-06-01', lastChapter: 'Extra', updatedAt: '' },
+  { id: 'a', title: 'Árvore', englishTitle: 'World Tree', lastReadOn: '2026-06-01', lastChapter: 'Extra', updatedAt: '' },
   { id: 'c', title: 'Boruto', lastReadOn: '2026-06-01', lastChapter: '2', updatedAt: '' },
 ]
 it('filtra por título sem caixa/acentos e distingue busca vazia de sem resultado', () => {
@@ -37,4 +37,12 @@ it('limita a página após filtro/redução e trata lista vazia e limites', () =
   expect(readingPage([1, 2], -1).current).toBe(1)
   expect(readingPage([], 4)).toMatchObject({ items: [], current: 1, first: 0, last: 0, total: 1 })
   expect(readingPage(visibleReadings(records, 'arvore', 'title-desc'), 11).items.map(item => item.id)).toEqual(['a'])
+})
+
+it('busca pelos dois nomes sem duplicar obras e mantém a ordenação pelo título principal', () => {
+  expect(visibleReadings(records, 'WORLD TRÉE', 'title-asc').map(item => item.id)).toEqual(['a'])
+  expect(visibleReadings(records, 'arvore', 'title-desc').map(item => item.id)).toEqual(['a'])
+  const aliases = [{ ...records[0], englishTitle: 'Shared Name' }, { ...records[1], englishTitle: 'Shared Name' }, { ...records[2], title: 'Shared Name', englishTitle: 'Shared Name' }]
+  expect(visibleReadings(aliases, 'shared name', 'title-asc').map(item => item.id)).toEqual(['a', 'c', 'b'])
+  expect(visibleReadings(records, '', 'title-asc').map(item => item.id)).toEqual(['a', 'c', 'b'])
 })

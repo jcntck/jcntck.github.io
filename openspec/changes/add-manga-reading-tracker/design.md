@@ -16,11 +16,11 @@ Ver `proposal.md`. Shell `0.1.0`, Drive `0.2.2` e login `0.3.1` já foram public
 
 Após abrir o PR, fornecer comandos de execução local e aguardar a avaliação do usuário. Cada fix que ele relatar incrementa o patch e atualiza pacote, lockfile e versão alvo desta change no mesmo PR. A versão indicada inicialmente é a base; a tag e a identificação pública usam a versão final revisada. O usuário realiza o merge pelo GitHub nas próximas entregas; não executar merge ou auto-merge por ele.
 
-A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.3` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.3` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
+A base aprovada foi `0.4.0`; o patch atual desta change é `0.4.4` após revisão do titular. Conferir `dev` antes de editar e atualizar `package.json` e os campos de versão correspondentes do lockfile no PR de `dev` para `main`. Reutilizar o workflow dev para checks obrigatórios de lint, tipos, testes, build e coerência de versão. Após o merge, o workflow prod valida o commit final, cria `v0.4.4` com a versão do pacote e publica o mesmo artefato, sem incrementar versão nem criar commits em `main`.
 
 Conferir versão alvo, pacote, lockfile, tag, SHA e identificação pública, comparando somente as changes da entrega atual. Tag existente só é reutilizável no mesmo commit; divergência falha sem sobrescrita. A publicação automática segue separada da homologação explícita do usuário.
 
-A versão `0.4.3` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
+A versão `0.4.4` substitui a previsão anterior `1.0.0` por decisão do usuário; o formato global dos dados permanece na versão 1.
 
 ### Módulo sobre contratos existentes
 
@@ -30,7 +30,7 @@ A seção `modules.mangas` do envelope versão 1 é um objeto com `items`, uma l
 
 ### Modelo de leitura
 
-Cada registro possui `id` UUID estável, `title`, `lastChapter`, `lastReadOn`, `updatedAt` e os campos opcionais `scanUrl`, `scanName` (nome/label da origem) e `coverUrl` (capa HTTPS direta sem credenciais). Ausência da capa é compatível com registros existentes; campo vazio remove o endereço e nenhuma imagem binária é persistida. Links aceitam somente HTTP/HTTPS absolutos sem credenciais; registros antigos sem link ou nome permanecem compatíveis. Nome vazio usa o hostname como label; remover o link remove seu nome associado. Capítulo é texto obrigatório para aceitar “12.5” e “Extra 1”; título não é identificador único. Validar trim de título e capítulo e exigir data válida não futura no dia local.
+Cada registro possui `id` UUID estável, `title`, `englishTitle` opcional, `lastChapter`, `lastReadOn`, `updatedAt` e os campos opcionais `scanUrl`, `scanName` (nome/label da origem) e `coverUrl` (capa HTTPS direta sem credenciais). Ausência da capa é compatível com registros existentes; campo vazio remove o endereço e nenhuma imagem binária é persistida. Links aceitam somente HTTP/HTTPS absolutos sem credenciais; registros antigos sem link ou nome permanecem compatíveis. Nome vazio usa o hostname como label; remover o link remove seu nome associado. Capítulo é texto obrigatório para aceitar “12.5” e “Extra 1”; título não é identificador único. Validar trim de título e capítulo e exigir data válida não futura no dia local.
 
 Guardar `lastReadOn` como `YYYY-MM-DD`, um dia civil sem horário e sem conversão para UTC. `updatedAt` é um instante técnico e não determina quando a obra foi lida. Cadastro começa com hoje selecionado, sempre editável para registros retroativos. A edição mantém a data até uma mudança explícita, inclusive ao corrigir título ou capítulo.
 
@@ -56,7 +56,7 @@ Gerar identidade estável antes da primeira tentativa. Preparar a seção por `s
 
 ### Consulta local e link da scan (patch 0.4.3)
 
-Busca por título sem distinguir caixa ou acentos e ordenação por título A–Z/Z–A ou data de leitura mais antiga/recente. A ordenação padrão é título A–Z; empates usam título e UUID. Filtrar e ordenar não mudam a seção persistida ou a fila. Resultado vazio de busca é distinto de biblioteca vazia.
+Busca pelo título principal ou pelo nome em inglês sem distinguir caixa ou acentos e ordenação por título A–Z/Z–A ou data de leitura mais antiga/recente. A ordenação padrão é título A–Z; empates usam título e UUID. Filtrar e ordenar não mudam a seção persistida ou a fila. Resultado vazio de busca é distinto de biblioteca vazia.
 
 A listagem usa o nome opcional da scan como texto do link, com hostname como alternativa para registros antigos. Abre em nova aba sem referenciador; não executa fetch, HEAD, polling ou consulta de status. O patch 0.4.2 removeu por solicitação do titular a verificação entregue em 0.4.1; a capa 0.4.3 é somente exibição de imagem, sem restaurar consultas de status.
 
@@ -70,6 +70,12 @@ Ao salvar, destacar a obra e mostrar confirmação textual de salvamento na aba 
 Aceitar `coverUrl` opcional como HTTPS absoluto sem usuário/senha, editável/removível e compatível com registros sem capa. Renderizar `<img>` diretamente, sem `crossorigin`, fetch, canvas, cópia ou consulta HEAD. Usar dimensões reservadas, `loading="lazy"`, `decoding="async"` e `referrerPolicy="no-referrer"`. Imagens de terceiros podem recusar hotlink ou falhar; mostrar alternativa visual acessível sem repetir tentativas em loop. Trocar a URL permite nova tentativa. Apenas URLs são sincronizadas, sem Storage/Firebase adicional.
 
 Após busca e ordenação, apresentar 12 obras por página e controles anterior/próxima/números com página atual, total e intervalo de registros. Para 126 obras, são 11 páginas, a última com 6. Navegação é local e monta imagens somente dos registros da página. Busca/ordem reiniciam na primeira página; salvar limpa a busca e abre a página que contém a obra, preservando fechamento/foco/feedback. Limitar a página quando a lista diminuir, sem tela vazia indevida. Trocar de página move o foco para o título da biblioteca. Paginação não modifica a ordem/dados persistidos, não faz chamadas Drive e não cria pendências.
+
+### Edição e nome em inglês (patch 0.4.4)
+
+`englishTitle` é um texto opcional informado pelo leitor, com trim, editável e removido ao esvaziar. Registros anteriores sem o campo continuam válidos. Mostrar abaixo do título principal, com estilo secundário e quebra para textos longos. Buscar inclui os dois nomes sem duplicar obras, ignorando caixa e acentos; ordenação continua usando título principal/data e a paginação permanece posterior ao filtro. Não traduzir nem consultar catálogos/serviços externos. Salvar preserva UUID, data, capa, scan e propriedades extras.
+
+A ação visível Editar fica no rodapé de cada card, alinhada ao link da scan e à direita, com nome acessível incluindo a obra. O rodapé permanece com Editar quando não há scan. Em celular, permitir quebra de rótulos longos sem rolagem horizontal, mantendo alcance por teclado e estados de habilitação existentes. A edição mantém fechamento, foco, feedback e sincronização manual.
 
 ### Três faixas de tempo decorrido
 
@@ -86,7 +92,7 @@ Menos de 6 meses completos: texto discreto; de 6 meses até menos de 12: destaqu
 
 Iniciar somente depois das etapas anteriores publicadas, testadas e explicitamente homologadas. Testar regras e interação com adaptador em memória, depois com a integração real homologada. Publicar pelo pipeline existente e conferir cadastro retroativo, correção, mensagens de tempo, reabertura em outro dispositivo e revisão visual no endereço de produção.
 
-Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.3.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
+Registrar versão, URL, commit, execução, resultados e homologação em `docs/releases/0.4.4.md`. Rollback usa o procedimento existente e não remove o arquivo do Drive. Como o módulo adiciona somente sua seção ao envelope compatível, manter dados extras preservados ao voltar a um frontend anterior. Testar essa preservação antes da entrega.
 
 ## Open Questions
 

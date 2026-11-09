@@ -143,7 +143,7 @@ O módulo MUST apenas apresentar o link da scan e seu nome/hostname para abertur
 - **AND** a aplicação não solicita o endereço da scan nem mostra controle ou estado de verificação
 
 ### Requirement: Buscar e ordenar a biblioteca localmente
-O módulo SHALL buscar por título sem distinção de caixa/acentos e ordenar por título crescente/decrescente ou data de leitura mais antiga/recente, com desempate estável. O padrão SHALL ser título crescente. Essas ações MUST NOT fazer requisições ao Drive, modificar dados ou criar pendências.
+O módulo SHALL buscar por título principal ou nome em inglês opcional sem distinção de caixa/acentos e ordenar por título crescente/decrescente ou data de leitura mais antiga/recente, com desempate estável. O padrão SHALL ser título crescente. Essas ações MUST NOT fazer requisições ao Drive, modificar dados ou criar pendências.
 
 #### Scenario: Buscar e ordenar obras
 - **WHEN** o leitor busca um título e escolhe nome ou data
@@ -206,3 +206,23 @@ O tempo completo SHALL ter no máximo três faixas de destaque crescente: menos 
 - **WHEN** hoje é 09/11/2026 e a leitura foi em 25/07/2024
 - **THEN** a mensagem é “Lido há 2 anos 3 meses 15 dias” com destaque forte
 - **AND** uma leitura com menos de 6 meses usa destaque discreto e, ao completar 6 meses, passa ao intermediário sem alterar sua data
+
+### Requirement: Registrar e pesquisar o nome em inglês
+O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, com trim, apresentado abaixo do título principal como informação secundária. Registros sem o campo MUST permanecer compatíveis. A busca SHALL considerar ambos os nomes sem distinguir caixa/acentos nem duplicar resultados. A ordenação SHALL permanecer pelo título principal ou data e MUST NOT haver tradução, pesquisa externa ou sincronização automática.
+
+#### Scenario: Consultar por um nome alternativo
+- **WHEN** o leitor informa um nome em inglês, salva na aba e pesquisa esse nome ou o título principal
+- **THEN** encontra a mesma obra uma única vez com o título principal e o nome secundário na listagem
+- **AND** a consulta reinicia a paginação sem chamadas Drive e o nome é persistido somente ao Sincronizar
+
+#### Scenario: Editar ou remover o nome em inglês
+- **WHEN** o leitor altera ou esvazia o campo e salva
+- **THEN** o nome é atualizado ou removido, preservando UUID, data, capa, scan e campos compatíveis
+
+### Requirement: Editar pelo rodapé da obra
+Cada card SHALL apresentar a ação visível Editar no rodapé, alinhada ao link da scan quando presente. O controle SHALL permanecer disponível para obras sem scan, respeitar o estado da conexão e ter nome acessível que identifique a obra.
+
+#### Scenario: Acessar edição no rodapé
+- **WHEN** o leitor consulta uma obra com ou sem scan em computador ou celular
+- **THEN** encontra Editar no rodapé e pode abrir o formulário por teclado
+- **AND** link e ação ficam na mesma linha quando há espaço, sem controles cortados ou rolagem horizontal por textos longos

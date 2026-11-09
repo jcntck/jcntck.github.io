@@ -20,9 +20,9 @@ O modo manual é padrão. `setAutomatic(true)` habilita tentativas com debounce 
 
 A autenticação SDK guarda exclusivamente sua própria sessão, por até 30 dias desde o authTime. Documentos de negócio não são movidos para Firebase. Mangás consomem este contrato sem uma segunda fila de sincronização.
 
-## Mangás (0.4.3)
+## Mangás (0.4.4)
 
-`modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO e os campos opcionais `scanUrl` (HTTP/HTTPS sem credenciais) , `scanName` (nome da scan) e `coverUrl` (capa HTTPS direta sem credenciais). Registros antigos sem link ou nome continuam válidos. Nome vazio usa o hostname como texto do link; esvaziar o endereço remove também o nome associado. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
+`modules.mangas` é um objeto `{ items: Manga[] }`. Cada registro contém `id` UUID estável, `title`, `englishTitle` opcional, `lastChapter` textual, `lastReadOn` como dia civil `YYYY-MM-DD` e `updatedAt` como instante técnico ISO e os campos opcionais `scanUrl` (HTTP/HTTPS sem credenciais) , `scanName` (nome da scan) e `coverUrl` (capa HTTPS direta sem credenciais). Registros antigos sem link ou nome continuam válidos. Nome vazio usa o hostname como texto do link; esvaziar o endereço remove também o nome associado. Ausência da seção, depois de leitura válida, significa lista vazia. Uma seção inválida bloqueia edição, sem substituição por vazio. Campos extras do registro, da seção, do envelope e outros módulos são preservados.
 
 `src/modules/mangas/model.ts` valida e atualiza exclusivamente essa seção. Datas remotas aparentemente futuras são mantidas e apresentadas para conferência; entradas do formulário não aceitam datas futuras. O cálculo de tempo usa aniversários completos, ajustados ao último dia de mês/ano, e dias civis sem divisão de intervalos locais de 24 horas. Foco, visibilidade e meia-noite local atualizam as mensagens.
 
@@ -39,3 +39,7 @@ No patch 0.4.3, `coverUrl` é opcional, validado como HTTPS absoluto e removido 
 `readingPage` limita a página e recorta 12 obras depois de busca/ordem. Com 126 obras há 11 páginas, a última com 6. Não há leitura/gravação Drive ao navegar, nem armazenamento separado da lista. Apenas imagens dos registros montados nessa página podem carregar; navegação mantém pendências. Busca/ordem resetam a página e salvar calcula a posição da obra, limpa o filtro e a foca.
 
 `calendarSince` calcula meses completos totais pelo aniversário ajustado do dia original e separa anos/meses, com dias civis restantes desde o aniversário. Exibe todas as unidades e preserva fim de mês/ano bissexto. `readingEmphasis` usa <6 meses, 6–11 meses e >=12 meses como apresentação derivada. Esses níveis não são campos persistidos nem prazos/atrasos; texto, peso e fundo acompanham a cor.
+
+No patch 0.4.4, `englishTitle` é texto opcional normalizado com trim, removido quando vazio e compatível com registros antigos sem esse campo. A listagem o apresenta abaixo do título principal com estilo secundário. `visibleReadings` pesquisa ambos sem caixa/acentos e sem duplicar resultados; ordenação mantém título principal/data e o recorte por página ocorre depois do filtro. Não há tradução ou chamadas externas. O nome segue a mesma operação manual, preservando UUID, data, scan, capa e extras.
+
+Cada card usa rodapé próprio com link da scan e Editar alinhados. Sem scan, o rodapé mantém Editar. O nome acessível do botão inclui o título da obra; os estados da sessão, fechamento/foco após salvar e feedback permanecem compartilhados.

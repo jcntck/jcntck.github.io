@@ -63,3 +63,17 @@ it.each(['http://covers.example/a.jpg', '/capa.jpg', 'data:image/png;base64,abc'
   expect(validateFields({ ...record, coverUrl }, '2026-11-09')).toHaveProperty('coverUrl')
   expect(() => readSection({ items: [{ ...record, coverUrl }] })).toThrow(/capa/)
 })
+
+it('inclui, edita e remove o nome em inglês sem mudar identidade, data ou campos compatíveis', () => {
+  const base = readSection({ extension: 'keep', items: [{ ...record, scanUrl: 'https://scan.example/obra', scanName: 'Scan', coverUrl: 'https://covers.example/a.jpg', extra: 'keep' }] })
+  expect(base.items[0].englishTitle).toBeUndefined()
+  const added = updateReading(base, { ...base.items[0], englishTitle: '  World Tree  ' }, '2026-11-09')
+  expect(added.items[0]).toEqual({ ...base.items[0], title: record.title.trim(), lastChapter: record.lastChapter.trim(), englishTitle: 'World Tree' })
+  const edited = updateReading(added, { ...added.items[0], englishTitle: 'World Tree Updated' }, '2026-11-09')
+  expect(edited.items[0].englishTitle).toBe('World Tree Updated')
+  const removed = updateReading(edited, { ...edited.items[0], englishTitle: '   ' }, '2026-11-09')
+  expect(removed.items[0]).not.toHaveProperty('englishTitle')
+  expect(removed.items[0]).toMatchObject({ id: record.id, lastReadOn: record.lastReadOn, extra: 'keep', scanName: 'Scan', coverUrl: 'https://covers.example/a.jpg' })
+  expect(base.items[0]).not.toHaveProperty('englishTitle')
+  expect(() => readSection({ items: [{ ...record, englishTitle: 42 }] })).toThrow(/nome em inglês inválido/)
+})
