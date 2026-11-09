@@ -7,12 +7,18 @@ import { Navigate, useLocation, useNavigate, NavLink, Route, Routes } from 'reac
 import { ConnectionPage } from '../features/connection/ConnectionPage'
 import { HomePage } from './HomePage'
 import type { HubModule } from './navigation'
+import { MangasPage } from '../modules/mangas/MangasPage'
+
+const defaultModules: readonly HubModule[] = [
+  { id: 'mangas', label: 'Mangás', path: '/mangas', element: <MangasPage /> },
+  { id: 'connection', label: 'Conexão', path: '/connection', element: <ConnectionPage /> },
+]
 
 function NotFound() {
   return <section className="page-heading"><p className="eyebrow">PÁGINA NÃO ENCONTRADA</p><h1>Vamos voltar ao início?</h1><p className="page-description">Este espaço ainda não existe no seu hub.</p><NavLink className="return-link" to="/">Voltar ao início <span aria-hidden="true">→</span></NavLink></section>
 }
 
-function Shell({ modules = [{ id: 'connection', label: 'Conexão', path: '/connection', element: <ConnectionPage /> }] }: { modules?: readonly HubModule[] }) {
+function Shell({ modules = defaultModules }: { modules?: readonly HubModule[] }) {
   const auth = useAuth()
   const hub = useHub()
   const location = useLocation()
@@ -45,7 +51,7 @@ function Shell({ modules = [{ id: 'connection', label: 'Conexão', path: '/conne
         <header className="topbar"><span>Meu espaço pessoal</span><AccountMenu /></header>
         <main id="main-content" tabIndex={-1}>
           <div className="auth-status" role="status" aria-live="polite">{!signedIn && auth.message}{signedIn && !auth.persistent && 'Login temporário: o armazenamento do navegador está bloqueado. Recarregar encerra a sessão.'}</div>
-          <Routes><Route path="/" element={<HomePage />} />{modules.map((module) => <Route key={module.id} path={module.path} element={module.access === 'public' || signedIn ? module.element : restoring || auth.phase === 'error' ? <p className="page-description">{auth.message}</p> : <Navigate to="/" replace />} />)}<Route path="*" element={<NotFound />} /></Routes>
+          <Routes><Route path="/" element={<HomePage mangasAvailable={modules.some(module => module.id === 'mangas')} />} />{modules.map((module) => <Route key={module.id} path={module.path} element={module.access === 'public' || signedIn ? module.element : restoring || auth.phase === 'error' ? <p className="page-description">{auth.message}</p> : <Navigate to="/" replace />} />)}<Route path="*" element={<NotFound />} /></Routes>
         </main>
         <footer className="footer"><span>My Hub <span className="footer-dot" aria-hidden="true">·</span> Feito para o seu ritmo.</span><span className="release-info" aria-label="Versão da aplicação">v{__APP_VERSION__}<span aria-hidden="true"> / </span><span title={__COMMIT_SHA__}>{__COMMIT_SHA__ === 'development' ? 'desenvolvimento' : __COMMIT_SHA__.slice(0, 7)}</span></span></footer>
       </div>

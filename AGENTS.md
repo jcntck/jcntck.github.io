@@ -23,7 +23,7 @@ Estas regras se aplicam a todo planejamento, desenvolvimento, documentação e e
 - A versão da aplicação fica em `package.json`. Na implementação da entrega, atualizar essa versão e os campos de versão correspondentes do lockfile em `dev`, no mesmo PR do trabalho entregue.
 - Se o projeto ainda não tiver `package.json`, criá-lo com a versão aprovada durante a inicialização da aplicação; não criar um manifesto incompleto apenas para cumprir uma alteração de planejamento.
 - Conferir coerência entre versão alvo da change entregue, `package.json`, lockfile, identificação pública e tag `v<versão>` antes de publicar. Comparar apenas as changes incluídas na entrega atual; propostas futuras podem ter outras versões.
-- Versões aprovadas para as etapas atuais: `add-modular-shell` → `0.1.0`; `add-cloud-library` → `0.2.0` (entrega final homologada `0.2.2`); `add-google-sign-in` → `0.3.0`; `add-manga-reading-tracker` → `1.0.0`, concluindo o MVP. Não agrupar changes de versões diferentes numa mesma entrega sem decisão explícita do usuário.
+- Versões aprovadas para as etapas atuais: `add-modular-shell` → `0.1.0`; `add-cloud-library` → `0.2.0` (entrega final homologada `0.2.2`); `add-google-sign-in` → `0.3.0`; `add-manga-reading-tracker` → `0.4.0` (patch atual `0.4.4`), conforme revisão do usuário. Não agrupar changes de versões diferentes numa mesma entrega sem decisão explícita do usuário.
 
 ## CI/CD
 

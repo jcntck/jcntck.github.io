@@ -69,6 +69,37 @@ describe('sessão isolada', () => {
 })
 
 describe('sincronização compartilhada', () => {
+  it('mantém seções manuais pendentes mesmo com automação, foco e novas edições', async () => {
+    vi.useFakeTimers()
+    const f = fixture(); await f.session.connect(async () => grant)
+    f.session.setAutomatic(true)
+    f.session.stageSection('modules', 'mangas', { items: ['primeira'] }, { manual: true })
+    await vi.advanceTimersByTimeAsync(1000)
+    f.session.stageSection('modules', 'mangas', { items: ['primeira', 'segunda'] }, { manual: true })
+    f.session.resumeAutomatic()
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(f.writes).toEqual([])
+    await f.session.sync()
+    expect(f.writes).toEqual(['A'])
+    expect(f.documents.A?.document.modules.mangas).toEqual({ items: ['primeira', 'segunda'] })
+    f.session.stageSection('modules', 'mangas', { items: ['correção'] }, { manual: true })
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(f.writes).toEqual(['A'])
+    f.session.disconnect()
+  })
+  it('não envia uma seção manual enfileirada depois da confirmação automática de outra seção', async () => {
+    vi.useFakeTimers()
+    const f = fixture(); await f.session.connect(async () => grant); f.session.setAutomatic(true)
+    f.session.stageProbe()
+    f.session.stageSection('modules', 'mangas', { items: ['obra'] }, { manual: true })
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(f.writes).toEqual(['A'])
+    expect(f.session.getSnapshot().pending?.key).toBe('mangas')
+    expect(f.documents.A?.document.modules.mangas).toBeUndefined()
+    await f.session.sync()
+    expect(f.writes).toEqual(['A', 'A'])
+    f.session.disconnect()
+  })
   it('prepara sem gravar e sincroniza somente por ação, sem criar documento na leitura vazia', async () => {
     const f = fixture(); await f.session.connect(async () => grant)
     f.session.stageProbe(); expect(f.writes).toEqual([])
@@ -90,10 +121,14 @@ describe('sincronização compartilhada', () => {
     await session.connect(async () => grant); session.stageSection('modules', 'first', 1)
     const sending = session.sync(); const first = session.getSnapshot().pending!
     session.stageSection('modules', 'first', 2); session.stageSection('modules', 'second', 3)
+    expect(session.pendingSection('modules', 'first')).toBe(2)
+    expect(session.pendingSection('modules', 'second')).toBe(3)
     finish({ fileId: 'a', document: applyOperation(emptyEnvelope(), first) }); await sending
     expect(session.getSnapshot().pending?.value).toBe(2)
     await session.sync(); expect(session.getSnapshot().pending?.key).toBe('second')
-    await session.sync(); expect(session.getSnapshot().snapshot?.document.modules).toEqual({ first: 2, second: 3 }); session.disconnect()
+    await session.sync(); expect(session.getSnapshot().snapshot?.document.modules).toEqual({ first: 2, second: 3 })
+    expect(session.pendingSection('modules', 'first')).toBeUndefined()
+    session.disconnect()
   })
   it('automação é opt-in, serializada e pausa sem abrir popup ao expirar ou falhar', async () => {
     vi.useFakeTimers(); const f = fixture(); await f.session.connect(async () => grant)
