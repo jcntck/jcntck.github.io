@@ -9,15 +9,15 @@
 
 ## 2. Experiência e aparência do módulo
 
-- [ ] 2.1 Registrar a entrada e rota “Mangás” e preparar prévia navegável da hierarquia e aparência; verificar acesso direto no caminho real do Pages e revisar com o usuário a composição para celular e computador, mantendo os campos e fluxos definidos.
+- [x] 2.1 Registrar a entrada e rota “Mangás” e preparar prévia navegável da hierarquia e aparência; verificar acesso direto no caminho real do Pages e revisar com o usuário a composição para celular e computador, mantendo os campos e fluxos definidos.
 - [x] 2.2 Implementar cadastro e correção acessíveis com pendências em memória, sincronização compartilhada e confirmação de salvamento remoto; verificar por testes de interação validação, identidade preservada, data alterada somente por ação explícita e formulário preservado nos erros retornados pelo contrato de armazenamento.
 - [x] 2.3 Implementar listagem, estado vazio, data absoluta e tempo decorrido; verificar recalculo ao abrir, recuperar foco e virar o dia, navegação por teclado e ausência de controles cortados em celular.
-- [ ] 2.4 Documentar cadastro retroativo, correção e interpretação das mensagens e refinar a aparência com os retornos da prévia; verificar que interface e guia correspondem entre si e não introduzem vencimentos, agendamentos ou promessas de capítulos novos.
+- [x] 2.4 Documentar cadastro retroativo, correção e interpretação das mensagens e refinar a aparência com os retornos da prévia; verificar que interface e guia correspondem entre si e não introduzem vencimentos, agendamentos ou promessas de capítulos novos.
 
 ## 3. Entrega e homologação do negócio
 
-- [ ] 3.1 Abrir o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados, fornecer instruções para teste local do usuário e aplicar cada fix relatado com incremento patch sincronizado; aguardar o merge feito por ele e acompanhar o workflow prod criar a tag da versão final revisada (atual `v0.4.6`, base `0.4.0`) e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/0.4.6.md`.
-- [ ] 3.2 Executar no site real cadastro retroativo, correção, reabertura em outro dispositivo, preservação da amostra técnica e revisão visual em celular e computador; apresentar os resultados e registrar homologação explícita do usuário, corrigindo regressões dos contratos anteriores antes de concluir.
+- [x] 3.1 Abrir o PR `dev` → `main` após lint, tipos, testes, build e versão aprovados, fornecer instruções para teste local do usuário e aplicar cada fix relatado com incremento patch sincronizado; aguardar o merge feito por ele e acompanhar o workflow prod criar a tag da versão final revisada (atual `v0.4.6`, base `0.4.0`) e publicar o commit validado; verificar coerência entre versão alvo, pacote, lockfile, tag, versão e rota em produção e registrar URL, commit, execução e resultados em `docs/releases/0.4.6.md`.
+- [x] 3.2 Executar no site real cadastro retroativo, correção, reabertura em outro dispositivo, preservação da amostra técnica e revisão visual em celular e computador; apresentar os resultados e registrar homologação explícita do usuário, corrigindo regressões dos contratos anteriores antes de concluir.
 
 ## Workflow follow-up
 
@@ -25,7 +25,7 @@
 
 ## Entrega inicial para teste
 
-PR #4 aberto com versão 0.4.0, revisado até 0.4.4 e integrado pelo titular, conforme `docs/releases/0.4.4.md`. O PR #5 continua em 0.4.6, conforme `docs/releases/0.4.6.md`. Prévia e documentação prontas; 2.1/2.4 permanecem pendentes somente pela avaliação/refinamento com o usuário. 3.1/3.2 aguardam merge/publicação da revisão final e homologação geral. Nenhuma tag criada antes do merge; cada alteração solicitada após esta liberação é patch fix no mesmo PR.
+PR #4 aberto com versão 0.4.0, revisado até 0.4.4 e integrado pelo titular, conforme `docs/releases/0.4.4.md`. O PR #5 foi integrado pelo titular com a versão final 0.4.6, conforme `docs/releases/0.4.6.md`. Revisão visual aceita e publicação confirmada em 2026-11-09; 2.1, 2.4 e 3.1 concluídas. O aceite geral foi recebido com “Otimo, pode arquivar”; o titular confirmou “Concluí o roteiro 3.2” e autorizou sincronizar e arquivar em 2026-11-09. Todas as 31 tarefas foram concluídas. Os testes reais na conta são declaração do titular, sem atribuição ao agente. Nenhuma tag criada antes do merge; cada alteração solicitada após esta liberação é patch fix no mesmo PR.
 
 ## 4. Patch de revisão 0.4.1
 
