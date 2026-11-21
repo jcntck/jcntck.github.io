@@ -48,7 +48,7 @@
 ## 7. PR e liberação para teste
 
 - [x] 7.1 Finalizar o registro de entrega `docs/releases/0.5.0.md` com resultados locais e roteiro executável: Node da `.nvmrc`, `npm ci`, `npm run dev -- --host localhost` e rotas de Mangás/Conexão; conferir que a avaliação inclui cancelamento/exclusão, refresh, duas ordens e autorização real sem registrar credenciais.
-- [ ] 7.2 Assim que os checks locais passarem, enviar os commits em `dev` e abrir imediatamente o PR `dev` → `main`; verificar URL/origem do PR, execução do CI obrigatório e disponibilização das instruções de teste ao titular, sem merge ou auto-merge pelo agente.
+- [x] 7.2 Assim que os checks locais passarem, enviar os commits em `dev` e abrir imediatamente o PR `dev` → `main`; verificar URL/origem do PR, execução do CI obrigatório e disponibilização das instruções de teste ao titular, sem merge ou auto-merge pelo agente.
 - [ ] 7.3 Tratar cada fix solicitado após a liberação como incremento patch no mesmo PR, alinhando pacote, lockfile, versão alvo e evidências antes de enviar; verificar os checks pertinentes e de versão a cada patch, sem criar tag antecipada.
 
 ## 8. Publicação e homologação
