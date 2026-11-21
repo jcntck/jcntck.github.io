@@ -20,6 +20,17 @@ O sistema SHALL oferecer o mesmo fluxo de autorização e sincronização aos co
 - **THEN** a interface informa o estado e oferece uma ação explícita utilizável quando o serviço estiver pronto
 - **AND** concluir o carregamento não abre um popup sem novo acionamento do usuário
 
+### Requirement: Distinguir confirmações temporárias de atenção persistente
+Confirmações de conexão, leitura e sincronização sem pendências ou problemas SHALL aparecer em verde por três segundos. Progresso SHALL usar estilo neutro. Pendências, cache indisponível, erros e conflitos SHALL permanecer visíveis enquanto aplicáveis. Nova confirmação SHALL reaparecer e reiniciar seu prazo; renderizações alheias MUST NOT prolongá-lo. Descartar o aviso MUST NOT alterar a fila ou a conexão.
+
+#### Scenario: Concluir e dispensar uma confirmação
+- **WHEN** uma operação termina com sucesso sem pendências ou problemas
+- **THEN** a confirmação verde desaparece após três segundos e os controles permanecem disponíveis
+
+#### Scenario: Exigir atenção após um sucesso
+- **WHEN** uma pendência, falha ou conflito substitui a confirmação
+- **THEN** o estado de atenção fica visível e o timer anterior não o remove
+
 ## MODIFIED Requirements
 
 ### Requirement: Coordenar sincronização com estado compartilhado

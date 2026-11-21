@@ -8,6 +8,8 @@ import { useLocalDay } from './useLocalDay'
 import { ReadingCard } from './ReadingCard'
 import { PAGE_SIZE, readingPage, visibleReadings, type ReadingOrder } from './view'
 import './mangas.css'
+import { DriveNotice } from '../../shared/components/DriveNotice'
+import { Notice } from '../../shared/components/Notice'
 import { Icon } from '../../shared/components/Icon'
 import { useDriveActions } from '../../shared/session/useDriveActions'
 
@@ -49,7 +51,6 @@ export function MangasPage() {
   try { if (state.snapshot !== undefined) confirmed = readSection(state.snapshot?.document.modules.mangas).items } catch { /* Domain errors disable editing above. */ }
   const unavailable = ['disconnected', 'expired', 'error'].includes(state.phase)
   const syncing = state.phase === 'saving'
-  const remoteChosen = state.syncPhase === 'synced' && state.message.includes('versão mais recente')
   const feedbackVisible = feedback && section.items.some(item => item.id === feedback.record.id && canonical(item) === canonical(feedback.record))
   const feedbackConfirmed = feedback && confirmed.some(item => item.id === feedback.record.id && canonical(item) === canonical(feedback.record))
   const visible = visibleReadings(section.items, query, order)
@@ -85,7 +86,7 @@ export function MangasPage() {
       <button ref={createButton} className="manga-primary" disabled={!canEdit} onClick={() => open()}><Icon name="plus" />Cadastrar mangá</button>
     </div>
     {actions.error && <p role="alert">{actions.error} <button onClick={actions.retry}>Tentar carregar Google</button></p>}
-    {removed && <p role="status" className="manga-feedback">{removed.title}: {section.items.some(item => item.id === removed.id) ? 'a versão do Drive foi adotada.' : confirmed.some(item => item.id === removed.id) || state.pending ? 'removida localmente; pendente de sincronização.' : state.syncPhase === 'synced' ? 'remoção confirmada no Drive.' : 'removida da biblioteca local.'}</p>}
+    {removed && <Notice tone={state.pending || section.items.some(item => item.id === removed.id) ? 'warning' : 'success'} eventKey={`${removed.id}:${state.syncPhase}:${!!state.pending}`} message={`${removed.title}: ${section.items.some(item => item.id === removed.id) ? 'a versão do Drive foi adotada.' : confirmed.some(item => item.id === removed.id) || state.pending ? 'removida localmente; pendente de sincronização.' : state.syncPhase === 'synced' ? 'remoção confirmada no Drive.' : 'removida da biblioteca local.'}`} />}
     {deleting && <dialog ref={deletionDialog} className="delete-dialog" aria-labelledby="delete-title" onCancel={() => { setDeleting(null); deletionTrigger.current?.focus() }} onClose={() => { setDeleting(null); deletionTrigger.current?.focus() }}>
       <h2 id="delete-title">Excluir {deleting.title}?</h2><p>A remoção fica salva localmente e pendente de sincronização com o Drive.</p>
       <div className="connection-actions"><button autoFocus className="manga-secondary" onClick={() => deletionDialog.current?.close()}>Cancelar</button><button className="manga-primary" disabled={!canEdit} onClick={() => {
@@ -105,12 +106,10 @@ export function MangasPage() {
 
     {loaded && !problem && <div className="manga-stats" aria-label="Resumo das leituras"><div><strong>{section.items.length}</strong><span>obras</span></div><div><strong>{section.items.filter(item => readingEmphasis(item.lastReadOn, today) === 'recent').length}</strong><span>menos de 6 meses</span></div><div><strong>{section.items.filter(item => readingEmphasis(item.lastReadOn, today) === 'long').length}</strong><span>há 1 ano ou mais</span></div></div>}
     <div className="manga-sync-bar">
-      <p role="status" key={`${state.phase}-${state.syncPhase}`} className="manga-sync-status">{unavailable ? loaded ? 'Biblioteca disponível no navegador. Drive desconectado para sincronização.' : 'Sincronização indisponível.' : ['loading', 'authorizing'].includes(state.phase) ? 'Carregando a biblioteca…' : syncing ? 'Sincronizando com o Drive…' : state.pending ? state.cached ? 'Alterações salvas no navegador, pendentes de sincronização.' : 'Alterações salvas nesta aba, pendentes de sincronização.' : state.syncPhase === 'synced' ? remoteChosen ? state.message : 'Gravação confirmada no Drive.' : 'Drive conectado. Biblioteca carregada.'}</p>
+      {!problem && <DriveNotice state={state} successMessage={state.syncPhase === 'synced' ? undefined : 'Drive conectado. Biblioteca carregada.'} />}
       <button className="manga-secondary" aria-busy={syncing} disabled={syncing || (!state.canWrite && !actions.ready)} onClick={() => void actions.run()}><Icon name="upload" />{syncing ? 'Sincronizando…' : 'Sincronizar'}</button>
     </div>
-    {state.phase === 'error' && <p role="alert" className="manga-notice">{state.message}</p>}
     {!loaded && !unavailable && <p className="manga-notice">Aguarde a leitura do Drive para consultar seus registros.</p>}
-    {state.cacheError && <p role="alert" className="manga-notice">{state.cacheError}</p>}
     {problem && <div className="manga-connection-alert" role="alert"><p>{problem} Confira ou releia o arquivo pela página Conexão antes de editar.</p><Link to="/connection">Abrir Conexão <Icon name="arrow" /></Link></div>}
     {draft && <dialog ref={editorDialog} className="reading-dialog" aria-labelledby="reading-form-title" onCancel={event => { event.preventDefault(); closeEditor() }} onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation() }}><form className="manga-form" onSubmit={submit} noValidate aria-labelledby="reading-form-title">
       <div className="section-heading"><h2 id="reading-form-title">{section.items.some(item => item.id === draft.id) ? 'Editar leitura' : 'Nova leitura'}</h2>
@@ -130,7 +129,7 @@ export function MangasPage() {
       <div className="reading-form-actions"><button className="manga-primary" disabled={!canEdit} type="submit">Salvar leitura</button>{section.items.some(item => item.id === draft.id) && <button type="button" className="manga-secondary reading-delete" disabled={!canEdit} onClick={event => { deletionTrigger.current = event.currentTarget; setDeleting(draft) }}><Icon name="trash" />Excluir obra</button>}</div>
       <p className="manga-help">{state.cached ? 'Salva no navegador.' : 'Salva nesta aba.'} Quando terminar suas edições, use Sincronizar para enviar ao Drive.</p>
     </form></dialog>}
-    {feedbackVisible && <p key={feedback.id} className="manga-feedback" role="status"><Icon name="check" /> {feedback.record.title}: {feedbackConfirmed ? 'gravação confirmada no Drive.' : state.cached ? 'leitura salva no navegador. Pendente de sincronização.' : 'leitura salva nesta aba. Pendente de sincronização.'}</p>}
+    {feedbackVisible && <Notice tone={feedbackConfirmed ? 'success' : 'warning'} eventKey={`${feedback.id}:${!!feedbackConfirmed}`} message={`${feedback.record.title}: ${feedbackConfirmed ? 'gravação confirmada no Drive.' : state.cached ? 'leitura salva no navegador. Pendente de sincronização.' : 'leitura salva nesta aba. Pendente de sincronização.'}`} />}
     {loaded && !problem && <section className="manga-library" aria-labelledby="reading-list-title">
       <div className="section-heading"><h2 id="reading-list-title" ref={libraryHeading} tabIndex={-1}>Sua biblioteca</h2><span>{query.trim() ? `${visible.length} de ${section.items.length} obras` : `${section.items.length} ${section.items.length === 1 ? 'obra' : 'obras'}`}</span></div>
       {section.items.length > 0 && <div className="manga-toolbar">

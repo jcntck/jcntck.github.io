@@ -139,3 +139,9 @@ A legenda visível das faixas (menos de 6 meses, 6 a 11 meses, 1 ano ou mais) ac
 ## Revisão 0.5.4
 
 Substituir as cores fixas dos botões da sobreposição pelos tokens semânticos card/card-foreground, border, muted e destructive/destructive-foreground. O foco usa o ring compartilhado. Preservar animação, área clicável, tags, hover/foco/toque e fluxos existentes.
+
+## Revisão de notificações 0.5.5
+
+Compartilhar a classificação dos estados Drive entre Mangás e Conexão: sucesso em ready sem pendências/problemas, progresso neutro em authorizing/loading/saving, atenção persistente para pendências/cache/expiração/adoção remota que supera alterações, erro persistente para falhas/conflitos. Desconexão com cache válido e sem pendências não demanda banner.
+
+Um componente de notificação acessível remove sucessos após 3000ms. O timer é vinculado à ocorrência (snapshot ou identificador do feedback), não a renderizações de tema/busca; nova ocorrência, mesmo com o mesmo texto, reaparece. Substituição por outro estado e desmontagem cancelam o timer. Avisos e erros não têm dispensa automática. Manter o botão Sincronizar separado da notificação e a fila/cache fora do estado visual. Feedbacks de remoção/salvamento usam a mesma política quando confirmados no Drive.

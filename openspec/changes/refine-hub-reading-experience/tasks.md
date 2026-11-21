@@ -83,3 +83,8 @@
 
 - [x] 12.1 Aplicar os tokens de tema aos botões da capa, incluindo hover, foco e exclusão; verificar as ações nos temas claro/escuro em computador/celular.
 - [x] 12.2 Alinhar a versão 0.5.4, validar os checks e enviar ao mesmo PR #6 com evidências.
+
+## 13. Patch de notificações 0.5.5
+
+- [x] 13.1 Compartilhar notificações verdes de três segundos e atenção persistente, mantendo progresso neutro e Sincronizar disponível; verificar timers, repetição, substituição e os fluxos em Mangás/Conexão.
+- [ ] 13.2 Alinhar versão 0.5.5, validar os checks e enviar ao mesmo PR #6 com evidências.

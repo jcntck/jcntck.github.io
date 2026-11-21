@@ -140,7 +140,7 @@ test('pagina 126 obras com capas externas, falha visual e tempo completo sem cha
   expect(writes).toBe(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.getByRole('button', { name: 'Sincronizar', exact: true }).click()
-  await expect(page.getByText('Gravação confirmada no Drive.', { exact: true })).toBeVisible()
+  await expect(page.getByText('Gravação confirmada por releitura do Drive.', { exact: true })).toBeVisible()
   expect(writes).toBe(1)
   const saved = remote.modules.mangas as MangaSection
   expect(saved.items).toHaveLength(127)

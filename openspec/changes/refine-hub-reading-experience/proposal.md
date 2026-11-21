@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.4`
+`0.5.5`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -59,3 +59,7 @@ O mesmo patch restaura a legenda das três faixas de tempo de leitura, removida 
 ## Patch 0.5.4
 
 Correção solicitada na revisão: os botões de ações sobre a capa usam superfícies, bordas, ícones, hover e exclusão derivados do tema da aplicação, nos modos claro e escuro.
+
+## Patch 0.5.5
+
+Revisão do titular: apresentar confirmações de conexão/sincronização em verde, removidas após três segundos; manter visíveis somente pendências, erros e outros estados que exigem atenção. Progresso usa apresentação neutra, e o botão Sincronizar permanece disponível após o desaparecimento do sucesso.
