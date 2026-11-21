@@ -72,4 +72,4 @@
 
 - [x] 10.1 Compactar cards e revelar ações por hover/foco/toque com status acessível; verificar cenários de computador/celular.
 - [x] 10.2 Compartilhar modal de cadastro/edição com exclusão, Escape e foco; verificar salvar, cancelar e excluir no modal.
-- [ ] 10.3 Alinhar versão 0.5.2, validar os checks e atualizar o mesmo PR #6 com roteiro e evidências.
+- [x] 10.3 Alinhar versão 0.5.2, validar os checks e atualizar o mesmo PR #6 com roteiro e evidências.
