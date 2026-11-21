@@ -87,4 +87,4 @@
 ## 13. Patch de notificações 0.5.5
 
 - [x] 13.1 Compartilhar notificações verdes de três segundos e atenção persistente, mantendo progresso neutro e Sincronizar disponível; verificar timers, repetição, substituição e os fluxos em Mangás/Conexão.
-- [ ] 13.2 Alinhar versão 0.5.5, validar os checks e enviar ao mesmo PR #6 com evidências.
+- [x] 13.2 Alinhar versão 0.5.5, validar os checks e enviar ao mesmo PR #6 com evidências.
