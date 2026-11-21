@@ -66,4 +66,4 @@
 
 - [x] 9.1 Alinhar proposta, pacote e lockfile à 0.5.1 e substituir a aproximação por paleta, fontes e composição da referência; verificar build e comparação das capturas de desktop/celular com os componentes do ZIP.
 - [x] 9.2 Usar ícones Lucide reais em navegação, conta, tema, busca e ações, incluindo Conexão; verificar lint, tipos e testes de navegação, conta e operações existentes.
-- [ ] 9.3 Concluir validação local, registrar evidências visuais e enviar a 0.5.1 ao mesmo PR #6; verificar suíte completa, identificação da versão e execução do CI no head enviado.
+- [x] 9.3 Concluir validação local, registrar evidências visuais e enviar a 0.5.1 ao mesmo PR #6; verificar suíte completa, identificação da versão e execução do CI no head enviado.
