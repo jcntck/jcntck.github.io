@@ -77,4 +77,4 @@
 ## 11. Patch visual 0.5.3
 
 - [x] 11.1 Animar o contêiner comum e restaurar a tag e a legenda de leitura com o dia local; verificar alinhamento durante a transição e preferência de movimento reduzido no navegador.
-- [ ] 11.2 Alinhar a versão 0.5.3, validar os checks e enviar ao mesmo PR #6 com evidências.
+- [x] 11.2 Alinhar a versão 0.5.3, validar os checks e enviar ao mesmo PR #6 com evidências.
