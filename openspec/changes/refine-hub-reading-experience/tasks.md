@@ -78,3 +78,8 @@
 
 - [x] 11.1 Animar o contêiner comum e restaurar a tag e a legenda de leitura com o dia local; verificar alinhamento durante a transição e preferência de movimento reduzido no navegador.
 - [x] 11.2 Alinhar a versão 0.5.3, validar os checks e enviar ao mesmo PR #6 com evidências.
+
+## 12. Patch de tema 0.5.4
+
+- [x] 12.1 Aplicar os tokens de tema aos botões da capa, incluindo hover, foco e exclusão; verificar as ações nos temas claro/escuro em computador/celular.
+- [ ] 12.2 Alinhar a versão 0.5.4, validar os checks e enviar ao mesmo PR #6 com evidências.

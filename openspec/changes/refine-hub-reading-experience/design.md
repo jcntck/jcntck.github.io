@@ -135,3 +135,7 @@ O titular substituiu a apresentação detalhada dos cards por capa/título e sta
 Aplicar a transformação de hover ao contêiner comum da capa, em vez de à imagem isolada. Sobreposição, acionador e badges passam a acompanhar a mesma geometria em toda a animação. Restaurar o badge resumido de última leitura à esquerda, com data/tempo completo acessíveis e as faixas já existentes. Usar o dia reativo da página para recalcular o badge na virada do dia, sem alterar registros. Manter espaço reservado para o indicador de sincronização à direita e respeitar movimento reduzido.
 
 A legenda visível das faixas (menos de 6 meses, 6 a 11 meses, 1 ano ou mais) acompanha as cores das tags restauradas e permanece junto à biblioteca.
+
+## Revisão 0.5.4
+
+Substituir as cores fixas dos botões da sobreposição pelos tokens semânticos card/card-foreground, border, muted e destructive/destructive-foreground. O foco usa o ring compartilhado. Preservar animação, área clicável, tags, hover/foco/toque e fluxos existentes.

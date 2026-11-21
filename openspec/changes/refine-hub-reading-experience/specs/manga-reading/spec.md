@@ -59,7 +59,7 @@ Sincronizar uma exclusão SHALL usar a política existente de comparação de at
 
 
 ### Requirement: Revelar ações sobre a capa
-O card SHALL mostrar somente capa, título e indicador acessível de sincronização no canto superior direito, amarelo para pendência e check verde para confirmação. Hover, foco de teclado e toque na capa SHALL revelar uma sobreposição com escurecimento e botões de ícone Editar, Excluir e scan quando houver URL. As ações MUST permanecer operáveis por teclado e respeitar movimento reduzido.
+O card SHALL mostrar somente capa, título e indicador acessível de sincronização no canto superior direito, amarelo para pendência e check verde para confirmação. Hover, foco de teclado e toque na capa SHALL revelar uma sobreposição com escurecimento e botões de ícone Editar, Excluir e scan quando houver URL. As ações MUST permanecer operáveis por teclado, acompanhar as cores e estados do tema claro/escuro e respeitar movimento reduzido.
 
 #### Scenario: Acionar no celular
 - **WHEN** o leitor toca a capa

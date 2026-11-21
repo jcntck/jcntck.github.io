@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.3`
+`0.5.4`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -55,3 +55,7 @@ Revisão do titular: remover dica temporal e painel redundante de desconexão; c
 Correção solicitada na revisão: mover capa, sobreposição de ações e indicadores como um único conjunto durante o hover; restaurar a tag de última leitura no canto superior esquerdo, preservando o estado de sincronização à direita.
 
 O mesmo patch restaura a legenda das três faixas de tempo de leitura, removida indevidamente na simplificação dos cards.
+
+## Patch 0.5.4
+
+Correção solicitada na revisão: os botões de ações sobre a capa usam superfícies, bordas, ícones, hover e exclusão derivados do tema da aplicação, nos modos claro e escuro.

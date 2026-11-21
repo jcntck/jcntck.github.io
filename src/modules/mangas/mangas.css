@@ -59,8 +59,8 @@
 .card-sync-icon .icon { width:18px; height:18px; }.card-sync-pending { color:#b47b00; }.card-sync-saved { color:#188750; }
 :root[data-theme="dark"] .card-sync-pending { color:#ffd45d; }:root[data-theme="dark"] .card-sync-saved { color:#73e0a4; }
 .card-actions { position:absolute; inset:0; z-index:2; display:flex; flex-wrap:wrap; align-content:center; justify-content:center; align-items:center; gap:8px; padding:12px; border-radius:16px; background:#0b1923a6; opacity:0; pointer-events:none; transition:opacity 180ms ease; }
-.card-actions .card-action { display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid #ffffff70; background:#fff; color:#19333f; border-radius:50%; text-decoration:none; transition:transform 180ms,background-color 180ms; }
-.card-action:hover { transform:translateY(-2px); }.card-actions .card-action-delete { color:#b13e33; }
+.card-actions .card-action { display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid var(--border); background:var(--card); color:var(--card-foreground); border-radius:50%; text-decoration:none; transition:transform 180ms,background-color 180ms; }
+.card-action:hover { transform:translateY(-2px); background:var(--muted); }.card-actions .card-action-delete { color:var(--destructive); }.card-actions .card-action-delete:hover { background:var(--destructive); color:var(--destructive-foreground); }
 .reading-card[data-menu-open=true] .card-actions,.reading-card:has(.card-menu-toggle:focus-visible) .card-actions,.reading-card .card-actions:focus-within { opacity:1; visibility:visible; pointer-events:none; }
 @media(hover:hover) { .reading-card:hover .card-actions { opacity:1; visibility:visible; pointer-events:none; } }
 .reading-dialog { width:min(680px,calc(100vw - 32px)); max-height:90dvh; padding:0; border:1px solid var(--border); border-radius:24px; color:var(--foreground); background:var(--card); box-shadow:var(--shadow-lift); overflow:auto; }

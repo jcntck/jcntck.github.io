@@ -87,6 +87,13 @@ test('pagina 126 obras com capas externas, falha visual e tempo completo sem cha
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await expect(animatedCard.locator('.cover-wrap')).toHaveCSS('transform', 'none')
   await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.getByRole('button', { name: 'Ações de Obra 001', exact: true }).click({ position: { x: 12, y: 12 } })
+  const originalTheme = await page.locator('html').getAttribute('data-theme')
+  for (const theme of ['light', 'dark']) {
+    await page.evaluate(value => { document.documentElement.dataset.theme = value }, theme)
+    await page.screenshot({ path: testInfo.outputPath(`actions-${theme}.png`), animations: 'disabled' })
+  }
+  await page.evaluate(value => { document.documentElement.dataset.theme = value || 'light' }, originalTheme)
   await page.mouse.move(0, 0)
   const titleBox = await page.getByRole('heading', { name: 'Obra 001', exact: true }).boundingBox()
   expect(titleBox!.y).toBeGreaterThanOrEqual(coverBox!.y + coverBox!.height)
