@@ -55,7 +55,7 @@ test('pagina 126 obras com capas externas, falha visual e tempo completo sem cha
   await expect(cover).not.toHaveAttribute('crossorigin')
   await expect(cover).toHaveAttribute('loading', 'lazy')
   const footerWithoutScan = page.getByRole('button', { name: 'Editar Obra 001', exact: true }).locator('..')
-  await expect(footerWithoutScan.getByRole('button', { name: 'Editar Obra 001', exact: true })).toHaveText('Editar ↗')
+  await expect(footerWithoutScan.getByRole('button', { name: 'Editar Obra 001', exact: true })).toHaveText('Editar')
   await expect(footerWithoutScan.getByRole('link')).toHaveCount(0)
   expect(covers.every(path => Number(path.slice(1, -4)) % 3 === 1)).toBe(true)
   const firstCard = await page.locator('.manga-list>li').nth(0).boundingBox()

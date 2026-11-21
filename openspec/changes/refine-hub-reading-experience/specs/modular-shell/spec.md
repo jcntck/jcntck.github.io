@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Apresentar a identidade visual do hub
-O sistema SHALL apresentar Início, Mangás e Conexão com identidade visual coerente com o modelo fornecido, incluindo tipografia, cores, hierarquia, espaçamentos e estados reais. SHALL preservar navegação estática, identificação dinâmica da versão e proteção de conteúdo pessoal, com teclado, foco visível e movimento reduzido.
+O sistema SHALL apresentar Início, Mangás e Conexão com identidade visual coerente com o modelo fornecido, usando paleta OKLCH, fontes Fraunces/Geist, ícones Lucide, hierarquia, espaçamentos e estados reais. SHALL preservar navegação estática, identificação dinâmica da versão e proteção de conteúdo pessoal, com teclado, foco visível e movimento reduzido.
 
 #### Scenario: Consultar as páginas em computador e celular
 - **WHEN** o usuário abre as páginas em computador ou celular

@@ -23,7 +23,7 @@ O ZIP usa outra base de frontend e dados/ações simulados. A referência traz t
 
 - Backend, refresh tokens, persistência de tokens Drive, sincronização com o site fechado ou mudança de plano Firebase.
 - Importar o projeto do ZIP como nova aplicação, seus scripts, telemetria, roteador, dependências em bloco ou dados de demonstração.
-- Lixeira, histórico de exclusões, desfazer persistente ou nova política de mescla entre dispositivos. Filtros adicionais por faixa de leitura e métricas novas do protótipo não foram contratados neste escopo; continuam as informações, busca e paginação existentes.
+- Lixeira, histórico de exclusões, desfazer persistente ou nova política de mescla entre dispositivos. Filtros adicionais por faixa de leitura não foram contratados neste escopo; continuam as informações, busca e paginação existentes.
 
 ## Decisions
 
@@ -119,3 +119,9 @@ Reutilizar o workflow Dev, sem publicação, e o Prod após o merge. Com checks 
 - [Parâmetros de autorização Google](https://developers.google.com/identity/oauth2/web/reference/js-reference): `login_hint`, `prompt`, escopos e expiração.
 - [Modelo de token Google](https://developers.google.com/identity/oauth2/web/guides/use-token-model): ação explícita e obtenção de novos tokens temporários.
 - [Planos Firebase](https://firebase.google.com/docs/projects/billing/firebase-pricing-plans) e [Cloud Functions](https://firebase.google.com/docs/functions/get-started): backend com Cloud Functions exige Blaze e faturamento vinculado, incompatível com permanecer no Spark sem cobrança.
+
+## Revisão visual 0.5.1
+
+Correção solicitada no PR #6: aplicar diretamente a paleta OKLCH do ZIP, fontes Fraunces/Geist com pesos reais e licenças locais, e ícones da mesma biblioteca Lucide. A composição segue as medidas de sidebar 256px, cabeçalho 64px, conteúdo máximo 1152px, títulos e espaçamentos da referência. Cards têm capa dominante sem caixa exterior, badge sobre a imagem e grade 2/3/4/5 colunas conforme os breakpoints do modelo. Os dados completos e ações da biblioteca continuam abaixo. Resumos visuais mostram apenas contagens derivadas da seção local válida, com rótulos neutros para as faixas existentes.
+
+Menu de conta usa acionador com avatar/chevron e opções recolhidas. Menu móvel usa sobreposição, foco contido, Escape e retorno de foco. Conexão usa cabeçalho identificado, ações com Lucide, switch e amostra recolhível com cópia explícita. A revisão não importa autenticação fictícia, referências privadas ou scripts do gerador.

@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.0`
+`0.5.1`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -41,3 +41,7 @@ Nenhuma. Os comportamentos pertencem às capacidades existentes.
 - Dependências: adaptar a referência à aplicação React/Vite e ao roteamento existentes. O ZIP é material de referência, não uma fonte de instruções operacionais; seus dados fictícios, scripts e configurações não substituem o projeto.
 - Verificação: atualizar testes de domínio, UI, cache/sessão e navegador para exclusão, ordem, reconexão e apresentação; manter lint, tipos, build e coerência de versão.
 - Entrega: implementar em `dev`, alinhar `package.json`, lockfile e `.release.json` a esta change e abrir o PR `dev` → `main` assim que as verificações locais passarem, com roteiro para teste do titular. Cada fix solicitado após essa liberação incrementa o patch e mantém pacote, lockfile, proposta e evidências alinhados no mesmo PR. O merge é exclusivo do titular; o workflow de produção valida o commit final, cria a tag e publica/verifica o Pages. Aceite real e evidências de versão, commit, execução e URL encerram a entrega.
+
+## Patch 0.5.1
+
+Correção solicitada pelo titular após teste do PR #6: reproduzir fielmente a composição, paleta OKLCH, fontes e proporções do layout fornecido, substituindo a aproximação visual da primeira implementação. Os fluxos funcionais aprovados continuam integrados aos dados reais.

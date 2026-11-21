@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 const fixture = 'http://127.0.0.1:5175/tests/browser/fixtures/auth.html'
 test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL), 'Fixture Auth é local; a produção verifica somente o artefato público e usa homologação real para login.')
 
-test('restaura login após refresh, mantém Drive independente e sincroniza com fetch nativo', async ({ page }) => {
+test('restaura login após refresh, mantém Drive independente e sincroniza com fetch nativo', async ({ page }, testInfo) => {
   await page.route('https://accounts.google.com/gsi/client', route => route.fulfill({ contentType: 'application/javascript', body: `window.google={accounts:{oauth2:{initTokenClient:config=>({requestAccessToken:()=>config.callback({access_token:'synthetic-drive-only',expires_in:3600,scope:'https://www.googleapis.com/auth/drive.file openid'})}),hasGrantedAllScopes:()=>true}}};` }))
   let remoteDocument: unknown = null
   let driveRequests = 0
@@ -37,6 +37,8 @@ test('restaura login após refresh, mantém Drive independente e sincroniza com 
   await expect(page.getByText('Nova leitura remota concluída.', { exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Amostra retornada pelo Drive' }).locator('..')).toHaveText(sample!)
   expect(writes).toBe(1)
+  await page.evaluate(() => document.fonts.ready)
+  await page.screenshot({ path: testInfo.outputPath('connection.png'), fullPage: true, animations: 'disabled' })
   const previous = driveRequests
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
@@ -50,12 +52,15 @@ test('logout propaga entre abas e sessão de trinta dias não é restaurada apó
   await context.route('https://accounts.google.com/gsi/client', route => route.fulfill({ contentType: 'application/javascript', body: 'window.google={accounts:{oauth2:{}}};' }))
   await page.goto(`${fixture}#/`)
   await page.getByRole('button', { name: 'Entrar com Google' }).click()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
   const second = await context.newPage(); await second.goto(`${fixture}#/connection`)
   await expect(second.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await page.getByRole('button', { name: 'Sair', exact: true }).click()
   await expect(second.getByRole('heading', { level: 1 })).toHaveText('Seu espaço, aos poucos.')
   await page.getByRole('button', { name: 'Entrar com Google' }).click()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
   await page.clock.install({ time: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 + 1000) })
   await page.reload()
@@ -84,12 +89,14 @@ test('SDK Firebase real persiste e restaura sem sobrescrever o login com estado 
   await page.goto('http://127.0.0.1:5175/tests/browser/fixtures/auth-sdk.html#/connection')
   await page.getByRole('button', { name: 'Entrar com Google' }).click()
   await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
   await expect(page.getByRole('img', { name: 'Foto de SDK simulado' })).toHaveJSProperty('naturalWidth', 32)
   await expect(page.getByRole('button', { name: 'Trocar conta', exact: true })).toBeVisible()
   const previous = refreshes
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Conexão', exact: true })).toBeVisible()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible()
   expect(refreshes).toBeGreaterThan(previous)
   const avatar = page.getByRole('img', { name: 'Foto de SDK simulado' })
@@ -97,6 +104,7 @@ test('SDK Firebase real persiste e restaura sem sobrescrever o login com estado 
   await avatar.dispatchEvent('error', { bubbles: false })
   await expect(avatar).toHaveCount(0)
   await expect(page.getByText('SS', { exact: true })).toBeVisible()
+  if (!(await page.getByRole('button', { name: 'Sair', exact: true }).isVisible())) await page.getByRole('button', { name: 'Menu da conta' }).click()
   await page.getByRole('button', { name: 'Sair', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Entrar com Google' })).toBeVisible()
   await page.reload()
