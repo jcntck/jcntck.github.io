@@ -138,12 +138,12 @@ export function MangasPage() {
         <div className="order-field"><span className="sr-only">Ordenar por última leitura</span><button className="manga-secondary" aria-label={`Ordem: ${order === 'date-desc' ? 'Mais recente' : 'Mais antiga'}. Alternar ordem por última leitura`} onClick={() => { setOrder(order === 'date-desc' ? 'date-asc' : 'date-desc'); setRequestedPage(1) }}><Icon name="order" />{order === 'date-desc' ? 'Mais recente' : 'Mais antiga'}</button></div>
       </div>}
       {visible.length > 0 && <><p className="manga-page-count" role="status">Exibindo {page.first}–{page.last} de {visible.length} {visible.length === 1 ? 'obra' : 'obras'}</p>
-        </>}
+        <ul className="manga-age-legend" aria-label="Destaques do tempo de leitura"><li>Menos de 6 meses</li><li>6 a 11 meses</li><li>1 ano ou mais</li></ul></>}
       {section.items.length === 0 ? <div className="empty-state"><Icon name="plus" /><h3>A próxima leitura começa aqui.</h3><p>Ainda não há mangás cadastrados. Registre o capítulo e a data da sua última leitura.</p><button className="manga-text-button" disabled={!canEdit} onClick={() => open()}>Cadastrar o primeiro mangá</button></div> :
         visible.length === 0 ? <div className="empty-state"><Icon name="empty" /><h3>Nenhuma obra encontrada.</h3><p>Tente outro título ou limpe a busca para ver sua biblioteca.</p><button className="manga-text-button" onClick={() => { setQuery(''); setRequestedPage(1) }}>Limpar busca</button></div> : <ul className="manga-list">{page.items.map(item => {
           const saved = confirmed.find(record => record.id === item.id)
           const isPending = !saved || canonical(saved) !== canonical(item)
-          return <ReadingCard key={`${item.id}-${item.updatedAt}`} item={item} pending={isPending} canEdit={!!canEdit} highlighted={feedback?.record.id === item.id} onEdit={() => open(item)} onDelete={trigger => { deletionTrigger.current = trigger; setDeleting(item) }} />
+          return <ReadingCard today={today} key={`${item.id}-${item.updatedAt}`} item={item} pending={isPending} canEdit={!!canEdit} highlighted={feedback?.record.id === item.id} onEdit={() => open(item)} onDelete={trigger => { deletionTrigger.current = trigger; setDeleting(item) }} />
         })}</ul>}
       {visible.length > PAGE_SIZE && <nav className="manga-pagination" aria-label="Paginação da biblioteca">
         <button className="manga-secondary" aria-label="Página anterior" disabled={page.current === 1} onClick={() => changePage(page.current - 1)}>Anterior</button>

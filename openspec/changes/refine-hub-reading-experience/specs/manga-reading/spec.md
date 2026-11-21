@@ -72,6 +72,13 @@ Cadastro e edição SHALL usar o mesmo formulário em modal acessível, com todo
 - **WHEN** o leitor abre Editar e escolhe Excluir obra
 - **THEN** pode cancelar e permanecer no modal, ou confirmar e retornar à biblioteca com remoção pendente
 
+### Requirement: Animar a capa e seus controles como um conjunto
+A animação de hover SHALL mover conjuntamente a capa, a sobreposição, o acionador e os indicadores, mantendo alinhamento durante toda a transição. A tag de última leitura SHALL ocupar o canto superior esquerdo sem sobrepor o estado de sincronização à direita, usando a data real e o dia local atual. A biblioteca SHALL manter uma legenda visível das três faixas de tempo, com as mesmas cores das tags. Movimento reduzido MUST desativar o deslocamento.
+
+#### Scenario: Entrar e sair do hover
+- **WHEN** o leitor move o ponteiro sobre a capa e depois o retira
+- **THEN** imagem e sobreposição mantêm os mesmos limites durante a animação e as duas tags acompanham o conjunto
+
 ## MODIFIED Requirements
 
 ### Requirement: Buscar e ordenar a biblioteca localmente
@@ -127,7 +134,7 @@ O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, 
 - **THEN** o nome é atualizado ou removido, preservando UUID, data, capa, scan e campos compatíveis
 
 ### Requirement: Destacar capas em cards verticais
-A biblioteca SHALL usar grade responsiva de cards com capa vertical dominante na proporção 2:3, seguindo a referência visual. SHALL mostrar somente título, capa e status de sincronização no card; informações restantes SHALL aparecer no modal compartilhado de cadastro/edição. A grade SHALL ter múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
+A biblioteca SHALL usar grade responsiva de cards com capa vertical dominante na proporção 2:3, seguindo a referência visual. SHALL mostrar título, capa, tag de última leitura à esquerda e status de sincronização à direita no card; informações restantes SHALL aparecer no modal compartilhado de cadastro/edição. A grade SHALL ter múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
 
 #### Scenario: Consultar a coleção em grade
 - **WHEN** o leitor abre a biblioteca em computador ou celular
@@ -150,7 +157,7 @@ O sistema SHALL listar as obras com capa, título e indicador de sincronização
 
 #### Scenario: Biblioteca carregada
 - **WHEN** uma biblioteca com obras termina de carregar
-- **THEN** cada card apresenta somente capa, título e estado local/remoto, com detalhes acessíveis pela edição
+- **THEN** cada card apresenta capa, título, tag de última leitura e estado local/remoto, com detalhes acessíveis pela edição
 
 #### Scenario: Biblioteca vazia
 - **WHEN** uma biblioteca válida sem obras termina de carregar

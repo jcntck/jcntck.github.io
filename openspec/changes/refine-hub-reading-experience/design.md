@@ -129,3 +129,9 @@ Menu de conta usa acionador com avatar/chevron e opções recolhidas. Menu móve
 ## Revisão de interação 0.5.2
 
 O titular substituiu a apresentação detalhada dos cards por capa/título e status no canto superior direito (amarelo pendente, check verde confirmado, com nomes acessíveis). Remover a dica temporal e o painel de desconexão; o botão Sincronizar é o caminho de reconexão. Erros de dados/cache continuam explícitos. A sobreposição de ações Lucide escurece a capa no hover ou foco e abre por toque no celular. Os demais campos, data e tempo completo aparecem no modal compartilhado de cadastro/edição. O modal contém opção de excluir com a confirmação existente, Escape, foco contido e retorno ao acionador ou à biblioteca depois de salvar/excluir. Nenhuma alteração no formato, cache ou política de sincronização.
+
+## Revisão 0.5.3
+
+Aplicar a transformação de hover ao contêiner comum da capa, em vez de à imagem isolada. Sobreposição, acionador e badges passam a acompanhar a mesma geometria em toda a animação. Restaurar o badge resumido de última leitura à esquerda, com data/tempo completo acessíveis e as faixas já existentes. Usar o dia reativo da página para recalcular o badge na virada do dia, sem alterar registros. Manter espaço reservado para o indicador de sincronização à direita e respeitar movimento reduzido.
+
+A legenda visível das faixas (menos de 6 meses, 6 a 11 meses, 1 ano ou mais) acompanha as cores das tags restauradas e permanece junto à biblioteca.

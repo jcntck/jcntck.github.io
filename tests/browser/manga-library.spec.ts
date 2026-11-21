@@ -66,6 +66,28 @@ test('pagina 126 obras com capas externas, falha visual e tempo completo sem cha
   const coverBox = await page.locator('.manga-cover').first().boundingBox()
   expect(coverBox!.width / coverBox!.height).toBeCloseTo(2 / 3, 2)
   expect(coverBox!.width / firstCard!.width).toBeGreaterThan(.8)
+  await expect(page.getByRole('list', { name: 'Destaques do tempo de leitura' }).getByRole('listitem')).toHaveText(['Menos de 6 meses', '6 a 11 meses', '1 ano ou mais'])
+  const animatedCard = page.locator('.reading-card').first()
+  await expect(animatedCard.locator('.cover-age')).toHaveText('este mês')
+  await animatedCard.hover({ position: { x: 4, y: 4 } })
+  for (const elapsed of [0, 80, 180]) {
+    await page.clock.runFor(elapsed)
+    const geometry = await animatedCard.evaluate(card => {
+      const image = card.querySelector('.manga-cover')!.getBoundingClientRect()
+      const overlay = card.querySelector('.card-actions')!.getBoundingClientRect()
+      const age = card.querySelector('.cover-age')!.getBoundingClientRect()
+      const sync = card.querySelector('.card-sync-icon')!.getBoundingClientRect()
+      return { x: image.x - overlay.x, y: image.y - overlay.y, width: image.width - overlay.width, height: image.height - overlay.height, ageOffset: age.top - image.top, syncOffset: sync.top - image.top, badgesGap: sync.left - age.right }
+    })
+    for (const delta of [geometry.x, geometry.y, geometry.width, geometry.height]) expect(Math.abs(delta)).toBeLessThan(.5)
+    expect(geometry.ageOffset).toBeCloseTo(8, 0)
+    expect(geometry.syncOffset).toBeCloseTo(8, 0)
+    expect(geometry.badgesGap).toBeGreaterThan(0)
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(animatedCard.locator('.cover-wrap')).toHaveCSS('transform', 'none')
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.mouse.move(0, 0)
   const titleBox = await page.getByRole('heading', { name: 'Obra 001', exact: true }).boundingBox()
   expect(titleBox!.y).toBeGreaterThanOrEqual(coverBox!.y + coverBox!.height)
   await page.getByRole('heading', { name: 'Sua biblioteca', exact: true }).evaluate(element => element.scrollIntoView({ block: 'start' }))

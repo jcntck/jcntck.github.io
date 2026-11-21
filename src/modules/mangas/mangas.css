@@ -46,7 +46,7 @@
 @media(min-width:1280px) { .manga-list { grid-template-columns:repeat(5,minmax(0,1fr)); } }
 @media(max-width:640px) { .mangas-heading { align-items:flex-start; flex-direction:column; }.manga-fields { grid-template-columns:1fr; }.manga-sync-bar { align-items:flex-start; flex-direction:column; }.manga-toolbar { flex-direction:column; align-items:stretch; }.order-field { flex:auto; }.manga-card h3 { font-size:14px; }.manga-form .section-heading { align-items:flex-start; } }
 @media(max-width:360px) { .manga-list { grid-template-columns:minmax(0,1fr); } }
-@media(hover:hover) and (prefers-reduced-motion:no-preference) { .manga-cover { transition:transform 200ms,box-shadow 200ms; }.manga-card:hover .manga-cover { transform:translateY(-4px); box-shadow:var(--shadow-lift); } }
+@media(hover:hover) and (prefers-reduced-motion:no-preference) { .cover-wrap { transition:transform 200ms; }.manga-cover { transition:box-shadow 200ms; }.manga-card:hover .cover-wrap { transform:translateY(-4px); }.manga-card:hover .manga-cover { box-shadow:var(--shadow-lift); } }
 @media(prefers-reduced-motion:reduce) { .mangas-page * { animation:none!important; transition:none!important; } }
 
 .cover-initial { font:600 60px Fraunces,Georgia,serif; color:var(--accent); line-height:1; }
@@ -72,3 +72,5 @@
 .card-actions .card-action { pointer-events:none; }
 .reading-card[data-menu-open=true] .card-action,.reading-card:has(.card-menu-toggle:focus-visible) .card-action,.card-actions:focus-within .card-action { pointer-events:auto; }
 @media(hover:hover) { .reading-card:hover .card-action { pointer-events:auto; } }
+
+.reading-card .cover-age { z-index:3; max-width:calc(100% - 54px); pointer-events:none; }

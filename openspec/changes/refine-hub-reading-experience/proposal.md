@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.2`
+`0.5.3`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -49,3 +49,9 @@ Correção solicitada pelo titular após teste do PR #6: reproduzir fielmente a 
 ## Patch 0.5.2
 
 Revisão do titular: remover dica temporal e painel redundante de desconexão; cards mostram capa, título e ícone de sincronização amarelo/verde. Ações Lucide Editar/Excluir/scan aparecem sobre a capa com escurecimento por hover, foco ou toque. Cadastro/edição compartilham modal acessível com informações completas e exclusão disponível.
+
+## Patch 0.5.3
+
+Correção solicitada na revisão: mover capa, sobreposição de ações e indicadores como um único conjunto durante o hover; restaurar a tag de última leitura no canto superior esquerdo, preservando o estado de sincronização à direita.
+
+O mesmo patch restaura a legenda das três faixas de tempo de leitura, removida indevidamente na simplificação dos cards.

@@ -28,3 +28,12 @@ it('revela por toque, abre edição e inclui somente a scan cadastrada', async (
   await userEvent.click(screen.getByRole('button', { name: 'Editar Minha obra' }))
   expect(edit).toHaveBeenCalledTimes(1)
 })
+
+it('restaura a tag de última leitura e a recalcula sem alterar a obra', () => {
+  const props = { item, pending: true, canEdit: true, highlighted: false, onEdit: vi.fn(), onDelete: vi.fn() }
+  const { rerender } = render(<ReadingCard {...props} today="2026-11-21" />)
+  expect(screen.getByText('há 7 meses')).toHaveAccessibleName('Última leitura em 06/04/2026: Lido há 0 anos 7 meses 15 dias')
+  rerender(<ReadingCard {...props} today="2027-04-06" />)
+  expect(screen.getByText('há 1 ano')).toBeInTheDocument()
+  expect(item.lastReadOn).toBe('2026-04-06')
+})
