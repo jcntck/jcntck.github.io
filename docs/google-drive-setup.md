@@ -23,8 +23,14 @@ Execute `npm ci`, `npm run dev -- --host localhost` e abra `http://localhost:517
 - Aguarde expiração ou [revogue o acesso](https://myaccount.google.com/connections). Uma operação deve solicitar reconexão; não deve confirmar gravação. Reconecte A para conferir/repetir a mesma tentativa. Trocar para B descarta a tentativa de A.
 - Interrompa a rede ao gravar. A interface deve preservar a tentativa e não afirmar sucesso. Reconecte a mesma conta e repita: o UUID da operação permanece estável. Reler pede confirmação para descartar a tentativa local.
 - Abra duas abas, carregue ambas, grave na primeira e tente gravar na segunda: deve bloquear divergência detectada. Escolha reler para descartar a tentativa e trazer o documento remoto.
-- Inspecione URLs, console, Local Storage, Session Storage e IndexedDB: nenhum token nem dado privado persistido pelo hub. O token existe apenas em memória e no cabeçalho Authorization das requisições HTTPS ao Google. Não copie tokens para evidências.
+- Inspecione URLs, console, Local Storage, Session Storage e IndexedDB: nenhum token Drive persistido pelo hub; dados privados da biblioteca podem existir no cache por conta. O token existe apenas em memória e no cabeçalho Authorization das requisições HTTPS ao Google. Não copie tokens para evidências.
 
 Use um dispositivo por vez: leitura seguida de escrita não é uma transação. Gravações simultâneas entre a conferência e o envio ainda podem se sobrepor. Não há fila offline durável; fechar a aba descarta tentativas. Desconectar limpa a sessão local e não revoga o consentimento no Google. Para revogar, use o link de gerenciamento.
 
 Não edite manualmente ou compartilhe `my-hub.json` durante a homologação. Arquivo inválido, inacessível ou múltiplos candidatos bloqueiam a escrita, sem criar substitutos. Em produção, registre os resultados sem nomes, emails, tokens ou conteúdo privado em `docs/releases/0.2.2.md`. Testes automatizados não substituem consentimento real nem homologação explícita.
+
+## Reconexão simplificada — 0.5.0
+
+Em Mangás ou Conexão, Sincronizar pode solicitar autorização e continuar o envio pelo mesmo clique, após conferir identidade e documento. Conectar/Reconectar isoladamente somente lê. A identidade validada é indicada ao Google sem forçar nova escolha ou consentimento; Escolher conta do Drive permite recuperação explícita e continua exigindo a mesma conta do login. O Google ainda pode exibir popup ou solicitar interação.
+
+Refresh restaura login e cache, mas não o token Drive. Não há popup automático ao restaurar, consultar ou voltar à aba. Tokens continuam somente em memória; não há backend nem refresh tokens. Firebase Auth permanece no Spark, sem cobrança. Tema é uma preferência visual separada no navegador e não contém credenciais.

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { Icon } from '../components/Icon'
+import { useRef, useState } from 'react'
 import { useAuth, useHub } from './hooks'
 function AccountAvatar({ name, photoURL }: { name: string; photoURL?: string }) {
   const [failed, setFailed] = useState(false)
@@ -15,6 +16,8 @@ function AccountAvatar({ name, photoURL }: { name: string; photoURL?: string }) 
 }
 
 export function AccountMenu() {
+  const [open, setOpen] = useState(false)
+  const trigger = useRef<HTMLButtonElement>(null)
   const hub = useHub()
   const auth = useAuth()
   const busy = ['restoring', 'signing-in'].includes(auth.phase)
@@ -22,14 +25,13 @@ export function AccountMenu() {
     if (hub.cloud.getSnapshot().pending && !window.confirm('Sair e descartar as alterações ainda não sincronizadas?')) return
     void hub.auth.logout().then(() => { if (switchAccount && hub.auth.getSnapshot().phase === 'anonymous') void hub.auth.login() })
   }
-  return <div className="account-menu">
+  return <div className="account-menu" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false) }} onKeyDown={event => { if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false); trigger.current?.focus() } }}>
     {auth.phase === 'signed-in' ? <>
-      <span className="account-identity">
+      <button ref={trigger} className="account-trigger" aria-label="Menu da conta" aria-expanded={open} onClick={() => setOpen(value => !value)}><span className="account-identity">
         <AccountAvatar key={`${auth.identity?.googleId}:${auth.identity?.photoURL || ''}`} name={auth.identity?.name || 'Conta Google'} photoURL={auth.identity?.photoURL} />
         <span className="account-name" title={auth.identity?.name}>{auth.identity?.name}</span>
-      </span>
-      <button onClick={() => leave(true)}>Trocar conta</button>
-      <button onClick={() => leave()}>Sair</button>
+      </span><Icon name="chevron" /></button>
+      {open && <div className="account-dropdown"><p>{auth.identity?.name}</p><small>Conta Google</small><button onClick={() => leave(true)}><Icon name="refresh" />Trocar conta</button><button onClick={() => leave()}><Icon name="logout" />Sair</button></div>}
     </> : <>
       <button disabled={!auth.configured || busy} onClick={() => void hub.auth.login()}>{busy ? 'Verificando sessão…' : 'Entrar com Google'}</button>
       {busy && <button onClick={() => void hub.auth.logout('Entrada cancelada. Você pode tentar novamente.')}>Cancelar entrada</button>}

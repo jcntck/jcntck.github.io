@@ -2,6 +2,9 @@ import { createFirebaseAuth } from '../../integrations/firebase/auth'
 import { CloudSession } from '../../integrations/google-drive/session'
 import { AuthSession, type AuthPort } from './auth-session'
 export class Hub {
+  private driveBusy = false
+  acquireDrive() { if (this.driveBusy) return false; this.driveBusy = true; return true }
+  releaseDrive() { this.driveBusy = false }
   readonly auth: AuthSession
   readonly cloud: CloudSession
   constructor(port: AuthPort, cloud?: CloudSession) {
