@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { applyOperation, emptyEnvelope, type Json } from '../../shared/storage/library'
-import { readSection, updateReading, validateFields, type Manga } from './model'
+import { readSection, removeReading, updateReading, validateFields, type Manga } from './model'
 
 const record: Manga = { id: 'a30bb95b-a749-4366-8e68-ec1e3f7bc5f3', title: ' One Piece ', lastChapter: ' Extra 1 ', lastReadOn: '2026-04-06', updatedAt: '2026-11-09T12:00:00.000Z' }
 describe('biblioteca de leituras', () => {
@@ -76,4 +76,15 @@ it('inclui, edita e remove o nome em inglês sem mudar identidade, data ou campo
   expect(removed.items[0]).toMatchObject({ id: record.id, lastReadOn: record.lastReadOn, extra: 'keep', scanName: 'Scan', coverUrl: 'https://covers.example/a.jpg' })
   expect(base.items[0]).not.toHaveProperty('englishTitle')
   expect(() => readSection({ items: [{ ...record, englishTitle: 42 }] })).toThrow(/nome em inglês inválido/)
+})
+
+it('remove somente o UUID escolhido e preserva a seção e registros restantes', () => {
+  const other = { ...record, id: 'b30bb95b-a749-4366-8e68-ec1e3f7bc5f3', extra: 'preserve' }
+  const section = { items: [record, other], extension: 'preserve' }
+  const next = removeReading(section, record.id)
+  expect(next).toEqual({ items: [other], extension: 'preserve' })
+  expect(section.items).toHaveLength(2)
+  expect(removeReading(next, record.id)).toEqual(next)
+  expect(removeReading(next, other.id).items).toEqual([])
+  expect(() => removeReading({ items: [{} as Manga] }, record.id)).toThrow()
 })

@@ -57,3 +57,9 @@ No patch visual 0.4.5, a biblioteca passa a uma grade de cards verticais com cap
 No envio, reler e aplicar a mesma regra. Se remoto ganha, retornar a cópia sem PATCH/POST; se local ganha, aplicar somente a seção da operação sobre o remoto para preservar outras seções e extras. Reconhecer UUID/valor já confirmado antes da comparação por data para recuperar resposta perdida. Campos iguais/revisão confirmada evitam duplicação. A confirmação segue por releitura do Drive; conectar, consultar e editar não enviam mangás automaticamente.
 
 É uma estratégia last-write-wins por cópia, sem mescla de edições concorrentes da mesma seção. Relógios incorretos podem escolher a cópia errada; usar um dispositivo/aba por vez. localStorage é específico da origem/navegador e pode ser apagado pelo usuário, não é backup entre dispositivos. Nenhum serviço novo, configuração manual ou custo é necessário.
+
+## Exclusão de obras — 0.5.0
+
+Excluir exige confirmação com o título. A seção `modules.mangas` é consolidada sem o UUID escolhido e preparada como operação manual, inclusive com Drive desconectado. A remoção e as outras edições sobrevivem ao refresh quando o cache está disponível. Não há DELETE do arquivo Drive, alteração de schema ou remoção de outros módulos. Em falhas de cache, a UI avisa que a pendência permanece somente em memória.
+
+Sincronizar confirma o resultado por releitura. A política existente por data continua: remoto mais recente ou empatado prevalece, podendo restaurar uma obra removida localmente. Não há lixeira, tombstones ou mescla concorrente por obra.

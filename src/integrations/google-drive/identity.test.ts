@@ -15,6 +15,19 @@ describe('GIS', () => {
     const result = authorize(oauth, 'public-client-id')
     if (scenario === 'success') expect(await result).toEqual(grant)
     else await expect(result).rejects.toThrow(/não concluída/)
-    expect(popup).toHaveBeenCalledWith({ prompt: 'select_account' })
+    expect(popup).toHaveBeenCalledWith({ prompt: '' })
   })
+})
+it('usa identidade validada como hint e permite seleção somente por opção explícita', async () => {
+  const popup = vi.fn()
+  const oauth: OAuth = {
+    hasGrantedAllScopes: () => true,
+    initTokenClient: config => {
+      expect(config.login_hint).toBe('google-sub')
+      return { requestAccessToken: options => { popup(options); config.callback({ access_token: 'memory', expires_in: 60, scope: `${DRIVE_SCOPE} openid` }) } }
+    },
+  }
+  await authorize(oauth, 'client', 'google-sub')
+  await authorize(oauth, 'client', 'google-sub', true)
+  expect(popup.mock.calls).toEqual([[{ prompt: '' }], [{ prompt: 'select_account' }]])
 })

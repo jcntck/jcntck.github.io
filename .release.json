@@ -1,8 +1,5 @@
 {
   "changes": [
-    "add-manga-reading-tracker"
-  ],
-  "archivedChanges": {
-    "add-manga-reading-tracker": "2026-11-09-add-manga-reading-tracker"
-  }
+    "refine-hub-reading-experience"
+  ]
 }

@@ -55,3 +55,8 @@ export function updateReading(section: MangaSection, record: Manga, today = loca
   const result = { ...section, items: current ? section.items.map(item => item.id === next.id ? next : item) : [...section.items, next] }
   return readSection(result)
 }
+
+export function removeReading(section: MangaSection, id: string): MangaSection {
+  const valid = readSection(section)
+  return { ...valid, items: valid.items.filter(item => item.id !== id) }
+}

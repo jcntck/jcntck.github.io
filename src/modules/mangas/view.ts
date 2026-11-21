@@ -1,6 +1,6 @@
 import type { Manga } from './model'
 
-export type ReadingOrder = 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc'
+export type ReadingOrder = 'date-asc' | 'date-desc'
 export const PAGE_SIZE = 12
 export function readingPage<T>(items: readonly T[], requested: number) {
   const total = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
@@ -20,7 +20,7 @@ export function visibleReadings(items: readonly Manga[], query: string, order: R
   const term = searchable(query.trim())
   return items.filter(item => searchable(item.title).includes(term) || searchable(item.englishTitle ?? '').includes(term)).sort((a, b) => {
     const byTitle = collator.compare(a.title, b.title)
-    const primary = order.startsWith('date') ? a.lastReadOn.localeCompare(b.lastReadOn) : byTitle
+    const primary = a.lastReadOn.localeCompare(b.lastReadOn)
     return (order.endsWith('desc') ? -primary : primary) || byTitle || a.id.localeCompare(b.id)
   })
 }
