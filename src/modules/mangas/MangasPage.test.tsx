@@ -1,12 +1,17 @@
-import { act, render, screen, within } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expect, it, vi } from 'vitest'
+import { beforeAll, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { CloudSession } from '../../integrations/google-drive/session'
 import { Hub } from '../../shared/session/hub'
 import { HubContext } from '../../shared/session/hooks'
 import { LibraryError, applyOperation, emptyEnvelope, type Snapshot } from '../../shared/storage/library'
 import { MangasPage } from './MangasPage'
+
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', '') }
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); this.dispatchEvent(new Event('close')) }
+})
 
 async function setup(remote: Snapshot | null = null, connected = true) {
   const save = vi.fn(async (base: Snapshot | null, op: Parameters<typeof applyOperation>[1]): Promise<Snapshot> => {
@@ -23,8 +28,7 @@ async function setup(remote: Snapshot | null = null, connected = true) {
 it('aguarda leitura válida e não apresenta biblioteca desconhecida como vazia', async () => {
   const { save } = await setup(null, false)
   expect(screen.getByRole('button', { name: 'Cadastrar mangá' })).toBeDisabled()
-  expect(screen.getByRole('alert')).toHaveTextContent('Drive desconectado')
-  expect(screen.getByRole('link', { name: /Abrir Conexão/ })).toHaveAttribute('href', '/connection')
+  expect(screen.queryByRole('link', { name: /Abrir Conexão/ })).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Conectar Google Drive' })).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Sincronizar' })).toBeDisabled()
   expect(screen.queryByText(/Ainda não há mangás cadastrados/)).not.toBeInTheDocument()
@@ -52,9 +56,9 @@ it('valida, prepara sem escrever, preserva formulário na falha e confirma retry
   await user.click(screen.getByRole('button', { name: 'Salvar leitura' }))
   expect(screen.queryByRole('form')).not.toBeInTheDocument()
   expect(screen.getByText(/leitura salva nesta aba/)).toBeVisible()
-  expect(screen.getByText('Pendente de sincronização')).toBeVisible()
-  expect(screen.getByText('Pirate Adventure')).toBeVisible()
-  expect(screen.getByRole('button', { name: 'Editar One Piece' })).toHaveTextContent('Editar')
+  expect(screen.getByRole('img', { name: 'Pendente de sincronização: One Piece' })).toBeInTheDocument()
+  expect(screen.queryByText('Pirate Adventure')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Editar One Piece' })).toHaveAccessibleName('Editar One Piece')
   expect(save).not.toHaveBeenCalled()
   await user.click(screen.getByRole('button', { name: 'Editar One Piece' }))
   const operation = cloud.getSnapshot().pending!
@@ -66,7 +70,7 @@ it('valida, prepara sem escrever, preserva formulário na falha e confirma retry
   expect(screen.queryByText('Confirmado no Drive')).not.toBeInTheDocument()
   await act(() => cloud.connect(async () => ({ access_token: 'retry', expires_in: 3600, scope: '' })))
   await user.click(screen.getByRole('button', { name: 'Sincronizar' }))
-  expect(await screen.findByText('Confirmado no Drive')).toBeVisible()
+  expect(await screen.findByRole('img', { name: 'Confirmado no Drive: One Piece' })).toBeInTheDocument()
   expect(save.mock.calls[1][1].id).toBe(operation.id)
   expect(remote()?.document.diagnostics).toEqual({ probe: 'keep' })
   expect(remote()?.document.modules.other).toBe('keep')
@@ -82,8 +86,7 @@ it('valida, prepara sem escrever, preserva formulário na falha e confirma retry
   await user.clear(screen.getByLabelText('Título')); await user.type(screen.getByLabelText('Título'), 'One Piece corrigido')
   await user.click(screen.getByRole('button', { name: 'Salvar leitura' }))
   await user.click(screen.getByRole('button', { name: 'Sincronizar' }))
-  const card = screen.getByRole('heading', { name: 'One Piece corrigido' }).closest('li')!
-  expect(within(card).getByText('06/04/2026')).toBeVisible()
+  expect(screen.queryByText('06/04/2026')).not.toBeInTheDocument()
   expect((remote()!.document.modules.mangas as { items: { id: string }[] }).items[0].id).toBe(id)
   expect((remote()!.document.modules.mangas as { items: { scanUrl?: string }[] }).items[0]).not.toHaveProperty('scanUrl')
   expect((remote()!.document.modules.mangas as { items: { scanName?: string }[] }).items[0]).not.toHaveProperty('scanName')
@@ -104,7 +107,7 @@ it('observa expiração e reconexão sem controles OAuth no módulo', async () =
   const { cloud } = await setup()
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   await act(() => vi.advanceTimersByTimeAsync(3_600_001))
-  expect(screen.getByRole('alert')).toHaveTextContent('Autorização Drive expirada')
+  expect(screen.queryByRole('link', { name: /Abrir Conexão/ })).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Cadastrar mangá' })).toBeEnabled()
   expect(screen.getByRole('button', { name: 'Sincronizar' })).toBeDisabled()
   await act(() => cloud.connect(async () => ({ access_token: 'retry', expires_in: 3600, scope: '' })))

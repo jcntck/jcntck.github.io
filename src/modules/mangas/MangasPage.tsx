@@ -2,12 +2,11 @@ import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } fro
 import { Link } from 'react-router-dom'
 import { useHub } from '../../shared/session/hooks'
 import { canonical } from '../../shared/storage/library'
-import { absoluteDay, calendarSince, elapsed, readingEmphasis } from './dates'
+import { absoluteDay, elapsed, readingEmphasis } from './dates'
 import { readSection, removeReading, updateReading, validateFields, type Errors, type Manga, type MangaSection } from './model'
 import { useLocalDay } from './useLocalDay'
-import { ScanLink } from './ScanLink'
+import { ReadingCard } from './ReadingCard'
 import { PAGE_SIZE, readingPage, visibleReadings, type ReadingOrder } from './view'
-import { MangaCover } from './MangaCover'
 import './mangas.css'
 import { Icon } from '../../shared/components/Icon'
 import { useDriveActions } from '../../shared/session/useDriveActions'
@@ -24,6 +23,13 @@ export function MangasPage() {
   const state = useSyncExternalStore(cloud.subscribe, cloud.getSnapshot)
   const today = useLocalDay()
   const [draft, setDraft] = useState<Manga | null>(null)
+  const editorDialog = useRef<HTMLDialogElement>(null)
+  const editorTrigger = useRef<HTMLElement | null>(null)
+  useEffect(() => { if (draft) editorDialog.current?.showModal() }, [draft])
+  const closeEditor = () => {
+    setDraft(null)
+    requestAnimationFrame(() => { const target = editorTrigger.current; if (target?.isConnected) target.focus(); else createButton.current?.focus() })
+  }
   const [errors, setErrors] = useState<Errors>({})
   const [feedback, setFeedback] = useState<{ id: string; record: Manga } | null>(null)
   const [query, setQuery] = useState('')
@@ -53,6 +59,7 @@ export function MangasPage() {
     requestAnimationFrame(() => libraryHeading.current?.focus())
   }
   const open = (item?: Manga) => {
+    editorTrigger.current = document.activeElement as HTMLElement | null
     setDraft(item ? structuredClone(item) : { id: crypto.randomUUID(), title: '', lastChapter: '', lastReadOn: today, updatedAt: new Date().toISOString() })
     setErrors({}); setFeedback(null)
     requestAnimationFrame(() => formTitle.current?.focus())
@@ -101,14 +108,14 @@ export function MangasPage() {
       <p role="status" key={`${state.phase}-${state.syncPhase}`} className="manga-sync-status">{unavailable ? loaded ? 'Biblioteca disponível no navegador. Drive desconectado para sincronização.' : 'Sincronização indisponível.' : ['loading', 'authorizing'].includes(state.phase) ? 'Carregando a biblioteca…' : syncing ? 'Sincronizando com o Drive…' : state.pending ? state.cached ? 'Alterações salvas no navegador, pendentes de sincronização.' : 'Alterações salvas nesta aba, pendentes de sincronização.' : state.syncPhase === 'synced' ? remoteChosen ? state.message : 'Gravação confirmada no Drive.' : 'Drive conectado. Biblioteca carregada.'}</p>
       <button className="manga-secondary" aria-busy={syncing} disabled={syncing || (!state.canWrite && !actions.ready)} onClick={() => void actions.run()}><Icon name="upload" />{syncing ? 'Sincronizando…' : 'Sincronizar'}</button>
     </div>
-    <div className="reading-reference"><Icon name="bulb" /><p>Há seis meses ou um ano sem ler? O tempo é uma referência sua para decidir quando retomar.</p></div>
-    {unavailable && <div className="manga-connection-alert" role="alert"><p>{state.phase === 'disconnected' ? loaded ? 'Drive desconectado. Você pode consultar e editar a biblioteca local. Abra Conexão quando quiser sincronizar.' : 'Drive desconectado. Abra Conexão para carregar sua biblioteca antes de cadastrar ou editar.' : state.message}</p><Link to="/connection">Abrir Conexão <Icon name="arrow" /></Link></div>}
+    {state.phase === 'error' && <p role="alert" className="manga-notice">{state.message}</p>}
     {!loaded && !unavailable && <p className="manga-notice">Aguarde a leitura do Drive para consultar seus registros.</p>}
     {state.cacheError && <p role="alert" className="manga-notice">{state.cacheError}</p>}
     {problem && <div className="manga-connection-alert" role="alert"><p>{problem} Confira ou releia o arquivo pela página Conexão antes de editar.</p><Link to="/connection">Abrir Conexão <Icon name="arrow" /></Link></div>}
-    {draft && <form className="manga-form" onSubmit={submit} noValidate aria-labelledby="reading-form-title">
+    {draft && <dialog ref={editorDialog} className="reading-dialog" aria-labelledby="reading-form-title" onCancel={event => { event.preventDefault(); closeEditor() }} onKeyDown={event => { if (event.key === 'Escape') event.stopPropagation() }}><form className="manga-form" onSubmit={submit} noValidate aria-labelledby="reading-form-title">
       <div className="section-heading"><h2 id="reading-form-title">{section.items.some(item => item.id === draft.id) ? 'Editar leitura' : 'Nova leitura'}</h2>
-        <button type="button" className="manga-text-button" onClick={() => { setDraft(null); createButton.current?.focus() }}>Fechar formulário</button></div>
+        <button type="button" className="manga-text-button" onClick={closeEditor}>Fechar formulário</button></div>
+      {section.items.some(item => item.id === draft.id) && <div className="reading-details"><p>Última leitura em <time dateTime={draft.lastReadOn}>{absoluteDay(draft.lastReadOn)}</time></p><p className={`manga-elapsed manga-elapsed-${readingEmphasis(draft.lastReadOn, today)}`}>{elapsed(draft.lastReadOn, today)}</p></div>}
       <p className="manga-help">A data é o dia em que você leu, mesmo que esteja cadastrando depois. Corrigir título ou capítulo mantém essa data.</p>
       <div className="manga-fields">
         <div className="manga-title-field"><label htmlFor="manga-title">Título</label><input ref={formTitle} id="manga-title" value={draft.title} required aria-invalid={!!errors.title} aria-describedby={errors.title ? 'title-error' : undefined} onChange={event => setDraft({ ...draft, title: event.target.value })} />{errors.title && <span id="title-error" className="field-error">{errors.title}</span>}</div>
@@ -120,9 +127,9 @@ export function MangasPage() {
         <div className="manga-title-field"><label htmlFor="manga-cover-url">Link da capa (opcional)</label><input id="manga-cover-url" type="url" value={draft.coverUrl ?? ''} placeholder="https://imagens.exemplo/capa.jpg" aria-invalid={!!errors.coverUrl} aria-describedby={errors.coverUrl ? 'cover-help cover-error' : 'cover-help'} onChange={event => setDraft({ ...draft, coverUrl: event.target.value })} /><span id="cover-help" className="manga-help">Use o link direto HTTPS de uma imagem pública. A capa aparece na lista após salvar; deixe vazio para removê-la.</span>{errors.coverUrl && <span id="cover-error" className="field-error">{errors.coverUrl}</span>}</div>
       </div>
       {Object.keys(errors).length > 0 && <p role="alert">Confira os campos indicados antes de salvar a leitura.</p>}
-      <div><button className="manga-primary" disabled={!canEdit} type="submit">Salvar leitura</button></div>
+      <div className="reading-form-actions"><button className="manga-primary" disabled={!canEdit} type="submit">Salvar leitura</button>{section.items.some(item => item.id === draft.id) && <button type="button" className="manga-secondary reading-delete" disabled={!canEdit} onClick={event => { deletionTrigger.current = event.currentTarget; setDeleting(draft) }}><Icon name="trash" />Excluir obra</button>}</div>
       <p className="manga-help">{state.cached ? 'Salva no navegador.' : 'Salva nesta aba.'} Quando terminar suas edições, use Sincronizar para enviar ao Drive.</p>
-    </form>}
+    </form></dialog>}
     {feedbackVisible && <p key={feedback.id} className="manga-feedback" role="status"><Icon name="check" /> {feedback.record.title}: {feedbackConfirmed ? 'gravação confirmada no Drive.' : state.cached ? 'leitura salva no navegador. Pendente de sincronização.' : 'leitura salva nesta aba. Pendente de sincronização.'}</p>}
     {loaded && !problem && <section className="manga-library" aria-labelledby="reading-list-title">
       <div className="section-heading"><h2 id="reading-list-title" ref={libraryHeading} tabIndex={-1}>Sua biblioteca</h2><span>{query.trim() ? `${visible.length} de ${section.items.length} obras` : `${section.items.length} ${section.items.length === 1 ? 'obra' : 'obras'}`}</span></div>
@@ -131,14 +138,12 @@ export function MangasPage() {
         <div className="order-field"><span className="sr-only">Ordenar por última leitura</span><button className="manga-secondary" aria-label={`Ordem: ${order === 'date-desc' ? 'Mais recente' : 'Mais antiga'}. Alternar ordem por última leitura`} onClick={() => { setOrder(order === 'date-desc' ? 'date-asc' : 'date-desc'); setRequestedPage(1) }}><Icon name="order" />{order === 'date-desc' ? 'Mais recente' : 'Mais antiga'}</button></div>
       </div>}
       {visible.length > 0 && <><p className="manga-page-count" role="status">Exibindo {page.first}–{page.last} de {visible.length} {visible.length === 1 ? 'obra' : 'obras'}</p>
-        <ul className="manga-age-legend" aria-label="Destaques do tempo de leitura"><li>Menos de 6 meses</li><li>6 a 11 meses</li><li>1 ano ou mais</li></ul></>}
+        </>}
       {section.items.length === 0 ? <div className="empty-state"><Icon name="plus" /><h3>A próxima leitura começa aqui.</h3><p>Ainda não há mangás cadastrados. Registre o capítulo e a data da sua última leitura.</p><button className="manga-text-button" disabled={!canEdit} onClick={() => open()}>Cadastrar o primeiro mangá</button></div> :
         visible.length === 0 ? <div className="empty-state"><Icon name="empty" /><h3>Nenhuma obra encontrada.</h3><p>Tente outro título ou limpe a busca para ver sua biblioteca.</p><button className="manga-text-button" onClick={() => { setQuery(''); setRequestedPage(1) }}>Limpar busca</button></div> : <ul className="manga-list">{page.items.map(item => {
           const saved = confirmed.find(record => record.id === item.id)
           const isPending = !saved || canonical(saved) !== canonical(item)
-          return <li key={`${item.id}-${item.updatedAt}`} className={`manga-card${feedback?.record.id === item.id ? ' manga-card-updated' : ''}`}><div className="manga-card-main"><div className="cover-wrap"><MangaCover key={item.coverUrl ?? ''} url={item.coverUrl} title={item.title} /><span className={`cover-age cover-age-${readingEmphasis(item.lastReadOn, today)}`}>{(() => { const months = calendarSince(item.lastReadOn, today)?.totalMonths ?? 0; return months < 1 ? 'este mês' : months < 12 ? `há ${months} ${months === 1 ? 'mês' : 'meses'}` : `há ${Math.floor(months / 12)} ${months < 24 ? 'ano' : 'anos'}` })()}</span></div><div className="manga-card-reading"><h3 id={`reading-${item.id}`} tabIndex={-1} title={item.title}>{item.title}</h3>{item.englishTitle?.trim() && <p className="manga-english-title" lang="en" title={item.englishTitle}>{item.englishTitle}</p>}<p className="manga-chapter">Capítulo <strong>{item.lastChapter}</strong></p><p className="manga-date">Última leitura em <time dateTime={item.lastReadOn}>{absoluteDay(item.lastReadOn)}</time></p></div></div>
-            <div className="manga-card-detail"><p className={`manga-elapsed manga-elapsed-${readingEmphasis(item.lastReadOn, today)}`}>{elapsed(item.lastReadOn, today)}</p><span className={isPending ? 'manga-pending' : 'manga-saved'}>{isPending ? 'Pendente de sincronização' : 'Confirmado no Drive'}</span></div>
-            <div className="manga-card-footer">{item.scanUrl && <ScanLink url={item.scanUrl} name={item.scanName} title={item.title} />}<button className="manga-text-button" disabled={!canEdit} onClick={() => open(item)} aria-label={`Editar ${item.title}`}><Icon name="edit" />Editar</button><button className="manga-text-button manga-delete" disabled={!canEdit} aria-label={`Excluir ${item.title}`} onClick={event => { deletionTrigger.current = event.currentTarget; setDeleting(item) }}><Icon name="trash" />Excluir</button></div></li>
+          return <ReadingCard key={`${item.id}-${item.updatedAt}`} item={item} pending={isPending} canEdit={!!canEdit} highlighted={feedback?.record.id === item.id} onEdit={() => open(item)} onDelete={trigger => { deletionTrigger.current = trigger; setDeleting(item) }} />
         })}</ul>}
       {visible.length > PAGE_SIZE && <nav className="manga-pagination" aria-label="Paginação da biblioteca">
         <button className="manga-secondary" aria-label="Página anterior" disabled={page.current === 1} onClick={() => changePage(page.current - 1)}>Anterior</button>

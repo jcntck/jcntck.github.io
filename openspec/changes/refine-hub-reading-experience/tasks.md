@@ -67,3 +67,9 @@
 - [x] 9.1 Alinhar proposta, pacote e lockfile à 0.5.1 e substituir a aproximação por paleta, fontes e composição da referência; verificar build e comparação das capturas de desktop/celular com os componentes do ZIP.
 - [x] 9.2 Usar ícones Lucide reais em navegação, conta, tema, busca e ações, incluindo Conexão; verificar lint, tipos e testes de navegação, conta e operações existentes.
 - [x] 9.3 Concluir validação local, registrar evidências visuais e enviar a 0.5.1 ao mesmo PR #6; verificar suíte completa, identificação da versão e execução do CI no head enviado.
+
+## 10. Patch de interação 0.5.2
+
+- [x] 10.1 Compactar cards e revelar ações por hover/foco/toque com status acessível; verificar cenários de computador/celular.
+- [x] 10.2 Compartilhar modal de cadastro/edição com exclusão, Escape e foco; verificar salvar, cancelar e excluir no modal.
+- [ ] 10.3 Alinhar versão 0.5.2, validar os checks e atualizar o mesmo PR #6 com roteiro e evidências.

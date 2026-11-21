@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.1`
+`0.5.2`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -45,3 +45,7 @@ Nenhuma. Os comportamentos pertencem às capacidades existentes.
 ## Patch 0.5.1
 
 Correção solicitada pelo titular após teste do PR #6: reproduzir fielmente a composição, paleta OKLCH, fontes e proporções do layout fornecido, substituindo a aproximação visual da primeira implementação. Os fluxos funcionais aprovados continuam integrados aos dados reais.
+
+## Patch 0.5.2
+
+Revisão do titular: remover dica temporal e painel redundante de desconexão; cards mostram capa, título e ícone de sincronização amarelo/verde. Ações Lucide Editar/Excluir/scan aparecem sobre a capa com escurecimento por hover, foco ou toque. Cadastro/edição compartilham modal acessível com informações completas e exclusão disponível.

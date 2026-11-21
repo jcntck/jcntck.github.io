@@ -56,6 +56,22 @@ Sincronizar uma exclusão SHALL usar a política existente de comparação de at
 - **THEN** a cópia remota prevalece sem escrita e a pendência superada é removida conforme a política existente
 - **AND** a interface informa a adoção remota, sem afirmar que a exclusão local foi confirmada se a obra reaparecer
 
+
+
+### Requirement: Revelar ações sobre a capa
+O card SHALL mostrar somente capa, título e indicador acessível de sincronização no canto superior direito, amarelo para pendência e check verde para confirmação. Hover, foco de teclado e toque na capa SHALL revelar uma sobreposição com escurecimento e botões de ícone Editar, Excluir e scan quando houver URL. As ações MUST permanecer operáveis por teclado e respeitar movimento reduzido.
+
+#### Scenario: Acionar no celular
+- **WHEN** o leitor toca a capa
+- **THEN** as ações aparecem com o mesmo efeito visual do computador e podem ser acionadas sem navegar pela imagem
+
+### Requirement: Compartilhar modal de cadastro e edição
+Cadastro e edição SHALL usar o mesmo formulário em modal acessível, com todos os campos existentes e, na edição, data, tempo completo e opção de excluir. Escape e fechar SHALL descartar somente o formulário não salvo e devolver foco. Salvar SHALL preservar o fluxo manual e foco na obra; excluir SHALL exigir confirmação antes da remoção.
+
+#### Scenario: Excluir pela edição
+- **WHEN** o leitor abre Editar e escolhe Excluir obra
+- **THEN** pode cancelar e permanecer no modal, ou confirmar e retornar à biblioteca com remoção pendente
+
 ## MODIFIED Requirements
 
 ### Requirement: Buscar e ordenar a biblioteca localmente
@@ -85,7 +101,7 @@ O módulo SHALL observar a sessão Drive compartilhada e oferecer sincronizaçã
 
 #### Scenario: Desconectar ou expirar durante o uso
 - **WHEN** a conexão fica indisponível durante o uso do módulo
-- **THEN** um alerta apresenta o estado e um link para Conexão, sem outro painel de autorização
+- **THEN** o botão Sincronizar permanece o caminho de reconexão, sem painel redundante de desconexão ou dica temporal
 - **AND** a aplicação não abre popup nem envia ou cria arquivo automaticamente
 
 #### Scenario: Sincronizar a partir da biblioteca sem token válido
@@ -99,11 +115,11 @@ O módulo SHALL observar a sessão Drive compartilhada e oferecer sincronizaçã
 - **AND** nenhum envio pendente ocorre antes da conferência bem-sucedida da conta e do documento
 
 ### Requirement: Registrar e pesquisar o nome em inglês
-O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, com trim, apresentado abaixo do título principal como informação secundária. Registros sem o campo MUST permanecer compatíveis. A busca SHALL considerar ambos os nomes sem distinguir caixa/acentos nem duplicar resultados. A ordenação SHALL usar a data de leitura, com desempate pelo título principal e identificador, e MUST NOT haver tradução, pesquisa externa ou sincronização automática.
+O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, com trim, apresentado no formulário de edição como informação secundária. Registros sem o campo MUST permanecer compatíveis. A busca SHALL considerar ambos os nomes sem distinguir caixa/acentos nem duplicar resultados. A ordenação SHALL usar a data de leitura, com desempate pelo título principal e identificador, e MUST NOT haver tradução, pesquisa externa ou sincronização automática.
 
 #### Scenario: Consultar por um nome alternativo
 - **WHEN** o leitor informa um nome em inglês, salva localmente e pesquisa esse nome ou o título principal
-- **THEN** encontra a mesma obra uma única vez com o título principal e o nome secundário na listagem
+- **THEN** encontra a mesma obra uma única vez com o título principal na listagem e o nome secundário no formulário de edição
 - **AND** a consulta reinicia a paginação sem chamadas Drive e o nome é persistido somente ao Sincronizar
 
 #### Scenario: Editar ou remover o nome em inglês
@@ -111,11 +127,11 @@ O módulo SHALL permitir incluir, editar e remover um nome em inglês opcional, 
 - **THEN** o nome é atualizado ou removido, preservando UUID, data, capa, scan e campos compatíveis
 
 ### Requirement: Destacar capas em cards verticais
-A biblioteca SHALL usar grade responsiva de cards com capa vertical dominante na proporção 2:3, seguindo a referência visual. SHALL preservar título, nome em inglês, capítulo, data, tempo completo em três faixas e ações scan/Editar/Excluir. A grade SHALL ter múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
+A biblioteca SHALL usar grade responsiva de cards com capa vertical dominante na proporção 2:3, seguindo a referência visual. SHALL mostrar somente título, capa e status de sincronização no card; informações restantes SHALL aparecer no modal compartilhado de cadastro/edição. A grade SHALL ter múltiplas colunas em computador, duas em celular e uma em telas muito estreitas, sem controles cortados ou rolagem horizontal.
 
 #### Scenario: Consultar a coleção em grade
 - **WHEN** o leitor abre a biblioteca em computador ou celular
-- **THEN** encontra cards verticais com imagens em destaque, seguidos dos dados e ações existentes
+- **THEN** encontra cards verticais com imagens em destaque, título e status, com ações disponíveis por hover, foco ou toque
 - **AND** cada capa mantém espaço reservado e proporção consistente ao carregar, falhar ou estar ausente
 
 #### Scenario: Preservar os fluxos na nova composição
@@ -125,5 +141,25 @@ A biblioteca SHALL usar grade responsiva de cards com capa vertical dominante na
 
 #### Scenario: Exibir ações nos dois temas
 - **WHEN** o leitor consulta uma obra com ou sem capa/scan nos temas claro e escuro
-- **THEN** consegue identificar o tempo completo de leitura, o estado local/remoto e as ações Editar e Excluir
-- **AND** as faixas de tempo mantêm texto legível sem depender apenas de cor nem indicar atraso
+- **THEN** identifica o estado local/remoto pelo ícone acessível no canto superior direito e revela as ações Editar e Excluir sobre a capa
+- **AND** o modal apresenta os dados completos com texto legível, sem depender apenas de cor nem indicar atraso
+
+
+### Requirement: Listar a biblioteca com estado vazio
+O sistema SHALL listar as obras com capa, título e indicador de sincronização. Último capítulo, data da leitura em formato brasileiro, nomes alternativos e tempo decorrido em português SHALL aparecer no formulário de edição. Uma biblioteca sem obras SHALL apresentar indicação de vazio e ação de cadastro.
+
+#### Scenario: Biblioteca carregada
+- **WHEN** uma biblioteca com obras termina de carregar
+- **THEN** cada card apresenta somente capa, título e estado local/remoto, com detalhes acessíveis pela edição
+
+#### Scenario: Biblioteca vazia
+- **WHEN** uma biblioteca válida sem obras termina de carregar
+- **THEN** o sistema informa que ainda não há mangás cadastrados e oferece cadastrar o primeiro
+
+### Requirement: Editar pelo rodapé da obra
+A ação Editar SHALL ser oferecida como botão de ícone na sobreposição da capa, junto a Excluir e à scan quando presente. O controle SHALL funcionar sem scan e ser revelado por hover, foco ou toque, respeitando edição local e estado da sessão. O nome acessível SHALL identificar a obra.
+
+#### Scenario: Acessar edição no rodapé
+- **WHEN** o leitor revela as ações da obra em computador ou celular
+- **THEN** encontra o ícone Editar sobre a capa e pode abrir o mesmo formulário modal do cadastro por teclado ou toque
+- **AND** os controles não são cortados nem causam rolagem horizontal por títulos longos
