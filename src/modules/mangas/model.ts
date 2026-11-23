@@ -2,6 +2,7 @@ import type { Json } from '../../shared/storage/library'
 import { localDay, validDay } from './dates'
 
 export type Manga = { [key: string]: Json } & { id: string; title: string; englishTitle?: string; lastChapter: string; lastReadOn: string; updatedAt: string; scanUrl?: string; scanName?: string; coverUrl?: string }
+export type DeletedManga = { [key: string]: Json; id: string; title: string; updatedAt: string }
 export interface MangaSection { [key: string]: Json; items: Manga[] }
 export type Fields = Pick<Manga, 'title' | 'englishTitle' | 'lastChapter' | 'lastReadOn' | 'scanUrl' | 'scanName' | 'coverUrl'>
 export type Errors = Partial<Record<keyof Fields, string>>
@@ -38,6 +39,7 @@ export function readSection(value: Json | undefined): MangaSection {
     if (item.scanName !== undefined && typeof item.scanName !== 'string') throw new Error('Há um nome de scan inválido. Nada foi substituído.')
     if (item.coverUrl !== undefined && (typeof item.coverUrl !== 'string' || (item.coverUrl !== '' && !validCoverUrl(item.coverUrl)))) throw new Error('Há uma capa com endereço inválido. Nada foi substituído.')
   }
+  if (value.deletedItems !== undefined && (!Array.isArray(value.deletedItems) || value.deletedItems.some(item => !object(item) || typeof item.id !== 'string' || !uuid.test(item.id) || typeof item.title !== 'string' || !item.title.trim() || typeof item.updatedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(item.updatedAt) || !Number.isFinite(Date.parse(item.updatedAt))))) throw new Error('Há um marcador de exclusão inválido. Nada foi substituído.')
   return structuredClone(value) as MangaSection
 }
 export function updateReading(section: MangaSection, record: Manga, today = localDay()): MangaSection {
@@ -56,7 +58,10 @@ export function updateReading(section: MangaSection, record: Manga, today = loca
   return readSection(result)
 }
 
-export function removeReading(section: MangaSection, id: string): MangaSection {
+export function removeReading(section: MangaSection, id: string, now = new Date().toISOString()): MangaSection {
   const valid = readSection(section)
-  return { ...valid, items: valid.items.filter(item => item.id !== id) }
+  const item = valid.items.find(item => item.id === id)
+  if (!item) return valid
+  const updatedAt = new Date(Math.max(Date.parse(now), Date.parse(item.updatedAt) + 1)).toISOString()
+  return { ...valid, items: valid.items.filter(item => item.id !== id), deletedItems: [...(valid.deletedItems as DeletedManga[] | undefined ?? []), { id, title: item.title, updatedAt }] }
 }

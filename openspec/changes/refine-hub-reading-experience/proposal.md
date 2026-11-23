@@ -6,7 +6,7 @@ Após uma semana de uso, a biblioteca precisa permitir excluir obras, priorizar 
 
 ## Version
 
-`0.5.4`
+`0.5.6`
 
 Versão MINOR aprovada pelo titular para uma única entrega que reúne os quatro ajustes. A versão publicada de referência é `0.4.6`; pacote, lockfile e seleção de release serão atualizados durante a implementação.
 
@@ -59,3 +59,13 @@ O mesmo patch restaura a legenda das três faixas de tempo de leitura, removida 
 ## Patch 0.5.4
 
 Correção solicitada na revisão: os botões de ações sobre a capa usam superfícies, bordas, ícones, hover e exclusão derivados do tema da aplicação, nos modos claro e escuro.
+
+## Patch 0.5.5
+
+Revisão do titular: apresentar confirmações de conexão/sincronização em verde, removidas após três segundos; manter visíveis somente pendências, erros e outros estados que exigem atenção. Progresso usa apresentação neutra, e o botão Sincronizar permanece disponível após o desaparecimento do sucesso.
+
+## Patch 0.5.6
+
+Correção de perda de obras ao sincronizar: mesclar a seção por UUID ou título normalizado, conservar títulos exclusivos e escolher o registro com updatedAt mais recente nas repetições (empate favorece Drive). Exclusões passam a carregar marcadores datados para impedir reaparecimento de cópias antigas. Reconexão/releitura também mesclam cache e pendências antes de adotar o remoto; nenhuma gravação é feita por conectar. A política global permanece apenas para outras seções.
+
+O PR #6 já foi integrado na 0.5.4. Esta correção será entregue em novo PR dev → main junto das notificações 0.5.5 que permaneceram em dev, sem merge pelo agente.

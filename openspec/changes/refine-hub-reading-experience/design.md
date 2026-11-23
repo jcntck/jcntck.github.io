@@ -59,9 +59,9 @@ A UI terá Excluir junto às ações da obra e diálogo acessível com título, 
 
 Manter busca e direção da ordem depois de excluir. Limitar a página ao intervalo válido; focar a próxima obra disponível na página ou o título da biblioteca. Feedback deve identificar remoção local e pendência mesmo se o Drive estiver desconectado; após envio, só anunciar remoção confirmada quando a releitura comprovar ausência.
 
-Uma exclusão substitui `modules.mangas` com a lista consolidada, inclusive quando fica vazia. Não chamar DELETE na API Drive. Reutilizar `stageSection`, cache e `DriveStorage.save`; preservar IDs de operações incertas e datas em retries. Ao receber remoto mais recente/empatado, adotar esse conteúdo conforme a política atual e mostrar a decisão, inclusive se uma obra removida localmente reaparecer.
+Uma exclusão substitui `modules.mangas` com a lista consolidada, inclusive quando fica vazia. Não chamar DELETE na API Drive. Reutilizar `stageSection`, cache e `DriveStorage.save`; preservar IDs de operações incertas e datas em retries. Na 0.5.6, mesclar por obra conforme a seção 14 e preservar marcadores de exclusão datados, evitando o reaparecimento por cópias antigas.
 
-**Alternativas consideradas:** tombstones por obra ou coleção de exclusões. Exigiriam formato e política de mescla novos. A substituição manual da seção é compatível com `schemaVersion: 1` e com a política homologada; não promete exclusão permanente contra edições posteriores de outro dispositivo.
+**Evolução na 0.5.6:** adotar marcadores de exclusão por obra dentro da seção, ainda no schema 1. Uma edição posterior pode restaurar a obra conforme a política individual da seção 14.
 
 ### 5. Ordem exclusivamente por última leitura
 
@@ -100,7 +100,7 @@ Reutilizar o workflow Dev, sem publicação, e o Prod após o merge. Com checks 
 
 - **O Google ou o navegador ainda exigir interação** → Usar o hint sem prometer autorização silenciosa, oferecer recuperação explícita e validar o fluxo real com o titular.
 - **Perda de ativação para o popup** → Preparar GIS antes do clique e manter o início da autorização síncrono à ação do usuário; falhas pedem novo clique.
-- **Outra aba/dispositivo apresentar atualização remota posterior à exclusão** → Manter a política por data e indicar a adoção remota. Não prometer mescla por registro; orientar sincronizar antes de trocar de dispositivo.
+- **Outra aba/dispositivo apresentar atualização remota posterior à exclusão** → Mesclar por obra e data individual, preservando a exclusão datada mais recente. Orientar uso de um dispositivo por vez devido à ausência de transação distribuída.
 - **Cache bloqueado, cheio ou apagado** → Reutilizar fallback em memória com aviso; não confirmar persistência local quando ela falhar. Dados do navegador não substituem sincronização.
 - **UI divergente após operação concorrente ou troca de conta** → Capturar identidade/geração, reler estado no ato de confirmar e compartilhar progresso, bloqueios e fila.
 - **Regressão visual ou de foco** → Validar os dois temas, textos longos, imagens ausentes e falhas, computador/celular, teclado e movimento reduzido com a base Playwright existente.
@@ -139,3 +139,19 @@ A legenda visível das faixas (menos de 6 meses, 6 a 11 meses, 1 ano ou mais) ac
 ## Revisão 0.5.4
 
 Substituir as cores fixas dos botões da sobreposição pelos tokens semânticos card/card-foreground, border, muted e destructive/destructive-foreground. O foco usa o ring compartilhado. Preservar animação, área clicável, tags, hover/foco/toque e fluxos existentes.
+
+## Revisão de notificações 0.5.5
+
+Compartilhar a classificação dos estados Drive entre Mangás e Conexão: sucesso em ready sem pendências/problemas, progresso neutro em authorizing/loading/saving, atenção persistente para pendências/cache/expiração/adoção remota que supera alterações, erro persistente para falhas/conflitos. Desconexão com cache válido e sem pendências não demanda banner.
+
+Um componente de notificação acessível remove sucessos após 3000ms. O timer é vinculado à ocorrência (snapshot ou identificador do feedback), não a renderizações de tema/busca; nova ocorrência, mesmo com o mesmo texto, reaparece. Substituição por outro estado e desmontagem cancelam o timer. Avisos e erros não têm dispensa automática. Manter o botão Sincronizar separado da notificação e a fila/cache fora do estado visual. Feedbacks de remoção/salvamento usam a mesma política quando confirmados no Drive.
+
+## 14. Mesclagem por obra — patch 0.5.6
+
+Esta decisão substitui a seleção integral de modules.mangas por data de documento descrita anteriormente. Mesmo com documento remoto mais novo, obras exclusivas do cache/fila são preservadas. Cada grupo corresponde a UUID igual ou título igual após NFKC, remoção de espaços nas extremidades, redução de espaços consecutivos e minúsculas. Não há aproximação por similaridade ou tradução. O maior updatedAt da obra vence; em empate o remoto vence, e exclusão empata vencendo registro ativo. O registro vencedor é mantido completo, respeitando a remoção intencional de campos opcionais. Outros módulos e metadados remotos são preservados.
+
+A seção recebe deletedItems opcionais com id, title e updatedAt. Ausência em uma lista antiga não significa exclusão; somente marcador explícito remove uma obra mais antiga. Nova edição posterior ao marcador pode restaurá-la. Marcadores não são eliminados automaticamente. A data de exclusão é posterior à versão conhecida da obra, e a data do documento nunca retrocede após uma gravação mesclada. Arquivos sem marcadores continuam válidos no schema 1. Dados incompatíveis bloqueiam a operação antes de substituir cache ou gravar.
+
+DriveStorage relê, mescla a operação com a seção remota, compara conteúdo e só escreve se houver diferença; releitura confirma o resultado completo. Recuperação de resposta perdida compara a mescla com o conteúdo remoto. CloudSession mescla também ao conectar/reler, reconstruindo pendência manual se o resultado ainda não estiver no Drive e preservando o ID da tentativa quando o valor não muda. A confirmação de envio não deve reaplicar uma base obsoleta. Edições em fila são rebaseadas sobre a confirmação, mantendo alterações independentes. A mesclagem resolve divergências já visíveis na leitura; a API estática atual ainda não oferece transação entre dispositivos simultâneos.
+
+O PR #6 foi integrado pelo titular na 0.5.4 antes do envio da 0.5.5. A entrega 0.5.6 exige novo PR dev → main e inclui as notificações da 0.5.5 ainda presentes somente em dev. Nenhuma integração é feita pelo agente.
