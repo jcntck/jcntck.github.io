@@ -39,7 +39,7 @@ Confirmar a exclusão SHALL remover somente a obra escolhida da biblioteca váli
 - **AND** se somente a gravação de cache falhar após uma remoção válida, a UI preserva a pendência em memória e orienta sincronizar antes de recarregar
 
 ### Requirement: Confirmar a remoção no Drive sem excluir o documento
-Sincronizar uma exclusão SHALL usar a política existente de comparação de atualização local/remota e confirmar o resultado por releitura. MUST alterar somente a seção de mangás, sem excluir o documento Drive. Falhas SHALL preservar tentativas não superadas, incluindo sua identidade e data, e permitir repetição segura. A UI MUST distinguir remoção local de confirmação remota.
+Sincronizar uma exclusão SHALL mesclar as obras e os marcadores de exclusão pela data individual e confirmar o resultado por releitura. MUST alterar somente a seção de mangás, sem excluir o documento Drive. Falhas SHALL preservar tentativas não superadas, incluindo sua identidade e data, e permitir repetição segura. A UI MUST distinguir remoção local de confirmação remota.
 
 #### Scenario: Enviar a exclusão mais recente
 - **WHEN** o leitor solicita Sincronizar e a remoção local é mais recente que a cópia remota
@@ -52,14 +52,14 @@ Sincronizar uma exclusão SHALL usar a política existente de comparação de at
 - **AND** nova tentativa reconhece uma remoção já confirmada sem duplicar a operação
 
 #### Scenario: Encontrar uma cópia remota mais recente ou empatada
-- **WHEN** a releitura encontra atualização remota mais recente ou empatada com a exclusão local
-- **THEN** a cópia remota prevalece sem escrita e a pendência superada é removida conforme a política existente
+- **WHEN** a releitura encontra uma edição da mesma obra estritamente posterior à exclusão local
+- **THEN** a edição posterior da obra prevalece, sem descartar títulos exclusivos da biblioteca mesclada
 - **AND** a interface informa a adoção remota, sem afirmar que a exclusão local foi confirmada se a obra reaparecer
 
 
 
 ### Requirement: Revelar ações sobre a capa
-O card SHALL mostrar somente capa, título e indicador acessível de sincronização no canto superior direito, amarelo para pendência e check verde para confirmação. Hover, foco de teclado e toque na capa SHALL revelar uma sobreposição com escurecimento e botões de ícone Editar, Excluir e scan quando houver URL. As ações MUST permanecer operáveis por teclado, acompanhar as cores e estados do tema claro/escuro e respeitar movimento reduzido.
+O card SHALL mostrar somente capa, título, tag de última leitura e indicador acessível de sincronização no canto superior direito, amarelo para pendência e check verde para confirmação. Hover, foco de teclado e toque na capa SHALL revelar uma sobreposição com escurecimento e botões de ícone Editar, Excluir e scan quando houver URL. As ações MUST permanecer operáveis por teclado, acompanhar as cores e estados do tema claro/escuro e respeitar movimento reduzido.
 
 #### Scenario: Acionar no celular
 - **WHEN** o leitor toca a capa
@@ -170,3 +170,36 @@ A ação Editar SHALL ser oferecida como botão de ícone na sobreposição da c
 - **WHEN** o leitor revela as ações da obra em computador ou celular
 - **THEN** encontra o ícone Editar sobre a capa e pode abrir o mesmo formulário modal do cadastro por teclado ou toque
 - **AND** os controles não são cortados nem causam rolagem horizontal por títulos longos
+
+
+### Requirement: Escolher a cópia com atualização mais recente
+A sincronização SHALL mesclar obras exclusivas de cache/fila e Drive e comparar updatedAt individual para obras repetidas por UUID ou título normalizado. O registro local SHALL prevalecer somente quando estritamente mais recente; o remoto SHALL prevalecer se mais recente ou empatado. A data global MUST NOT descartar obras exclusivas. Exclusões SHALL usar marcadores datados e vencer registros mais antigos ou empatados. Consultar/restaurar MUST NOT alterar a data. Envio MUST preservar seções extras e recuperar gravações já confirmadas sem duplicar operações.
+
+#### Scenario: Atualização local mais recente
+- **WHEN** uma obra local tem edição posterior à mesma obra remota e o leitor solicita Sincronizar
+- **THEN** a versão local da obra integra a união das bibliotecas preservando títulos exclusivos e demais seções, confirmada por releitura
+- **AND** apenas conectar ou consultar não envia essa pendência
+
+#### Scenario: Atualização remota mais recente ou empatada
+- **WHEN** a mesma obra do Drive é mais recente ou tem a mesma data da edição local
+- **THEN** a leitura/sincronização adota a versão remota dessa obra no cache sem descartar obras exclusivas; somente a união ainda ausente do Drive fica pendente de envio
+- **AND** refresh posterior mantém a cópia escolhida sem precisar reler o Drive
+
+### Requirement: Sincronizar pelo estado compartilhado
+O módulo MUST consumir o login e a sincronização compartilhados. O cadastro e a edição MUST aguardar uma leitura remota ou cache válido e preservar as demais seções e campos compatíveis. A biblioteca e a fila compartilhada SHALL ser persistidas no localStorage por identidade Google, restauradas somente após validar o login correspondente e preservadas em refresh/desconexão. Falha de cache MUST ser informada sem perder o estado em memória.
+
+#### Scenario: Login restaurado e Drive desconectado
+- **WHEN** o leitor abre o módulo após refresh com login válido
+- **THEN** consulta a biblioteca em cache e usa Sincronizar para reconectar quando necessário, sem painel ou aviso redundante de desconexão nem popup automático
+- **AND** uma biblioteca ainda desconhecida não é apresentada como vazia
+
+#### Scenario: Falha ou conflito de envio
+- **WHEN** a sincronização de uma leitura falha ou detecta divergência
+- **THEN** o formulário e as alterações pendentes são preservados sem indicação de salvamento remoto
+- **AND** o leitor pode reconectar para tentar novamente ou reler aplicando a mescla por obra e data individual
+
+#### Scenario: Envio manual solicitado ao fim das edições
+- **WHEN** o leitor prepara uma leitura após carregar a biblioteca
+- **THEN** cadastrar, corrigir, buscar e ordenar não enviam requisições ao Drive
+- **AND** somente a ação explícita Sincronizar envia a seção consolidada, mesmo se o automático estiver ligado em Conexão
+- **AND** a operação modifica somente `modules.mangas`, preservando diagnóstico, outros módulos e propriedades extras

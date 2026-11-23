@@ -32,7 +32,7 @@ Confirmações de conexão, leitura e sincronização sem pendências ou problem
 - **THEN** o estado de atenção fica visível e o timer anterior não o remove
 
 ### Requirement: Mesclar biblioteca por obra
-O sistema SHALL mesclar modules.mangas por UUID ou título normalizado, preservando obras exclusivas de ambos os lados mesmo quando a data global do remoto é maior. Para repetições SHALL usar o registro completo com updatedAt mais recente; empate SHALL favorecer Drive. Conexão, releitura e envio SHALL aplicar a mesma regra antes de substituir conteúdo local. Dados incompatíveis SHALL bloquear a mesclagem sem descartar pendências. Outros módulos SHALL ser preservados.
+O sistema SHALL mesclar mangás por UUID ou título normalizado, preservando obras exclusivas apesar da data global. Repetições SHALL usar o registro completo de maior updatedAt, com empate a favor do Drive. A regra SHALL valer ao conectar, reler e enviar antes de substituir conteúdo local. Dados incompatíveis SHALL bloquear a mescla sem descartar pendências. Outros módulos SHALL ser preservados.
 
 #### Scenario: Bibliotecas divergentes e documento remoto mais recente
 - **WHEN** cache contém A e B e Drive contém uma versão mais recente de A e uma obra C, com documento remoto mais recente
@@ -85,3 +85,15 @@ O sistema SHALL compartilhar identidade, conexão Drive e sincronização entre 
 - **WHEN** o usuário solicita Sincronizar sem pendências, inclusive após obter nova autorização
 - **THEN** a aplicação apresenta o resultado da leitura remota sem criar documento vazio ou nova operação
 - **AND** não anuncia gravação de uma alteração que não foi enviada
+
+### Requirement: Detectar divergência conhecida antes de salvar
+O sistema SHALL consultar a versão remota antes de salvar. Mangás SHALL usar a mescla por obra; as demais seções SHALL usar a data técnica de edição para operações com updatedAt. Nas demais seções, a atualização local SHALL prevalecer somente quando estritamente posterior à remota; versão remota mais recente ou empatada SHALL ser adotada sem escrita. Arquivos legados sem data no envelope SHALL usar modifiedTime. Operações antigas sem data MUST manter a detecção conservadora de conflito.
+
+#### Scenario: Sessão desatualizada
+- **WHEN** uma seção diferente de mangás tem cópia remota mais recente ou empatada com a edição local
+- **THEN** o sistema atualiza o cache e remove as pendências superadas, sem PATCH/POST
+
+#### Scenario: Local mais recente
+- **WHEN** uma seção diferente de mangás tem edição local mais recente e o usuário solicita sincronização
+- **THEN** a seção local é aplicada sobre a versão remota preservando outras seções e extras e confirmada por releitura
+- **AND** consultar, restaurar ou repetir envio não muda a data de edição

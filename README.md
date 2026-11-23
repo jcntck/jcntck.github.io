@@ -1,8 +1,8 @@
 # My Hub
 
-Aplicação pessoal com módulos internos. A versão `0.4.6` acrescenta a biblioteca de mangás: título, último capítulo, data da leitura, capa opcional e tempo decorrido, com login Google e sincronização Drive compartilhados.
+Aplicação pessoal com módulos internos. A versão `0.5.6` atualiza o visual e a biblioteca de mangás com exclusão, ordenação por última leitura, modal de edição e sincronização Drive que mescla obras por título/UUID e data individual. Login Google e cache por conta mantêm consulta e edição local.
 
-Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.4.6](docs/releases/0.4.6.md).
+Para ativar o login, siga [a configuração Firebase](docs/firebase-setup.md). Para a conexão Drive, siga [a configuração Google Drive](docs/google-drive-setup.md). Consulte também [o contrato compartilhado](docs/storage-contract.md) e [as evidências da entrega 0.5.6](docs/releases/0.5.6.md).
 
 ## Desenvolvimento local
 

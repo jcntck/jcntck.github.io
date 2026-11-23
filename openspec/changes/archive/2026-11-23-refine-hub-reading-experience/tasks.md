@@ -49,12 +49,12 @@
 
 - [x] 7.1 Finalizar o registro de entrega `docs/releases/0.5.0.md` com resultados locais e roteiro executável: Node da `.nvmrc`, `npm ci`, `npm run dev -- --host localhost` e rotas de Mangás/Conexão; conferir que a avaliação inclui cancelamento/exclusão, refresh, duas ordens e autorização real sem registrar credenciais.
 - [x] 7.2 Assim que os checks locais passarem, enviar os commits em `dev` e abrir imediatamente o PR `dev` → `main`; verificar URL/origem do PR, execução do CI obrigatório e disponibilização das instruções de teste ao titular, sem merge ou auto-merge pelo agente.
-- [ ] 7.3 Tratar cada fix solicitado após a liberação como incremento patch no mesmo PR, alinhando pacote, lockfile, versão alvo e evidências antes de enviar; verificar os checks pertinentes e de versão a cada patch, sem criar tag antecipada.
+- [x] 7.3 Tratar cada fix solicitado após a liberação como incremento patch no mesmo PR, alinhando pacote, lockfile, versão alvo e evidências antes de enviar; verificar os checks pertinentes e de versão a cada patch, sem criar tag antecipada.
 
 ## 8. Publicação e homologação
 
-- [ ] 8.1 Acompanhar o merge realizado exclusivamente pelo titular e o workflow Prod; verificar validação do commit final, criação da tag `v<versão final>`, deploy e resultado da verificação real, sem commits de incremento em `main` ou movimento de tags.
-- [ ] 8.2 Conferir coerência de versão alvo, pacote, lockfile, identificação em `version.json`, tag e SHA do merge; registrar versão, URL, commit e execução da entrega correspondente sem dados privados.
+- [x] 8.1 Acompanhar o merge realizado exclusivamente pelo titular e o workflow Prod; verificar validação do commit final, criação da tag `v<versão final>`, deploy e resultado da verificação real, sem commits de incremento em `main` ou movimento de tags.
+- [x] 8.2 Conferir coerência de versão alvo, pacote, lockfile, identificação em `version.json`, tag e SHA do merge; registrar versão, URL, commit e execução da entrega correspondente sem dados privados.
 - [ ] 8.3 Obter e registrar a homologação explícita do titular dos fluxos privados e do visual em produção; verificar que testes simulados estão distinguidos das declarações de uso real e que eventuais problemas retornam ao ciclo de correção autorizado.
 
 ## Workflow follow-up
@@ -94,3 +94,7 @@
 - [x] 14.1 Mesclar obras por UUID/título e data individual, com marcadores de exclusão, validação e preservação de campos; testar união, empates, renomeação, exclusão e legados.
 - [x] 14.2 Aplicar a mescla em Drive e sessão/cache/fila sem envio implícito; testar remoto mais recente, refresh, releitura, resposta perdida e edição durante envio.
 - [x] 14.3 Alinhar versão e documentação, executar checks locais e navegador e entregar em novo PR dev → main, pois o PR #6 foi integrado na 0.5.4; incluir a 0.5.5 que permaneceu em dev, sem merge pelo agente.
+
+## Encerramento — 2026-11-23
+
+O titular aprovou o PR #7 e solicitou explicitamente o arquivamento: “PR aprovada, pode arquivar tarega”. O merge e a publicação 0.5.6 foram conferidos, com specs principais sincronizadas. Tarefas concluídas: 47/48. A tarefa 8.3 permanece pendente no histórico porque não houve declaração específica de testes privados no site publicado; aprovação do PR e autorização de arquivamento estão registradas sem atribuir ao agente testes na conta real do titular. Arquivamento autorizado apesar dessa pendência, sem manter change ativa ou inventar evidências de homologação privada.
