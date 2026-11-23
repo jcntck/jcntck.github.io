@@ -3,11 +3,13 @@ import { CloudSession, type AccountStorage } from './session'
 import { BrowserLibraryCache, type CachePort } from '../../shared/storage/cache'
 import { applyOperation, emptyEnvelope, type Snapshot } from '../../shared/storage/library'
 
+const book = (lastChapter: string, updatedAt = lastChapter === 'original' ? '2026-11-08T12:00:00.000Z' : lastChapter === 'older' ? '2026-11-07T12:00:00.000Z' : '2026-11-09T12:00:00.000Z') => ({ id: 'a30bb95b-a749-4366-8e68-ec1e3f7bc5f3', title: 'Obra', lastChapter, lastReadOn: '2026-11-01', updatedAt })
+
 const grant = { access_token: 'never-persist-this-token', expires_in: 60, scope: 'drive.file' }
 afterEach(() => vi.useRealTimers())
 function fixture(cacheOverride?: CachePort) {
   let owner: string | undefined = 'A'
-  let remote: Snapshot | null = { fileId: 'a', document: { ...emptyEnvelope(), updatedAt: '2026-11-08T12:00:00.000Z', modules: { mangas: { items: ['original'] } } } }
+  let remote: Snapshot | null = { fileId: 'a', document: { ...emptyEnvelope(), updatedAt: '2026-11-08T12:00:00.000Z', modules: { mangas: { items: [book('original')] } } } }
   const entries = new Map<string, string>()
   const cache = cacheOverride ?? new BrowserLibraryCache(() => ({ getItem: (key: string) => entries.get(key) ?? null, setItem: (key: string, value: string) => entries.set(key, value) }))
   const load = vi.fn(async () => structuredClone(remote))
@@ -20,12 +22,12 @@ it('restaura consulta e pendência após refresh sem Drive, preserva IDs e polí
   vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-09T12:00:00Z'))
   const f = fixture(); const first = f.create()
   await first.connect(async () => grant)
-  first.stageSection('modules', 'mangas', { items: ['local'] }, { manual: true })
+  first.stageSection('modules', 'mangas', { items: [book('local')] }, { manual: true })
   const id = first.getSnapshot().pending?.id
   first.clearLocalSession()
   const restored = f.create(); restored.restoreCache()
   expect(restored.getSnapshot()).toMatchObject({ phase: 'disconnected', canEdit: true, canWrite: false, cached: true, pending: { id } })
-  expect(restored.pendingSection('modules', 'mangas')).toEqual({ items: ['local'] })
+  expect(restored.pendingSection('modules', 'mangas')).toEqual({ items: [book('local')] })
   expect(f.load).toHaveBeenCalledTimes(1); expect(f.save).not.toHaveBeenCalled()
   expect([...f.entries.values()].join('')).not.toContain(grant.access_token)
   await restored.connect(async () => grant)
@@ -35,18 +37,18 @@ it('restaura consulta e pendência após refresh sem Drive, preserva IDs e polí
   expect(f.save.mock.calls[0][1].id).toBe(id)
   restored.clearLocalSession()
   const again = f.create(); again.restoreCache()
-  expect(again.getSnapshot().snapshot?.document.modules.mangas).toEqual({ items: ['local'] })
+  expect(again.getSnapshot().snapshot?.document.modules.mangas).toEqual({ items: [book('local')] })
   expect(again.getSnapshot().pending).toBeUndefined(); again.clearLocalSession()
 })
-it.each(['2026-11-09T12:00:00.000Z', '2026-11-09T13:00:00.000Z'])('prefere remoto mais recente ou empatado %s sem gravar', async updatedAt => {
+it.each(['2026-11-09T12:00:00.000Z', '2026-11-09T13:00:00.000Z'])('resolve repetição pela data individual remota %s sem gravar', async updatedAt => {
   vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-09T12:00:00Z'))
   const f = fixture(); const session = f.create(); await session.connect(async () => grant)
-  session.stageSection('modules', 'mangas', { items: ['local'] }, { manual: true })
+  session.stageSection('modules', 'mangas', { items: [book('local')] }, { manual: true })
   session.disconnect()
-  f.remote({ fileId: 'a', document: { ...emptyEnvelope(), updatedAt, modules: { mangas: { items: ['remote'] }, extra: 'keep' } } })
+  f.remote({ fileId: 'a', document: { ...emptyEnvelope(), updatedAt, modules: { mangas: { items: [book('remote', updatedAt)] }, extra: 'keep' } } })
   await session.connect(async () => grant)
   expect(session.getSnapshot().pending).toBeUndefined()
-  expect(session.getSnapshot().snapshot?.document.modules.mangas).toEqual({ items: ['remote'] })
+  expect(session.getSnapshot().snapshot?.document.modules.mangas).toEqual({ items: [book('remote', updatedAt)] })
   expect(f.save).not.toHaveBeenCalled(); session.clearLocalSession()
   const next = f.create(); next.restoreCache()
   expect(next.getSnapshot().snapshot?.document.modules.extra).toBe('keep'); next.clearLocalSession()
@@ -67,29 +69,29 @@ it('cache bloqueado ou sem espaço mantém biblioteca e avisa que pendências s�
   const session = f.create(); session.restoreCache()
   expect(session.getSnapshot().cacheError).toMatch(/ler o cache/)
   await session.connect(async () => grant)
-  session.stageSection('modules', 'mangas', { items: ['local'] }, { manual: true })
+  session.stageSection('modules', 'mangas', { items: [book('local')] }, { manual: true })
   expect(session.getSnapshot()).toMatchObject({ cached: false, canEdit: true, syncPhase: 'pending' })
   expect(session.getSnapshot().cacheError).toMatch(/somente nesta aba/)
-  expect(session.pendingSection('modules', 'mangas')).toEqual({ items: ['local'] })
+  expect(session.pendingSection('modules', 'mangas')).toEqual({ items: [book('local')] })
   session.clearLocalSession()
 })
 
 it('mantém cache confirmado mais recente mesmo sem edições pendentes e só envia por ação', async () => {
   const f = fixture(); const session = f.create(); await session.connect(async () => grant)
   session.disconnect()
-  f.remote({ fileId: 'a', document: { ...emptyEnvelope(), updatedAt: '2026-11-07T12:00:00.000Z', modules: { mangas: { items: ['older'] }, another: 'keep remote' } } })
+  f.remote({ fileId: 'a', document: { ...emptyEnvelope(), updatedAt: '2026-11-07T12:00:00.000Z', modules: { mangas: { items: [book('older')] }, another: 'keep remote' } } })
   await session.connect(async () => grant)
-  expect(session.pendingSection('modules', 'mangas')).toEqual({ items: ['original'] })
+  expect(session.pendingSection('modules', 'mangas')).toEqual({ items: [book('original')] })
   expect(session.getSnapshot().pending?.updatedAt).toBe('2026-11-08T12:00:00.000Z')
   expect(f.save).not.toHaveBeenCalled()
   await session.sync()
-  expect(session.getSnapshot().snapshot?.document.modules).toEqual({ mangas: { items: ['original'] }, another: 'keep remote' })
+  expect(session.getSnapshot().snapshot?.document.modules).toEqual({ mangas: { items: [book('original')] }, another: 'keep remote' })
   session.clearLocalSession()
 })
 
 it('recupera gravação com resposta perdida depois de refresh sem duplicar o envio', async () => {
   const f = fixture(); const session = f.create(); await session.connect(async () => grant)
-  session.stageSection('modules', 'mangas', { items: ['saved despite network error'] }, { manual: true })
+  session.stageSection('modules', 'mangas', { items: [book('saved despite network error')] }, { manual: true })
   const operation = session.getSnapshot().pending!
   const confirmed = { fileId: 'a', document: applyOperation(session.getSnapshot().snapshot!.document, operation) }
   f.remote(confirmed)

@@ -88,3 +88,9 @@
 
 - [x] 13.1 Compartilhar notificações verdes de três segundos e atenção persistente, mantendo progresso neutro e Sincronizar disponível; verificar timers, repetição, substituição e os fluxos em Mangás/Conexão.
 - [x] 13.2 Alinhar versão 0.5.5, validar os checks e enviar ao mesmo PR #6 com evidências.
+
+## 14. Patch de mesclagem 0.5.6
+
+- [x] 14.1 Mesclar obras por UUID/título e data individual, com marcadores de exclusão, validação e preservação de campos; testar união, empates, renomeação, exclusão e legados.
+- [x] 14.2 Aplicar a mescla em Drive e sessão/cache/fila sem envio implícito; testar remoto mais recente, refresh, releitura, resposta perdida e edição durante envio.
+- [ ] 14.3 Alinhar versão e documentação, executar checks locais e navegador e entregar em novo PR dev → main, pois o PR #6 foi integrado na 0.5.4; incluir a 0.5.5 que permaneceu em dev, sem merge pelo agente.

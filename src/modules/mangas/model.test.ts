@@ -81,8 +81,8 @@ it('inclui, edita e remove o nome em inglês sem mudar identidade, data ou campo
 it('remove somente o UUID escolhido e preserva a seção e registros restantes', () => {
   const other = { ...record, id: 'b30bb95b-a749-4366-8e68-ec1e3f7bc5f3', extra: 'preserve' }
   const section = { items: [record, other], extension: 'preserve' }
-  const next = removeReading(section, record.id)
-  expect(next).toEqual({ items: [other], extension: 'preserve' })
+  const next = removeReading(section, record.id, '2026-11-10T12:00:00.000Z')
+  expect(next).toEqual({ items: [other], extension: 'preserve', deletedItems: [{ id: record.id, title: record.title, updatedAt: '2026-11-10T12:00:00.000Z' }] })
   expect(section.items).toHaveLength(2)
   expect(removeReading(next, record.id)).toEqual(next)
   expect(removeReading(next, other.id).items).toEqual([])

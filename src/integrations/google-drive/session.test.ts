@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { CloudSession, type AccountStorage } from './session'
 import { applyOperation, emptyEnvelope, LibraryError, type Snapshot } from '../../shared/storage/library'
+
+const book = (lastChapter: string, updatedAt = lastChapter === 'original' ? '2026-11-08T12:00:00.000Z' : lastChapter === 'older' ? '2026-11-07T12:00:00.000Z' : '2026-11-09T12:00:00.000Z') => ({ id: 'a30bb95b-a749-4366-8e68-ec1e3f7bc5f3', title: 'Obra', lastChapter, lastReadOn: '2026-11-01', updatedAt })
 const grant = { access_token: 'temporary', expires_in: 60, scope: 'drive.file' }
 function fixture() {
   let account = 'A'
@@ -73,16 +75,16 @@ describe('sincronização compartilhada', () => {
     vi.useFakeTimers()
     const f = fixture(); await f.session.connect(async () => grant)
     f.session.setAutomatic(true)
-    f.session.stageSection('modules', 'mangas', { items: ['primeira'] }, { manual: true })
+    f.session.stageSection('modules', 'mangas', { items: [book('primeira')] }, { manual: true })
     await vi.advanceTimersByTimeAsync(1000)
-    f.session.stageSection('modules', 'mangas', { items: ['primeira', 'segunda'] }, { manual: true })
+    f.session.stageSection('modules', 'mangas', { items: [book('segunda')] }, { manual: true })
     f.session.resumeAutomatic()
     await vi.advanceTimersByTimeAsync(2000)
     expect(f.writes).toEqual([])
     await f.session.sync()
     expect(f.writes).toEqual(['A'])
-    expect(f.documents.A?.document.modules.mangas).toEqual({ items: ['primeira', 'segunda'] })
-    f.session.stageSection('modules', 'mangas', { items: ['correção'] }, { manual: true })
+    expect(f.documents.A?.document.modules.mangas).toEqual({ items: [book('segunda')] })
+    f.session.stageSection('modules', 'mangas', { items: [book('correção')] }, { manual: true })
     await vi.advanceTimersByTimeAsync(1000)
     expect(f.writes).toEqual(['A'])
     f.session.disconnect()
@@ -91,7 +93,7 @@ describe('sincronização compartilhada', () => {
     vi.useFakeTimers()
     const f = fixture(); await f.session.connect(async () => grant); f.session.setAutomatic(true)
     f.session.stageProbe()
-    f.session.stageSection('modules', 'mangas', { items: ['obra'] }, { manual: true })
+    f.session.stageSection('modules', 'mangas', { items: [book('obra')] }, { manual: true })
     await vi.advanceTimersByTimeAsync(2000)
     expect(f.writes).toEqual(['A'])
     expect(f.session.getSnapshot().pending?.key).toBe('mangas')

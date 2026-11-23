@@ -1,3 +1,4 @@
+import { mergeMangas } from '../../modules/mangas/sync'
 import { canonical, updatedTime, LibraryError, type LibraryStorage, type Operation, type Snapshot } from '../../shared/storage/library'
 import { DriveStorage, type Account } from './drive'
 import type { Grant } from './identity'
@@ -80,7 +81,20 @@ export class CloudSession {
     this.syncPhase = this.pending ? 'pending' : 'idle'
     this.update('disconnected', 'Drive desconectado. O login do hub permanece independente.')
   }
-  private adoptRemote(remote: Snapshot | null) {
+  private adoptRemote(remote: Snapshot | null, confirmed = false) {
+    const isManga = (op: Operation) => op.target === 'modules' && op.key === 'mangas'
+    const staged = [this.pending, ...this.queue].filter((op): op is StagedOperation => !!op)
+    const mangaEdits = staged.filter(isManga)
+    const localValue = mangaEdits.at(-1)?.value ?? (!confirmed ? this.base?.document.modules.mangas : undefined)
+    // Compute before mutating state: an invalid section must leave cache/queue intact.
+    const merged = localValue !== undefined || remote?.document.modules.mangas !== undefined ? mergeMangas(localValue, remote?.document.modules.mangas) : undefined
+    let mangaPending: StagedOperation | undefined
+    if (merged && canonical(merged) !== canonical(remote?.document.modules.mangas ?? null)) {
+      const previous = mangaEdits.at(-1)
+      mangaPending = previous && canonical(previous.value) === canonical(merged) ? previous : { id: crypto.randomUUID(), target: 'modules', key: 'mangas', value: merged, updatedAt: new Date(Math.max(updatedTime(this.base), updatedTime(remote), ...staged.map(op => Date.parse(op.updatedAt ?? '') || 0))).toISOString(), manual: true }
+    }
+    const otherOperations = staged.filter(op => !isManga(op))
+    this.pending = otherOperations.shift(); this.queue = otherOperations
     // Recover a confirmed write after a lost response without sending it again.
     if (this.pending && remote?.document.revision === this.pending.id && canonical(remote.document[this.pending.target][this.pending.key]) === canonical(this.pending.value)) this.pending = this.queue.shift()
     const operations = [this.pending, ...this.queue].filter((op): op is StagedOperation => !!op)
@@ -88,16 +102,9 @@ export class CloudSession {
     const remoteTime = updatedTime(remote)
     const newest = Math.max(baseTime, ...operations.map(op => Date.parse(op.updatedAt ?? '') || 0))
     if (remoteTime && newest <= remoteTime) { this.pending = undefined; this.queue = [] }
-    else if (this.base && baseTime > remoteTime) {
-      // A previously confirmed cache can also be newer than an older remote copy.
-      // Prepare differences without uploading; keep the original content timestamp.
-      const restored: StagedOperation[] = []
-      const value = this.base.document.modules.mangas
-      if (value !== undefined && !operations.some(op => op.target === 'modules' && op.key === 'mangas') && canonical(value) !== canonical(remote?.document.modules.mangas ?? null)) {
-        restored.push({ id: crypto.randomUUID(), target: 'modules', key: 'mangas', value, updatedAt: new Date(baseTime).toISOString(), manual: true })
-      }
-      const remaining = [...restored, ...operations]
-      this.pending = remaining.shift(); this.queue = remaining
+    if (mangaPending) {
+      if (!this.pending) this.pending = mangaPending
+      else this.queue.push(mangaPending)
     }
     this.base = remote; this.loaded = true; this.known = true
     this.persist()
@@ -188,8 +195,8 @@ export class CloudSession {
     try {
       const saved = await this.storage.save(this.base, operation)
       if (generation !== this.generation) return
-      this.accessToken(); this.pending = this.queue.shift(); this.adoptRemote(saved); this.busy = false; this.lastSynced = new Date().toISOString(); this.syncPhase = this.pending ? 'pending' : 'synced'; this.persist()
-      this.update('ready', this.pending ? 'Envio confirmado. Há uma nova alteração pendente.' : saved.document.revision === operation.id ? 'Gravação confirmada por releitura do Drive.' : 'A versão mais recente do Drive foi mantida e salva no cache local.')
+      this.accessToken(); this.pending = this.queue.shift(); this.adoptRemote(saved, true); this.busy = false; this.lastSynced = new Date().toISOString(); this.syncPhase = this.pending ? 'pending' : 'synced'; this.persist()
+      this.update('ready', this.pending ? 'Envio confirmado. Há uma nova alteração pendente.' : saved.document.revision === operation.id ? 'Gravação confirmada por releitura do Drive.' : 'Biblioteca conferida e mesclada com o Drive.')
       this.scheduleAutomatic()
     } catch (error) { if (generation === this.generation) { this.busy = false; this.failure(error) } }
   }

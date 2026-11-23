@@ -1,3 +1,4 @@
+import { mergeMangas } from '../../modules/mangas/sync'
 import { applyOperation, canonical, emptyEnvelope, LibraryError, validate, type LibraryStorage, type Operation, type Snapshot, updatedTime } from '../../shared/storage/library'
 
 const API = 'https://www.googleapis.com/drive/v3'
@@ -38,11 +39,17 @@ export class DriveStorage implements LibraryStorage {
   }
   async save(base: Snapshot | null, operation: Operation): Promise<Snapshot> {
     const remote = await this.load()
+    const mangaOperation = operation.target === 'modules' && operation.key === 'mangas'
+    if (mangaOperation) {
+      const value = mergeMangas(operation.value, remote?.document.modules.mangas)
+      if (remote && canonical(value) === canonical(remote.document.modules.mangas ?? null)) return remote
+      operation = { ...operation, value, updatedAt: new Date(Math.max(updatedTime(remote), Date.parse(operation.updatedAt ?? '') || 0, ...value.items.map(item => Date.parse(item.updatedAt)))).toISOString() }
+    }
     // A lost success response can be recovered without issuing another write.
     if (remote?.document.revision === operation.id && canonical(remote.document[operation.target][operation.key]) === canonical(operation.value)) return remote
     // Timestamped local edits use last-write-wins; older clients retain conflict checks.
-    if (remote && operation.updatedAt && updatedTime(remote) >= Date.parse(operation.updatedAt)) return remote
-    if (!operation.updatedAt && (base?.fileId !== remote?.fileId || canonical(base?.document ?? null) !== canonical(remote?.document ?? null))) throw new LibraryError('conflict', 'O documento mudou no Drive. Recarregue para decidir sobre a tentativa local.')
+    if (!mangaOperation && remote && operation.updatedAt && updatedTime(remote) >= Date.parse(operation.updatedAt)) return remote
+    if (!mangaOperation && !operation.updatedAt && (base?.fileId !== remote?.fileId || canonical(base?.document ?? null) !== canonical(remote?.document ?? null))) throw new LibraryError('conflict', 'O documento mudou no Drive. Recarregue para decidir sobre a tentativa local.')
     const document = applyOperation(remote?.document ?? emptyEnvelope(), operation)
     if (remote) {
       await this.call(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(remote.fileId)}?uploadType=media`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(document) })

@@ -31,6 +31,27 @@ Confirmações de conexão, leitura e sincronização sem pendências ou problem
 - **WHEN** uma pendência, falha ou conflito substitui a confirmação
 - **THEN** o estado de atenção fica visível e o timer anterior não o remove
 
+### Requirement: Mesclar biblioteca por obra
+O sistema SHALL mesclar modules.mangas por UUID ou título normalizado, preservando obras exclusivas de ambos os lados mesmo quando a data global do remoto é maior. Para repetições SHALL usar o registro completo com updatedAt mais recente; empate SHALL favorecer Drive. Conexão, releitura e envio SHALL aplicar a mesma regra antes de substituir conteúdo local. Dados incompatíveis SHALL bloquear a mesclagem sem descartar pendências. Outros módulos SHALL ser preservados.
+
+#### Scenario: Bibliotecas divergentes e documento remoto mais recente
+- **WHEN** cache contém A e B e Drive contém uma versão mais recente de A e uma obra C, com documento remoto mais recente
+- **THEN** a biblioteca mesclada contém A atualizada, B e C
+- **AND** conectar mantém a mescla pendente sem gravar; sincronizar grava e confirma a união por releitura
+
+#### Scenario: Título repetido com IDs diferentes
+- **WHEN** duas obras possuem o mesmo título após normalizar maiúsculas e espaços, com UUIDs diferentes
+- **THEN** apenas a versão com updatedAt mais recente é apresentada; em empate prevalece Drive
+
+#### Scenario: Exclusão explícita e cópia antiga
+- **WHEN** uma exclusão datada é mesclada com registro anterior da mesma obra
+- **THEN** a obra permanece excluída e o marcador é preservado no cache e no Drive
+- **AND** ausência em um arquivo sem marcador não apaga obras exclusivas da outra cópia
+
+#### Scenario: Resposta perdida ou fila posterior
+- **WHEN** uma gravação mesclada perde a resposta ou há edição posterior em fila
+- **THEN** a releitura recupera o resultado confirmado e mantém edições posteriores sem descartar obras independentes ou duplicar títulos
+
 ## MODIFIED Requirements
 
 ### Requirement: Coordenar sincronização com estado compartilhado
@@ -49,7 +70,7 @@ O sistema SHALL compartilhar identidade, conexão Drive e sincronização entre 
 #### Scenario: Falha ou divergência
 - **WHEN** a sincronização falha ou detecta revisão remota divergente
 - **THEN** o estado informa erro ou conflito e mantém a tentativa não superada pela política de atualização até nova ação explícita
-- **AND** uma cópia remota mais recente ou empatada é adotada conforme a política existente, sem declarar enviada uma alteração local que foi superada
+- **AND** obras são mescladas pela data individual, preservando títulos exclusivos; uma versão remota mais recente ou empatada da mesma obra é adotada sem declarar enviada uma alteração local superada
 
 #### Scenario: Editar durante envio
 - **WHEN** uma nova alteração é preparada enquanto a anterior está sendo enviada

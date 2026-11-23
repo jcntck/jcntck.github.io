@@ -151,6 +151,6 @@ export function MangasPage() {
         <p role="status">Página {page.current} de {page.total}</p>
       </nav>}
     </section>}
-    <p className="manga-help manga-storage-note">{state.cached ? 'A biblioteca e as edições ficam salvas neste navegador para sua conta. Ao sincronizar, a cópia com a atualização mais recente prevalece; em empate, prevalece o Drive. Sincronize antes de trocar de dispositivo.' : 'Sem cache local disponível, as alterações ficam somente nesta aba. Sincronize antes de recarregar ou sair.'}</p>
+    <p className="manga-help manga-storage-note">{state.cached ? 'A biblioteca e as edições ficam salvas neste navegador para sua conta. Ao sincronizar, títulos diferentes são mesclados. Obras repetidas usam a alteração mais recente de cada obra; em empate, prevalece o Drive. Sincronize antes de trocar de dispositivo.' : 'Sem cache local disponível, as alterações ficam somente nesta aba. Sincronize antes de recarregar ou sair.'}</p>
   </section>
 }
