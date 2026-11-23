@@ -173,7 +173,7 @@ A ação Editar SHALL ser oferecida como botão de ícone na sobreposição da c
 
 
 ### Requirement: Escolher a cópia com atualização mais recente
-A sincronização SHALL mesclar obras exclusivas de cache/fila e Drive e comparar updatedAt individual para obras repetidas por UUID ou título normalizado. O registro local SHALL prevalecer somente quando estritamente mais recente; o remoto SHALL prevalecer se mais recente ou empatado. A data global MUST NOT descartar obras exclusivas. Exclusões SHALL usar marcadores datados e vencer registros mais antigos ou empatados. Consultar/restaurar MUST NOT alterar a data. Envio MUST preservar seções extras e recuperar gravações já confirmadas sem duplicar operações.
+A sincronização SHALL unir obras de cache/fila e Drive por UUID ou título normalizado, usando updatedAt individual: local vence se posterior; remoto vence empate. A data global MUST NOT descartar obras exclusivas. Exclusões datadas SHALL vencer registros anteriores ou empatados. Consultar/restaurar MUST NOT renovar datas. Envio MUST preservar outras seções e recuperar gravações confirmadas sem duplicação.
 
 #### Scenario: Atualização local mais recente
 - **WHEN** uma obra local tem edição posterior à mesma obra remota e o leitor solicita Sincronizar
